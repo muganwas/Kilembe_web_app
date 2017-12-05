@@ -3,3 +3,9 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+.link{
+  font-size: 13px;
+  color: #0d51da;
+  font-weight: bold;
+  cursor: pointer;
+}
