@@ -5,6 +5,7 @@ body {
 }
 .link{
   font-size: 13px;
+  text-decoration: underline;
   color: #0d51da;
   font-weight: bold;
   cursor: pointer;

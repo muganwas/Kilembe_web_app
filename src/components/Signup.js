@@ -6,6 +6,7 @@ class Signup extends Component {
         return (
             <div>
             <h3>Sign Up</h3>
+            <div id="feedBack">{this.props.message}</div><span onClick={this.props.onLogin} className="link">Login</span>
                 <label htmlFor="email_add">Email:</label>
                 <input id="email" type="text" onChange={this.props.userEmail}/>
                 <label htmlFor="pass">Password: </label>

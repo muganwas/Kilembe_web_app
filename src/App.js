@@ -7,7 +7,6 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Reset from './components/Reset';
 import Signup from './components/Signup';
-import Rebase from 're-base';
 
 class App extends Component {
   
@@ -18,27 +17,38 @@ class App extends Component {
     this.authHandler = this.authHandler.bind(this);
     this.logout = this.logout.bind(this);
     this.eAuthenticate = this.eAuthenticate.bind(this);
+    this.eReset = this.eReset.bind(this);
     this.handleEmail = this.handleEmail.bind(this);
     this.handlePass = this.handlePass.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
+    this.handleReset = this.handleReset.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
     this.goToReg = this.goToReg.bind(this);
     this.goToReset = this.goToReset.bind(this);
+    this.goToLogin = this.goToLogin.bind(this);
     this.state = {
       uid: null
     }
   }
-  componentWillUpdate(nextProps, nextState){
-    let uid = this.state.uid;
-    let name = this.state.dname;
-    if(nextState !== null || nextState !== "") {
-      localStorage.setItem(uid, name);
-    }
+
+  componentWillMount(){
+    let uid = localStorage.getItem("uid")==="null"?null:localStorage.getItem("uid");
+    let dname = localStorage.getItem("dname")==="null"?null:localStorage.getItem("dname");
+    let email = localStorage.getItem("email")==="null"?null:localStorage.getItem("email");
+    let exists = localStorage.getItem("exists")==="null" || "undefined"?null:localStorage.getItem("exists");
+    if(uid !==null || uid !== "") {
+      this.setState({
+        uid: uid,
+        dname: dname,
+        email: email,
+        exists: exists
+      });
+    } 
   }
-  handleSubmit(callback){
+  handleLogin(event){
+    event.preventDefault();
     let email = this.state.email;
     let password = this.state.Lpass;
-    let exists = this.state.exists;
     if(email !== null && password !== null){ 
         this.eAuthenticate(email, password); 
     }else{
@@ -47,12 +57,21 @@ class App extends Component {
       });
     }     
   }
-  handleSignup(callback){
+  handleReset(){
+    let email = this.state.email;
+    if(email !== null && email !== ""){ 
+        this.eReset(email); 
+    }else{
+      this.setState({
+        LoginMessage: "Enter a proper email and password"
+      });
+    }     
+  }
+  handleSignup(){
     let email = this.state.email;
     let password = this.state.Lpass;
-    let exists = this.state.exists;
     if(email !== null && password !== null){ 
-        this.eAuthenticate(email, password); 
+        this.eSignup(email, password); 
     }else{
       this.setState({
         LoginMessage: "Enter a proper email and password"
@@ -60,7 +79,7 @@ class App extends Component {
     }     
   }
   handleEmail(event){
-    let emailregex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    let emailregex = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
     let emailAdd = event.target.value;
     this.setState({
         Lemail: emailAdd,
@@ -92,6 +111,11 @@ class App extends Component {
       });
     }
   }
+  goToLogin(){
+    this.setState({
+      exists: null
+    });
+  }
   goToReset(){
     this.setState({
       reset: true
@@ -105,7 +129,8 @@ class App extends Component {
   eSignup(email, password){
     app.auth().createUserWithEmailAndPassword(email, password).then(()=>{
       this.setState({
-        exists: null
+        exists: null,
+        LoginMessage: "You Successfully Registered"
       });
     }, (error)=>{
       this.setState({
@@ -114,15 +139,36 @@ class App extends Component {
       });
     });
   }
-    
+  eReset(email){
+    app.auth().sendPasswordResetEmail(email).then(()=>{
+      this.setState({
+        LoginMessage: "We sent you a reset email, please check your inbox"
+      });
+    }, (error)=>{
+      this.setState({
+        LoginMessage: error.message,
+        exists: false
+      });
+    });
+  } 
   eAuthenticate(email, password){
     let name = email.split('@');
     name = name[0];
     app.auth().signInWithEmailAndPassword(email, password).then(()=>{
       this.setState({
         uid: email,
-        dname: name
+        dname: name,
       });
+      let uid = this.state.uid;
+      let exists = this.state.exists || null;
+      let dname = this.state.dname;
+      let Lemail = this.state.Lemail;
+      let states = [uid, exists,email,dname,Lemail];
+      let statesS = ['uid', 'exists','email','dname','Lemail'];
+      let len = states.length;
+      for(var count=0;count<len; count++){
+        localStorage.setItem(statesS[count], states[count]);
+      }
     }, (error)=>{
       console.log(error.message)
       this.setState({
@@ -157,7 +203,7 @@ class App extends Component {
       <div>
         <h3>Kilembe School Sign in</h3>
         <div id="feedBack">{this.state.LoginMessage}</div>
-        <Login onsubmit={this.handleSubmit} userEmail={this.handleEmail} pass={this.handlePass}/>
+        <Login onsubmit={this.handleLogin} userEmail={this.handleEmail} pass={this.handlePass}/>
         { Reg }  { pReset }
         <button onClick={()=>this.authenticate(fbAuth, this.authHandler)}>Sign in with Facebook</button><br/>
         <button onClick={()=>this.authenticate(googleAuth, this.authHandler)}>Sign in with Google</button><br/>
@@ -173,9 +219,21 @@ class App extends Component {
         dname:null,
         Lpass:null
       });
+      let uid = this.state.uid;
+      let exists = this.state.exists || null;
+      let dname = this.state.dname;
+      let Lemail = this.state.Lemail;
+      let email = this.state.email;
+      let states = [uid, exists,email,dname,Lemail];
+      let statesS = ['uid', 'exists','email','dname','Lemail'];
+      let len = states.length;
+      for(var count=0;count<len; count++){
+        localStorage.setItem(statesS[count], states[count]);
+      }
       console.log("user signed out!");
     })
   }
+  
   render() {
     const logout = <button onClick={this.logout}>Logout</button>;
     if(this.state.uid !== null) {
@@ -187,13 +245,13 @@ class App extends Component {
     }else if(this.state.exists === false){
       return(
         <div>
-          <Signup  />
+          <Signup message={this.state.LoginMessage} onsignup={this.handleSignup} userEmail={this.handleEmail} pass={this.handlePass} onLogin={this.goToLogin}  />
         </div>
       )
     }else if(this.state.reset === true) {
       return(
         <div>
-          <Reset  />
+          <Reset onReset={this.handleReset} message={this.state.LoginMessage}  userEmail={this.handleEmail}/>
         </div>
       )
 
