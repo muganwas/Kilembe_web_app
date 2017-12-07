@@ -5,13 +5,14 @@ class Signup extends Component {
     render(){
         return (
             <div>
-            <h3>Sign Up</h3>
-            <div id="feedBack">{this.props.message}</div><span onClick={this.props.onLogin} className="link">Login</span>
-                <label htmlFor="email_add">Email:</label>
-                <input id="email" type="text" onChange={this.props.userEmail}/>
-                <label htmlFor="pass">Password: </label>
-                <input id="pass" type="password" onChange={this.props.pass}/>
-                <button onClick={this.props.onsignup}>Sign up</button>
+            <span><h3>Sign Up</h3></span>
+            <span className={ this.props.feedback }>{this.props.message}</span>
+                <span><input id="email" placeholder="Email address" type="text" onChange={this.props.userEmail}/></span>
+                <span><input id="pass" placeholder="Password" type="password" onChange={this.props.pass}/></span>
+                <span><input id="passConfirm" placeholder="Confirm Password" type="password" onChange={this.props.conPass}/></span>
+                <span><button onClick={this.props.onsignup}>Sign up</button></span>
+                <span onClick={this.props.onLogin} className="link">Sign in</span>
+                <span onClick={this.props.reset} className="link">Forgot Passowrd</span>
             </div>
         )
     }

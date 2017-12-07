@@ -5,11 +5,12 @@ class Reset extends Component {
     render(){
         return (
             <div>
-            <h3>Fill in your email Address tor recieve password reset email</h3>
-            <div id="feedBack">{this.props.message}</div>
-                <label htmlFor="email_add">Email:</label>
-                <input id="email" type="text" onChange={this.props.userEmail}/>
-                <button onClick={this.props.onReset}>Reset Password</button>
+            <span><h3>Password Reset</h3></span>
+            <span className={ this.props.feedback }>{this.props.message}</span>
+                <span><input id="email" placeholder="Email address" type="text" onChange={this.props.userEmail}/></span>
+                <span><button onClick={this.props.onReset}>Reset Password</button></span>
+                <span onClick={this.props.onLogin} className="link">Sign in</span>
+                <span onClick={this.props.toReg} className="link">Register</span>
             </div>
         )
     }

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import app from './base';
 import Firebase from 'firebase';
@@ -20,6 +19,7 @@ class App extends Component {
     this.eReset = this.eReset.bind(this);
     this.handleEmail = this.handleEmail.bind(this);
     this.handlePass = this.handlePass.bind(this);
+    this.handlePassConf = this.handlePassConf.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
@@ -27,33 +27,49 @@ class App extends Component {
     this.goToReset = this.goToReset.bind(this);
     this.goToLogin = this.goToLogin.bind(this);
     this.state = {
-      uid: null
+      uid: null,
+      hidden: true
     }
   }
-
   componentWillMount(){
     let uid = localStorage.getItem("uid")==="null"?null:localStorage.getItem("uid");
     let dname = localStorage.getItem("dname")==="null"?null:localStorage.getItem("dname");
     let email = localStorage.getItem("email")==="null"?null:localStorage.getItem("email");
-    let exists = localStorage.getItem("exists")==="null" || "undefined"?null:localStorage.getItem("exists");
-    if(uid !==null || uid !== "") {
+    let exists = localStorage.getItem("exists")==="null"?null:localStorage.getItem("exists")==="false"?false:localStorage.getItem("exists");
+    let reset = localStorage.getItem("reset")=="null"?null:localStorage.getItem("reset")=="true"?true:localStorage.getItem("reset");
+    if(uid != null && exists ==null) {
       this.setState({
         uid: uid,
         dname: dname,
         email: email,
         exists: exists
       });
-    } 
+    }else if(uid == null && exists !==null){
+      this.setState({
+        exists: exists
+      });
+    }else if(uid == null && reset === true){
+      this.setState({
+        reset: reset
+      });
+    }
   }
+ 
   handleLogin(event){
     event.preventDefault();
     let email = this.state.email;
     let password = this.state.Lpass;
-    if(email !== null && password !== null){ 
+    if((email != null && email !== "") && (password != null && password !== "")){ 
         this.eAuthenticate(email, password); 
     }else{
       this.setState({
         LoginMessage: "Enter a proper email and password"
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     }     
   }
@@ -64,17 +80,36 @@ class App extends Component {
     }else{
       this.setState({
         LoginMessage: "Enter a proper email and password"
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     }     
   }
   handleSignup(){
     let email = this.state.email;
     let password = this.state.Lpass;
-    if(email !== null && password !== null){ 
-        this.eSignup(email, password); 
+    if((email != null && email !== "") && (password != null && password !== "")){
+      if((this.state.LoginMessage === null || this.state.LoginMessage === undefined) && (this.state.Lpass === this.state.PassCon)) {
+        this.eSignup(email, password);
+      }else{
+        let messg = "Rectify error bellow <br/>" + this.state.LoginMessage;
+        this.setState({
+          LoginMessage: messg
+        });
+      }   
     }else{
       this.setState({
         LoginMessage: "Enter a proper email and password"
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     }     
   }
@@ -88,11 +123,23 @@ class App extends Component {
       this.setState({
           email: emailAdd,
           LoginMessage: null
+      }, ()=> {
+        if(this.state.LoginMessage === null || this.state.LoginMessage === undefined || this.state.LoginMessage === "") {
+          this.setState({
+            hidden: true
+          });
+        }
       });
     }else{
       this.setState({
         email: null,
         LoginMessage: "Please enter an email address"
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       })
     }
   }
@@ -103,39 +150,100 @@ class App extends Component {
       this.setState({
           Lpass: event.target.value,
           LoginMessage: null
+      }, ()=> {
+        if(this.state.LoginMessage === null || this.state.LoginMessage === undefined || this.state.LoginMessage === "") {
+          this.setState({
+            hidden: true
+          });
+        }
       });
     }else{
       this.setState({
         Lpass: null,
         LoginMessage: "Your password should be 8 or more characters"
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     }
   }
+  handlePassConf(event){
+    let cPass = event.target.value;
+    if(cPass !== null) {
+      let pass = this.state.Lpass===undefined || this.state.Lpass===null ?"": this.state.Lpass;
+      if(pass != null && cPass != pass) {
+        this.setState({
+          LoginMessage: "Your passwords should match"
+        }, ()=>{
+          if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+            this.setState({
+              hidden: false
+            });
+          }
+        });
+      }else{
+        this.setState({
+          PassCon: cPass,
+          LoginMessage: null
+        }, ()=> {
+          if(this.state.LoginMessage === null || this.state.LoginMessage === undefined || this.state.LoginMessage === "") {
+            this.setState({
+              hidden: true
+            });
+          }
+        }); 
+      }
+    } 
+  }
   goToLogin(){
     this.setState({
-      exists: null
+      exists: null,
+      reset: null
     });
+    localStorage.setItem('exists', null);
+    localStorage.setItem('reset', null);
   }
   goToReset(){
     this.setState({
-      reset: true
+      reset: true,
+      exists: null
     });
+    localStorage.setItem('reset', true);
+    localStorage.setItem('exists', null);
   }
   goToReg(){
     this.setState({
-      exists: false
+      exists: false,
+      reset: null
     });
+    localStorage.setItem('exists', false);
+    localStorage.setItem('reset', null);
   }
   eSignup(email, password){
     app.auth().createUserWithEmailAndPassword(email, password).then(()=>{
       this.setState({
         exists: null,
         LoginMessage: "You Successfully Registered"
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     }, (error)=>{
       this.setState({
         LoginMessage: error.message,
         exists: false
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     });
   }
@@ -143,11 +251,23 @@ class App extends Component {
     app.auth().sendPasswordResetEmail(email).then(()=>{
       this.setState({
         LoginMessage: "We sent you a reset email, please check your inbox"
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     }, (error)=>{
       this.setState({
         LoginMessage: error.message,
         exists: false
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     });
   } 
@@ -158,6 +278,8 @@ class App extends Component {
       this.setState({
         uid: email,
         dname: name,
+        LoginMessage: null,
+        hidden: true
       });
       let uid = this.state.uid;
       let exists = this.state.exists || null;
@@ -173,6 +295,12 @@ class App extends Component {
       console.log(error.message)
       this.setState({
         LoginMessage: "Please confirm your cridentials, reset your password or signup."
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     });
   }
@@ -180,6 +308,12 @@ class App extends Component {
     app.auth().signInWithPopup(provider).then(callback, (error)=>{
       this.setState({
         LoginMessage: error.message
+      }, ()=>{
+        if(this.state.LoginMessage !== null && this.state.LoginMessage !== undefined && this.state.LoginMessage !== "") {
+          this.setState({
+            hidden: false
+          });
+        }
       });
     });
   }
@@ -191,22 +325,34 @@ class App extends Component {
     this.setState({
       uid: uid,
       email: email,
-      dname: name
+      dname: name,
+      LoginMessage: null,
+      hidden: true
     });
+    let exists = this.state.exists || null;
+    let dname = this.state.dname;
+    let Lemail = this.state.Lemail || null;
+    let states = [uid, exists,email,dname,Lemail];
+    let statesS = ['uid', 'exists','email','dname','Lemail'];
+    let len = states.length;
+    for(var count=0;count<len; count++){
+      localStorage.setItem(statesS[count], states[count]);
+    }
   }
   renderLogin(){
     const fbAuth = new Firebase.auth.FacebookAuthProvider();
     const googleAuth = new Firebase.auth.GoogleAuthProvider();
     const Reg = <span className="link" onClick={()=>this.goToReg()}>Register</span>;
-    const pReset = <span className="link" onClick={()=>this.goToReset()}>Reset Passowrd</span>;
+    const pReset = <span className="link" onClick={()=>this.goToReset()}>Forgot Passowrd</span>;
+    let feedBack = this.state.hidden === true?"hidden":"feedBack";
     return(
       <div>
-        <h3>Kilembe School Sign in</h3>
-        <div id="feedBack">{this.state.LoginMessage}</div>
+        <span><h3>Sign in</h3></span>
+        <span className={ feedBack }>{this.state.LoginMessage}</span>
         <Login onsubmit={this.handleLogin} userEmail={this.handleEmail} pass={this.handlePass}/>
         { Reg }  { pReset }
-        <button onClick={()=>this.authenticate(fbAuth, this.authHandler)}>Sign in with Facebook</button><br/>
-        <button onClick={()=>this.authenticate(googleAuth, this.authHandler)}>Sign in with Google</button><br/>
+        <span><button id="facebook" className="icon-facebook-squared" onClick={()=>this.authenticate(fbAuth, this.authHandler)}> &nbsp;Sign in with Facebook</button></span>
+        <span><button id="google" className="icon-google" onClick={()=>this.authenticate(googleAuth, this.authHandler)}> &nbsp;Sign in with Google</button></span>
       </div>
     )
   }
@@ -236,22 +382,23 @@ class App extends Component {
   
   render() {
     const logout = <button onClick={this.logout}>Logout</button>;
+    let feedBack = this.state.hidden === true?"hidden":"feedBack";
     if(this.state.uid !== null) {
       return(
-        <div>
+        <div className="Home">
           <Home logout={logout} dname={this.state.dname} email={this.state.email} />
         </div>
       )
     }else if(this.state.exists === false){
       return(
-        <div>
-          <Signup message={this.state.LoginMessage} onsignup={this.handleSignup} userEmail={this.handleEmail} pass={this.handlePass} onLogin={this.goToLogin}  />
+        <div className="App">
+          <Signup feedback={feedBack} message={this.state.LoginMessage} onsignup={this.handleSignup} userEmail={this.handleEmail} pass={this.handlePass} conPass={this.handlePassConf} reset={this.goToReset} onLogin={this.goToLogin} />
         </div>
       )
     }else if(this.state.reset === true) {
       return(
-        <div>
-          <Reset onReset={this.handleReset} message={this.state.LoginMessage}  userEmail={this.handleEmail}/>
+        <div className="App">
+          <Reset feedback={feedBack} onReset={this.handleReset} message={this.state.LoginMessage}  userEmail={this.handleEmail} toReg={this.goToReg} onLogin={this.goToLogin}/>
         </div>
       )
 

@@ -6,11 +6,9 @@ class Login extends Component {
         return (
             <div>
             <form onSubmit={this.props.onsubmit}>
-                <label htmlFor="email_add">Email:</label>
-                <input id="email" type="text" onChange={this.props.userEmail}/>
-                <label htmlFor="pass">Password: </label>
-                <input id="pass" type="password" onChange={this.props.pass}/>
-                <button type="submit" >Login</button>
+                <span><input id="email" placeholder="Email address" type="text" onChange={this.props.userEmail}/></span>
+                <span><input id="pass" placeholder="Password" type="password" onChange={this.props.pass}/></span>
+                <span><button type="submit" >Sign in</button></span>
             </form>
             </div>
         )
