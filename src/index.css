@@ -13,6 +13,12 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+li{
+  list-style: none;
+}
+.icon{
+  cursor: pointer;
+}
 .main{
   display: block;
   text-align: center;
@@ -21,7 +27,12 @@ body {
   box-sizing: border-box;
   display: inline-block;
   background-color: #f0f0f0;
-  padding: 0 50px 50px;
+  background-image: url('./images/kilembe-school.png');
+  background-repeat: no-repeat;
+  background-size: 40%;
+  background-position: 50px 20px;
+  margin: 10% 0;
+  padding: 70px 50px 50px;
   border-radius: 5px;
   width: 350px;
 }
@@ -70,4 +81,114 @@ body {
 }
 .hidden{
   display: none!important;
+}
+.shown{
+  display: block!important;
+}
+.Home{
+  width: 100%;
+  display: inline-block;
+  text-align: center;
+  overflow-x: hidden;
+}
+.container{
+  display: inline-block;
+  position: relative;
+  box-sizing: content-box;
+  overflow: hidden;
+  width: 70%;
+  text-align: left;
+}
+.Home .mainNav {
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  color: #fff;
+  background-color: #201d46;
+  padding: 5px 20px;
+}
+.mainNav .link {
+  color: #fff;
+  font-size: 13px;
+}
+.mainNav a {
+  font-size: 13px;
+  color: #ffffff;
+  padding: 2px 0;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+.mainNav .menu {
+  font-size: 20px;
+  float: right;
+  cursor: pointer;
+}
+.mainNav .icon-menu:hover ul {
+  display: block;
+  overflow: hidden;
+  padding: 5px;
+}
+.mainNav .icon-menu ul {
+  display: none;
+  text-align: left;
+  background-color: #201d46;
+  padding: 5px;
+  position: absolute;
+  box-sizing: border-box;
+  right:0;
+  top:5px;
+}
+.mainNav .icon-menu ul li {
+  display: block;
+  text-align: left;
+  padding: 2px 0 2px 0; 
+  border-bottom: thin solid #bdbbbb;
+  list-style-position:inside;
+}
+.mainNav .logout, #settings {
+  font-size: 13px;
+  font-weight: bold;
+  padding: 5px;
+}
+.mainNav .small {
+  font-size: 11px;
+}
+.Home .content {
+  padding: 10px 20px;
+}
+.settings {
+  border: thin solid #bdbbbb;
+  margin-top: 50px;
+}
+.save{
+  padding: 2px 0;
+  margin-top: 10px;
+  position: relative;
+}
+.settings input{
+  background-color: #f9e366;
+  border: thin solid #bdbbbb;
+  border-radius: 3px;
+}
+.Home .settingT {
+  font-size: 14px;
+  display: block;
+  background-color: #43423c;
+  color: #fff;
+  padding: 2px 5px;
+}
+.Home .settingD {
+  font-size: 13px;
+  display: block;
+  background-color: #fdd806;
+  padding: 2px 5px;
+}
+.Home .settingD input {
+  width: 300px;
+  padding: 2px;
+}
+#welcome{
+  font-size: 13px;
+
 }

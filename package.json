@@ -2,6 +2,7 @@
   "name": "kilembe_school",
   "version": "1.0.0",
   "description": "school app",
+  "homepage": "http://aliendynamic.com/reactDemo1/",
   "main": "index.js",
   "private": true,
   "dependencies": {
