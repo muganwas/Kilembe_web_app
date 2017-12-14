@@ -52,7 +52,7 @@ class Home extends Component {
             <div className="container">
                 {this.props.header}
                 <div className="content">
-                    <span id="welcome">You are Home, {this.state.dname || this.props.dname}!</span>
+                    <span id="welcome">You are Home, { this.state.dname || this.props.dname }!</span>
                 </div>
                 
             </div>
