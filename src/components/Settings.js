@@ -11,7 +11,7 @@ class Settings extends Component {
         this.changeUid = this.changeUid.bind(this);
         this.save = this.save.bind(this);
         this.state = {
-            
+            disabled: true            
         }
     }
     componentWillMount(){

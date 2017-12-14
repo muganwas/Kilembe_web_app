@@ -7,11 +7,9 @@ let usersRef = app.database().ref('users');
 class Home extends Component {
     constructor(){
         super();
-        this.state = {
-
-        }
+        this.state = {}
     }
-    componentWillMount(){
+    componentDidMount(){
         const userID = this.props.uid;     
         base.fetch(`users/${ userID }`, {
             context: this,
@@ -31,8 +29,6 @@ class Home extends Component {
                     context: this,
                     state: 'email'
                 });
-            }else{
-                console.log('not here!')
             }
         });
     }
@@ -56,7 +52,7 @@ class Home extends Component {
             <div className="container">
                 {this.props.header}
                 <div className="content">
-                    <span id="welcome">You are Home, {this.state.dname}!</span>
+                    <span id="welcome">You are Home, {this.state.dname || this.props.dname}!</span>
                 </div>
                 
             </div>
