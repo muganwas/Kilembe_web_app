@@ -34,7 +34,7 @@ class Courses extends Component {
         let vids = this.state.videos;
         let courz = this.state.courses;
         return(
-            <div>
+            <div key={key}>
                 <div className="course">
                     { courz[key] }
                 </div>
@@ -55,7 +55,7 @@ class Courses extends Component {
                     </div>
                     <div className="tutorial">
                     <header>Course Video</header>
-                        <iframe className="youtube"  src={ this.state.source }
+                        <iframe className="youtube" title="tutorial video" src={ this.state.source }
                         frameBorder="0" allowFullScreen></iframe>
                     </div>
                     <div className="clear"></div>
