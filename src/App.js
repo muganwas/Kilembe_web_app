@@ -41,9 +41,9 @@ class App extends Component {
     let dname = localStorage.getItem("dname")==="null"?null:localStorage.getItem("dname");
     let email = localStorage.getItem("email")==="null"?null:localStorage.getItem("email");
     let exists = localStorage.getItem("exists")==="null"?null:localStorage.getItem("exists")==="false"?false:localStorage.getItem("exists");
-    let reset = localStorage.getItem("reset")=="null"?null:localStorage.getItem("reset")=="true"?true:localStorage.getItem("reset");
-    let settings = localStorage.getItem("settings")=="null"?null:localStorage.getItem("settings")=="true"?true:localStorage.getItem("settings");
-    if(uid != null && exists ==null) {
+    let reset = localStorage.getItem("reset")==="null"?null:localStorage.getItem("reset")==="true"?true:localStorage.getItem("reset");
+    let settings = localStorage.getItem("settings")==="null"?null:localStorage.getItem("settings")==="true"?true:localStorage.getItem("settings");
+    if(uid !== null && exists === null) {
       this.setState({
         uid: uid,
         dname: dname,
@@ -51,11 +51,11 @@ class App extends Component {
         exists: exists,
         settings: settings
       });
-    }else if(uid == null && exists !==null){
+    }else if(uid === null && exists !==null){
       this.setState({
         exists: exists
       });
-    }else if(uid == null && reset === true){
+    }else if(uid === null && reset === true){
       this.setState({
         reset: reset
       });
@@ -66,7 +66,7 @@ class App extends Component {
     event.preventDefault();
     let email = this.state.email;
     let password = this.state.Lpass;
-    if((email != null && email !== "") && (password != null && password !== "")){ 
+    if((email !== null && email !== "") && (password !== null && password !== "")){ 
         this.eAuthenticate(email, password); 
     }else{
       this.setState({
@@ -99,7 +99,7 @@ class App extends Component {
   handleSignup(){
     let email = this.state.email;
     let password = this.state.Lpass;
-    if((email != null && email !== "") && (password != null && password !== "")){
+    if((email !== null && email !== "") && (password != null && password !== "")){
       if((this.state.LoginMessage === null || this.state.LoginMessage === undefined) && (this.state.Lpass === this.state.PassCon)) {
         this.eSignup(email, password);
       }else{
@@ -180,8 +180,8 @@ class App extends Component {
   handlePassConf(event){
     let cPass = event.target.value;
     if(cPass !== null) {
-      let pass = this.state.Lpass===undefined || this.state.Lpass===null ?"": this.state.Lpass;
-      if(pass != null && cPass != pass) {
+      let pass = this.state.Lpass===undefined || this.state.Lpass===null?"": this.state.Lpass;
+      if(pass !== null && cPass !== pass) {
         this.setState({
           LoginMessage: "Your passwords should match"
         }, ()=>{

@@ -21,7 +21,7 @@ class Settings extends Component {
             asArray: true
         }).then((data)=>{
             let length = data.length;
-            if(length!=0 && length!==null) {
+            if(length!==0 && length!==null) {
                 base.syncState(`users/${ userID }/dname`, {
                     context: this,
                     state: 'dname'
@@ -69,7 +69,7 @@ class Settings extends Component {
                         <span className="settingT">Your Email Address: </span> <span className="settingD"><input type="text" defaultValue={()=>this.state.email } placeholder={ this.state.email } disabled="true" /></span>
                         <span className="settingT">Your Display Name: </span> <span className="settingD"><input className="icon" type="text" defaultValue={ this.state.dname } placeholder={ this.state.dname } onChange={ this.changeDname } disabled={ this.state.disabled }/></span>
                         <span className="settingT">Your User Id: </span> <span className="settingD"><input className="icon" type="text" defaultValue={ this.state.uid } placeholder={ this.state.uid } onChange={ this.changeUid } disabled={ this.state.disabled }/></span>
-                        <span onClick={ this.save }  className="icon icon-floppy"></span>
+                        <button onClick={ this.save }  className="icon icon-floppy" disabled={ this.state.disabled }></button>
                     </div>
                 </div>
             </div>

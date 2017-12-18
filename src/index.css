@@ -13,6 +13,10 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+h3, h4, h5 {
+  font-size: 14px;
+  font-weight: bold;
+}
 li{
   list-style: none;
 }
@@ -116,7 +120,6 @@ li{
   color: #ffffff;
   padding: 2px 0;
   text-decoration: none;
-  font-weight: bold;
   cursor: pointer;
 }
 .mainNav .menu {
@@ -143,8 +146,10 @@ li{
   display: block;
   text-align: left;
   padding: 2px 0 2px 0; 
-  border-bottom: thin solid #bdbbbb;
   list-style-position:inside;
+}
+.mainNav .icon-menu ul li:first-child { 
+  border-bottom: thin solid #bdbbbb;
 }
 .mainNav .logout, #settings {
   font-size: 13px;
@@ -155,11 +160,15 @@ li{
   font-size: 11px;
 }
 .Home .content {
-  padding: 10px 20px;
+  padding: 0;
 }
 .settings {
   border: thin solid #bdbbbb;
   margin-top: 50px;
+}
+.clear{
+  content: "";
+  clear: both;
 }
 .save{
   padding: 2px 0;
@@ -190,5 +199,93 @@ li{
 }
 #welcome{
   font-size: 13px;
-
+  font-weight: bold;
+}
+.avator{
+  width: 80px;
+  height: 50px;
+  background-image: url("./images/avatar.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  padding: 5px;
+  margin: 3px 3px 3px 0;
+}
+.left-col{
+  position: relative;
+}
+.left-col::after{
+  contain: "";
+  clear: both;
+}
+.courses{
+  font-size: 13px;
+  background-color: #ece3e2;
+  border: thin solid #bdbbbb;
+  padding: 0 30px 20px;
+  margin: 0;
+}
+.courses .group{
+  float:left;
+  width: 45%;
+}
+.courses header {
+  display: block;
+  width: 50%;
+  float: left;
+  color: #43423c;
+  font-weight: bold;
+  cursor: pointer;
+}
+.courses .bod {
+  min-width: 50%;
+  float: left;
+  color: #43423c;
+  cursor: pointer;
+}
+.courses .urls{
+  display: block;
+  padding: 5px;
+  background-color: #fdd806;
+  border: thin solid #494141;
+  color: #43423c;
+  overflow: hidden;
+  font-weight: bold;
+  cursor: pointer;
+}
+.courses .urls:hover{
+  background-color: #caf8ca;
+}
+.courses .course {
+  display: block;
+  padding: 5px;
+  background-color: #43423c;
+  border: thin solid #494141;
+  color: #fff;
+  margin: 2px 0;
+}
+.courses .tutorial{
+  min-width: 50%;
+  overflow: hidden;
+  float: right;
+  padding: 5px;
+  width: 50%;
+  height: 315px;
+  background-color: #fff;
+}
+.courses .youtube {
+  box-sizing: content-box;
+  width: 100%;
+  height: 100%; 
+}
+.swagg{
+  margin: 50px 0;
+  font-size: 13px;
+  background-color: #201d46;
+  color: #fff;
+  border: thin solid #bdbbbb;
+  padding: 10px 10px;
+}
+.swagg a {
+  color: #89a8eb;
+  text-decoration: none;
 }
