@@ -10,7 +10,7 @@ import NotFound from './components/NotFound';
 let mPoint = document.getElementById('root');
 var Root = ()=>{
     return(
-        <BrowserRouter basename = "/" >
+        <BrowserRouter basename = "/reactDemo1/" >
         <div className="main">
             <Switch>
                 <Route exact path="/" component={ App } />
