@@ -267,7 +267,7 @@ li{
   min-width: 50%;
   overflow: hidden;
   float: right;
-  padding: 5px;
+  padding: 5px 5px 20px 5px;
   width: 50%;
   height: 315px;
   background-color: #fff;
