@@ -226,7 +226,7 @@ li{
 }
 .courses .group{
   float:left;
-  width: 45%;
+  width: 25%;
 }
 .courses header {
   display: block;
@@ -266,8 +266,9 @@ li{
 .courses .tutorial{
   min-width: 50%;
   overflow: hidden;
-  float: right;
+  float: left;
   padding: 5px 5px 20px 5px;
+  margin: 0 20px;
   width: 50%;
   height: 315px;
   background-color: #fff;
@@ -288,4 +289,21 @@ li{
 .swagg a {
   color: #89a8eb;
   text-decoration: none;
+}
+#paypal-button{
+  float: right;
+}
+.playlist{
+  box-sizing: content-box;
+  width:18%;
+  float: right;
+  background-color: #fff;
+  padding: 5px;
+}
+.playlist .item {
+  clear: both;
+  background-color: #000000;
+  color: #fff;
+  padding: 5px;
+  border-bottom: thin solid #fff;
 }

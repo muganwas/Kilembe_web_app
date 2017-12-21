@@ -9,7 +9,6 @@ let usersRef = app.database().ref('users');
 class Home extends Component {
     constructor(){
         super();
-        
         this.state = {
             courses: {}
         };
@@ -51,11 +50,20 @@ class Home extends Component {
                     });
                 }    
             }
-        });
-               
+        });          
+    }
+    getPlayList=(val)=>{
+        let playlist = this.props.playLProp || {};
+        let valLen = Object.keys(val).length;
+        let playlistLen = Object.keys(playlist).length;
+        if( valLen !== playlistLen ){
+            this.setState({
+                playlist: val
+            });
+        }   
     }
     render(){  
-        const userID = this.props.uid;     
+        const userID = this.props.uid;	
         base.fetch(`users/${ userID }`, {
             context: this,
             asArray: true
@@ -70,16 +78,19 @@ class Home extends Component {
                 });
             }
         });
+        
         return (
             <div className="container">
                 {this.props.header}
                 <div className="content">
                 <div className="avator"></div>
+                <div id="paypal-button"></div>
+                <div className="clear"></div>
                     <span id="welcome">You are Home, { this.state.dname || this.props.dname }!</span>
                     <div className="left-col">
                         <div className="courses">
                             <h4>Available Courses</h4>
-                            <Courses videos={ this.state.urls } courses = { this.state.courses } />
+                            <Courses playlist={ this.getPlayList } playLProp={this.state.playlist} videos={ this.state.urls } courses = { this.state.courses } />
                         </div>
                     </div>
                 </div>
