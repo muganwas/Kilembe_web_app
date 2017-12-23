@@ -268,7 +268,7 @@ li{
   overflow: hidden;
   float: left;
   padding: 5px 5px 20px 5px;
-  margin: 0 20px;
+  margin: 0 0 0 15px;
   width: 50%;
   height: 315px;
   background-color: #fff;
@@ -296,14 +296,32 @@ li{
 .playlist{
   box-sizing: content-box;
   width:18%;
-  float: right;
+  float: left;
   background-color: #fff;
   padding: 5px;
 }
 .playlist .item {
   clear: both;
+  position: relative;
   background-color: #000000;
   color: #fff;
   padding: 5px;
   border-bottom: thin solid #fff;
+}
+.playlist .text{
+  float: left;
+  padding: 2px;
+  width: 85%;
+}
+.playlist .ex{
+  display: table-cell;
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translate(0, -50%);
+  vertical-align: middle;
+  float: right;
+  padding: 2px;
+  border: thin solid #bdbbbb;
+  cursor: pointer;
 }

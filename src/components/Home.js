@@ -21,7 +21,6 @@ class Home extends Component {
             asArray: true
         }).then((info)=>{
             let length = info.length; 
-            //console.log(info)
             if(length!==0 && length!=null) {
                 for(var count =0; count<length; count++){
                     let course = info[count]['Course_Title'];
@@ -35,7 +34,7 @@ class Home extends Component {
                 }); 
             } 
         });
-        const userID = this.props.uid;     
+        const userID = this.props.uid;
         base.fetch(`users/${ userID }`, {
             context: this,
             asArray: true
@@ -46,24 +45,14 @@ class Home extends Component {
                 for(var count =0; count<length; count++){
                     base.syncState(`users/${ userID }/${kTitle[count]}`, {
                         context: this,
-                        state: kTitle[count]
+                        state: `${kTitle[count]}`
                     });
-                }    
+                }
             }
         });          
     }
-    getPlayList=(val)=>{
-        let playlist = this.props.playLProp || {};
-        let valLen = Object.keys(val).length;
-        let playlistLen = Object.keys(playlist).length;
-        if( valLen !== playlistLen ){
-            this.setState({
-                playlist: val
-            });
-        }   
-    }
     render(){  
-        const userID = this.props.uid;	
+        const userID = this.props.uid;
         base.fetch(`users/${ userID }`, {
             context: this,
             asArray: true
@@ -78,7 +67,6 @@ class Home extends Component {
                 });
             }
         });
-        
         return (
             <div className="container">
                 {this.props.header}
@@ -90,7 +78,7 @@ class Home extends Component {
                     <div className="left-col">
                         <div className="courses">
                             <h4>Available Courses</h4>
-                            <Courses playlist={ this.getPlayList } playLProp={this.state.playlist} videos={ this.state.urls } courses = { this.state.courses } />
+                            <Courses userID={this.props.uid} videos={ this.state.urls } courses = { this.state.courses } />
                         </div>
                     </div>
                 </div>

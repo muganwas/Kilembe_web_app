@@ -1,22 +1,31 @@
 import React, { Component } from 'react';
-
+import Rebase from 're-base';
+import app from '../base';
+let base = Rebase.createClass(app.database());
+let usersRef = app.database().ref('users');
 class Courses extends Component {
     constructor(props){
         super(props);
         this.showCourses = this.showCourses.bind(this);
         this.state = {
-            source: "https://www.youtube.com/embed/gfkTfcpWqAY",
             linkStyle: "urls",
             playlist: {}
         }
 
     }
+    componentWillMount(){
+        let userID= this.props.userID;
+        if(userID !== null && userID !== undefined){
+            base.syncState(`users/${ userID }/playlist`, {
+                context: this,
+                state: 'playlist'
+            });
+        }
+        
+    }
     componentDidUpdate(){
         let vids = this.props.videos;
         let courz = this.props.courses;
-        let playlist = this.state.playlist;
-        let playLProp = this.props.playLProp || {};
-        let len = Object.keys(playlist).length;
         if(vids !== null && vids !== undefined){
             let kaState = this.state.courses;
             if(kaState === undefined){
@@ -26,28 +35,45 @@ class Courses extends Component {
                 });
             }
         }
-        if(len>0 && (playlist !== playLProp)){
-        let sendPlaylist =  this.props.playlist;
-        sendPlaylist(this.state.playlist);
-        }
     }
     //alternative to binding
     goToUrl = (event)=>{
         let courseUrl = event.target.id;
-        let playlist = this.state.playlist;
+        let playlist = this.props.playLProp || {};
         playlist[event.target.title] = courseUrl;
         this.setState({
             source: courseUrl,
             playlist: playlist
         });
     }
+    removeItem = (key)=>{
+        let playlist1 = {...this.state.playlist};
+        let userID = this.props.userID;
+        delete playlist1[key];
+        let userRef = usersRef.child(userID);
+        userRef.update({
+            playlist: playlist1
+        });
+    }
     showPlayList = (key)=>{
         return(
             <div className="item" key={key}>
-                {key}
+                <div className="text">{key}</div><div onClick={ ()=>{this.removeItem(key)} } className="ex">&times;</div>
+                <div className="clear"></div>
             </div>
         )
 
+    }
+    playlistClass = ()=>{
+        let playlist = this.state.playlist;
+        let plen = Object.keys(playlist).length;
+        let there = "playlist";
+        let notThere = "hidden";
+        if(plen > 0){
+            return there; 
+        }else{
+            return notThere;
+        }
     }
     showCourses(key){
         let vids = this.state.videos;
@@ -67,9 +93,37 @@ class Courses extends Component {
             </div>
         )                
     }
+    videoSource = ()=>{
+        let playlist = this.state.playlist;
+        let playlistLen = Object.keys(playlist).length;
+        let iniVid = "https://www.youtube.com/embed/gfkTfcpWqAY";
+        let inividArr = iniVid.split('/');
+        if(playlistLen===0 && playlist !== undefined && playlist !== null){
+            return iniVid;
+        }else if(playlistLen>=1){
+            let vidArr = Object.values(playlist);
+            let vidArrLen = vidArr.length;
+            let count = 0;
+            let pLUrl = vidArr[0] + "?enablejsapi=1&playlist=";
+            for(count; count<vidArrLen; count++){
+                let currUrl = vidArr[count];
+                let currUrlArr = currUrl.split('/');
+                let vidId = currUrlArr[4];
+                if(count<(vidArrLen-1) && currUrl === vidArr[0]){
+                    pLUrl += "";
+                }
+                else if(count<(vidArrLen-1)){
+                    pLUrl += vidId + ",";
+                }else{
+                    pLUrl += vidId;
+                } 
+            }
+            return pLUrl;
+        }
+    }
     render(){
         let chcker = this.state.videos;
-        let plstk = this.props.playLProp || {};
+        let plstk = this.state.playlist || {};
         if(chcker !== undefined){  
             return(
                 <div>
@@ -78,12 +132,12 @@ class Courses extends Component {
                     </div>
                     <div className="tutorial">
                     <header>Course Video</header>
-                        <iframe className="youtube" title="tutorial video" src={ this.state.source }
+                        <iframe className="youtube" title="tutorial video" src={ this.videoSource() }
                         frameBorder="0" allowFullScreen></iframe>
                     </div>
-                    <div className="playlist">
+                    <div className={ this.playlistClass() }>
                     <header>Your Playlist</header>
-                        { Object.keys(plstk).map(this.showPlayList) }
+                       <span>{ Object.keys(plstk).map(this.showPlayList) }</span>
                     </div>
                     <div className="clear"></div>
                 </div>
