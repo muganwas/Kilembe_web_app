@@ -289,8 +289,7 @@ class App extends Component {
         uid: userId,
         dname: name,
         LoginMessage: null,
-        hidden: true,
-        playlist: {}
+        hidden: true
       });
       let uid = this.state.uid;
       let exists = this.state.exists || null;
@@ -302,7 +301,6 @@ class App extends Component {
       for(var count=0;count<len; count++){
         localStorage.setItem(statesS[count], states[count]);
       }
-      localStorage.setItem('playlist', JSON.stringify(this.state.playlist));
     }, (error)=>{
       console.log(error.message)
       this.setState({
@@ -339,8 +337,7 @@ class App extends Component {
       email: email,
       dname: name,
       LoginMessage: null,
-      hidden: true,
-      playlist: {}
+      hidden: true
     });
     let exists = this.state.exists || null;
     let dname = this.state.dname;
@@ -351,7 +348,6 @@ class App extends Component {
     for(var count=0;count<len; count++){
       localStorage.setItem(statesS[count], states[count]);
     }
-    localStorage.setItem('playlist', JSON.stringify(this.state.playlist));
   }
   renderLogin(){
     const fbAuth = new Firebase.auth.FacebookAuthProvider();
