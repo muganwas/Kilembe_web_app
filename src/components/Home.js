@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Rebase from 're-base';
 import app from '../base';
 import Courses from './courses';
+import Donate from './Donate';
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 
@@ -75,7 +76,8 @@ class Home extends Component {
                 <div className="avator"></div>
                 <div id="paypal-button"></div>
                 <div className="clear"></div>
-                    <span id="welcome">You are Home, { this.state.dname || this.props.dname }!</span>
+                    <span id="welcome">You are Home, { this.state.dname || this.props.dname }!</span><div className="paypal"><Donate/></div>
+                    <div className="clear"></div>
                     <div className="left-col">
                         <div className="courses">
                             <h4>Available Courses</h4>
