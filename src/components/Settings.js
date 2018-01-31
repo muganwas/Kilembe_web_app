@@ -15,7 +15,7 @@ class Settings extends Component {
         }
     }
     componentWillMount(){
-        const userID = localStorage.getItem('uid');     
+        const userID = localStorage.getItem('dname');     
         base.fetch(`users/${ userID }`, {
             context: this,
             asArray: true
