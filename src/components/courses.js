@@ -96,7 +96,6 @@ class Courses extends Component {
         let playlist = this.state.playlist;
         let playlistLen = Object.keys(playlist).length;
         let iniVid = "https://www.youtube.com/embed/gfkTfcpWqAY";
-        let inividArr = iniVid.split('/');
         if(playlistLen===0 && playlist !== undefined && playlist !== null){
             return iniVid;
         }else if(playlistLen>=1){
