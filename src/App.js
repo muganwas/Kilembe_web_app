@@ -278,21 +278,22 @@ class App extends Component {
       });
     });
   } 
-  eAuthenticate(email, password){
-    let Rname = email.split('@');
-    let eDomain = Rname[1].split('.');
-    let eProv = eDomain[0];
-    let name = Rname[0];
-    let userId = name + eProv;
-    app.auth().signInWithEmailAndPassword(email, password).then(()=>{
+  eAuthenticate(temail, password){
+    app.auth().signInWithEmailAndPassword(temail, password).then(()=>{
+      let currUser = app.auth().currentUser;
+      let uid = currUser.uid;
+      let email = currUser.email;
+      let Rname = email.split('@');
+      let eDomain = Rname[1].split('.');
+      let eProv = eDomain[0];
+      let name = Rname[0];
       this.setState({
-        uid: userId,
+        uid: uid,
         dname: name,
         LoginMessage: null,
         hidden: true,
         playlist: {}
       });
-      let uid = this.state.uid;
       let exists = this.state.exists || null;
       let dname = this.state.dname;
       let Lemail = this.state.Lemail;
@@ -329,7 +330,6 @@ class App extends Component {
       });
     });
   }
-  
   authHandler(authData){
     const uid= authData.user.uid;
     const name= authData.user.displayName;

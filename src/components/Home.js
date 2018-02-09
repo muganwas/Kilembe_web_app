@@ -15,6 +15,7 @@ class Home extends Component {
         };
     }
     componentWillMount(){
+        var currUser = app.auth().currentUser;
         var courses = [];
         var videos = [];
         base.fetch(`courses`, {
@@ -30,6 +31,7 @@ class Home extends Component {
                     videos[count] = vidUrl;
                 }
                 this.setState({
+                    currentUser: JSON.stringify(currUser),
                     courses: courses,
                     urls: videos
                 }); 
@@ -54,7 +56,7 @@ class Home extends Component {
         });          
     }
     render(){  
-        const userID = this.props.dname;
+        const userID = this.props.uid;
         base.fetch(`users/${ userID }`, {
             context: this,
             asArray: true
@@ -81,7 +83,7 @@ class Home extends Component {
                     <div className="left-col">
                         <div className="courses">
                             <h4>Available Courses</h4>
-                            <Courses userID={this.props.dname} videos={ this.state.urls } courses = { this.state.courses } />
+                            <Courses userID={this.props.uid} videos={ this.state.urls } courses = { this.state.courses } />
                         </div>
                     </div>
                 </div>
