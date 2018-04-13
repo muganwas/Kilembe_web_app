@@ -1,8 +1,9 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route, Switch} from 'react-router-dom'
-import './index.css';
-import '../src/styles.css';
+import './styles/index.css';
+import './styles/styles.css';
+import './styles/animations.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import NotFound from './components/NotFound';
@@ -22,8 +23,7 @@ var Root = ()=>{
 }
 
 render(
-    <Root/>, 
-        mPoint
+    <Root/>, mPoint
     );
 
 registerServiceWorker();

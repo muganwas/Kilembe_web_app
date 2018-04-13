@@ -4,7 +4,7 @@ class Donate extends Component {
 
     render(){
         return (
-            <div>
+            <div className="paypal">
                 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
                     <input type="hidden" name="business"
                         value="stevenmuganwa@live.com"></input>
@@ -18,7 +18,7 @@ class Donate extends Component {
                     <input type="image" name="submit"
                     src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif"
                     alt="Donate"></input>
-                    <image alt="" width="1" height="1"
+                    <img alt="" width="1" height="1"
                     src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" />
 
                 </form>

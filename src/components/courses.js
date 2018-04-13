@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Rebase from 're-base';
 import app from '../base';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 class Courses extends Component {
@@ -55,11 +56,18 @@ class Courses extends Component {
         });
     }
     showPlayList = (key)=>{
-        return(
+        return( 
+            
             <div className="item" key={key}>
-                <div className="text">{key}</div><div onClick={ ()=>{this.removeItem(key)} } className="ex">&times;</div>
-                <div className="clear"></div>
-            </div>
+                <ReactCSSTransitionGroup transitionName = "example"
+                transitionAppear = {true} transitionAppearTimeout = {500}
+                transitionLeave = {true} transitionLeaveTimeout = {500}  
+                >
+                    <div className="text">{key}</div><div onClick={ ()=>{this.removeItem(key)} } className="ex icon-x-circle"></div>
+                    <div className="clear"></div>
+                </ReactCSSTransitionGroup>  
+            </div>   
+                
         )
 
     }

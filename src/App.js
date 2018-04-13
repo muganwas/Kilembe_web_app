@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
+import './styles/App.css';
 import app from './base';
 import Firebase from 'firebase';
 import Home from './components/Home';
@@ -284,8 +284,6 @@ class App extends Component {
       let uid = currUser.uid;
       let email = currUser.email;
       let Rname = email.split('@');
-      let eDomain = Rname[1].split('.');
-      let eProv = eDomain[0];
       let name = Rname[0];
       this.setState({
         uid: uid,
@@ -409,7 +407,7 @@ class App extends Component {
   render() {
     const logout = <span className="logout" onClick={this.logout}>Logout</span>;
     const settings = <span className="link" onClick={this.settings} >Settings</span>
-    const header = <Header home={this.home} settings={settings} logout={logout}/>;
+    const header = <Header dname={ this.state.dname } userId={ this.state.uid } home={this.home} settings={settings} logout={logout}/>;
     let feedBack = this.state.hidden === true?"hidden":"feedBack";
     if(this.state.uid !== null) {
       if(this.state.settings === null)

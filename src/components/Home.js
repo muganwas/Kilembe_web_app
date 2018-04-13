@@ -75,10 +75,8 @@ class Home extends Component {
             <div className="container">
                 {this.props.header}
                 <div className="content">
-                <div className="avator"></div>
                 <div id="paypal-button"></div>
                 <div className="clear"></div>
-                    <span id="welcome">You are Home, { this.state.dname || this.props.dname }!</span><div className="paypal"><Donate/></div>
                     <div className="clear"></div>
                     <div className="left-col">
                         <div className="courses">
@@ -87,7 +85,9 @@ class Home extends Component {
                         </div>
                     </div>
                 </div>
-                <div className="swagg">A React Single Page Application by <Link to="https://www.upwork.com/freelancers/~01edb2b7356420e161">Muganwas</Link></div>                
+                <div className="swagg">A React Single Page Application by <Link to="https://www.upwork.com/freelancers/~01edb2b7356420e161">Muganwas</Link>   
+                </div>
+                <Donate/>               
             </div>
         )
     }

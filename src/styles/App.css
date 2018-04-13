@@ -3,7 +3,7 @@
 }
 .clear {
   clear: both;
-  content: " ";
+  content: "";
 }
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
@@ -23,9 +23,6 @@
 
 .App-intro {
   font-size: large;
-}
-.paypal {
-  float: right;
 }
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
