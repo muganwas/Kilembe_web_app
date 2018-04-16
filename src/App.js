@@ -2,38 +2,28 @@ import React, { Component } from 'react';
 import './styles/App.css';
 import app from './base';
 import Firebase from 'firebase';
+import Rebase from 're-base';
 import Home from './components/Home';
 import Login from './components/Login';
 import Reset from './components/Reset';
 import Signup from './components/Signup';
 import Settings from './components/Settings';
 import Header from './components/Header';
+import Friends from './components/Friends';
+let base = Rebase.createClass(app.database());
+var storage = Firebase.storage();
+var storageRef = storage.ref();
 
 class App extends Component {
   
   constructor(props){
     super(props);
-    this.authenticate = this.authenticate.bind(this);
-    this.renderLogin = this.renderLogin.bind(this);
-    this.authHandler = this.authHandler.bind(this);
-    this.logout = this.logout.bind(this);
-    this.eAuthenticate = this.eAuthenticate.bind(this);
-    this.eReset = this.eReset.bind(this);
-    this.handleEmail = this.handleEmail.bind(this);
-    this.handlePass = this.handlePass.bind(this);
-    this.handlePassConf = this.handlePassConf.bind(this);
-    this.handleLogin = this.handleLogin.bind(this);
-    this.handleReset = this.handleReset.bind(this);
-    this.handleSignup = this.handleSignup.bind(this);
-    this.goToReg = this.goToReg.bind(this);
-    this.goToReset = this.goToReset.bind(this);
-    this.goToLogin = this.goToLogin.bind(this);
-    this.settings = this.settings.bind(this);
-    this.home = this.home.bind(this);
     this.state = {
       uid: null,
       hidden: true,
-      settings: null
+      home: true,
+      settings: null,
+      friends: null
     }
   }
   componentWillMount(){
@@ -43,13 +33,17 @@ class App extends Component {
     let exists = localStorage.getItem("exists")==="null"?null:localStorage.getItem("exists")==="false"?false:localStorage.getItem("exists");
     let reset = localStorage.getItem("reset")==="null"?null:localStorage.getItem("reset")==="true"?true:localStorage.getItem("reset");
     let settings = localStorage.getItem("settings")==="null"?null:localStorage.getItem("settings")==="true"?true:localStorage.getItem("settings");
+    let home = localStorage.getItem("home")==="null"?null:localStorage.getItem("home")==="true"?true:true;
+    let friends = localStorage.getItem("friends")==="null"?null:localStorage.getItem("friends")==="true"?true:localStorage.getItem("friends");
     if(uid !== null && exists === null) {
       this.setState({
         uid: uid,
         dname: dname,
         email: email,
         exists: exists,
-        settings: settings
+        settings: settings,
+        home: home,
+        friends: friends
       });
     }else if(uid === null && exists !==null){
       this.setState({
@@ -62,7 +56,7 @@ class App extends Component {
     }
   }
  
-  handleLogin(event){
+  handleLogin = (event)=>{
     event.preventDefault();
     let email = this.state.email;
     let password = this.state.Lpass;
@@ -80,7 +74,7 @@ class App extends Component {
       });
     }     
   }
-  handleReset(){
+  handleReset = ()=>{
     let email = this.state.email;
     if(email !== null && email !== ""){ 
         this.eReset(email); 
@@ -96,7 +90,7 @@ class App extends Component {
       });
     }     
   }
-  handleSignup(){
+  handleSignup = ()=>{
     let email = this.state.email;
     let password = this.state.Lpass;
     if((email !== null && email !== "") && (password != null && password !== "")){
@@ -120,7 +114,7 @@ class App extends Component {
       });
     }     
   }
-  handleEmail(event){
+  handleEmail = (event)=>{
     let emailregex = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
     let emailAdd = event.target.value;
     this.setState({
@@ -150,7 +144,7 @@ class App extends Component {
       })
     }
   }
-  handlePass(event){
+  handlePass = (event)=>{
     let pass = event.target.value;
     let passLen = pass.length;
     if(passLen >= 8){
@@ -177,7 +171,7 @@ class App extends Component {
       });
     }
   }
-  handlePassConf(event){
+  handlePassConf = (event)=>{
     let cPass = event.target.value;
     if(cPass !== null) {
       let pass = this.state.Lpass===undefined || this.state.Lpass===null?"": this.state.Lpass;
@@ -205,7 +199,7 @@ class App extends Component {
       }
     } 
   }
-  goToLogin(){
+  goToLogin = ()=>{
     this.setState({
       exists: null,
       reset: null
@@ -213,7 +207,7 @@ class App extends Component {
     localStorage.setItem('exists', null);
     localStorage.setItem('reset', null);
   }
-  goToReset(){
+  goToReset = ()=>{
     this.setState({
       reset: true,
       exists: null
@@ -221,7 +215,7 @@ class App extends Component {
     localStorage.setItem('reset', true);
     localStorage.setItem('exists', null);
   }
-  goToReg(){
+  goToReg = ()=>{
     this.setState({
       exists: false,
       reset: null
@@ -229,7 +223,7 @@ class App extends Component {
     localStorage.setItem('exists', false);
     localStorage.setItem('reset', null);
   }
-  eSignup(email, password){
+  eSignup = (email, password)=>{
     app.auth().createUserWithEmailAndPassword(email, password).then(()=>{
       this.setState({
         exists: null,
@@ -254,7 +248,7 @@ class App extends Component {
       });
     });
   }
-  eReset(email){
+  eReset = (email)=>{
     app.auth().sendPasswordResetEmail(email).then(()=>{
       this.setState({
         LoginMessage: "We sent you a reset email, please check your inbox"
@@ -278,13 +272,14 @@ class App extends Component {
       });
     });
   } 
-  eAuthenticate(temail, password){
+  eAuthenticate = (temail, password)=>{
     app.auth().signInWithEmailAndPassword(temail, password).then(()=>{
       let currUser = app.auth().currentUser;
       let uid = currUser.uid;
       let email = currUser.email;
       let Rname = email.split('@');
       let name = Rname[0];
+      this.getUserAv(uid);
       this.setState({
         uid: uid,
         dname: name,
@@ -315,7 +310,7 @@ class App extends Component {
       });
     });
   }
-  authenticate(provider, callback){
+  authenticate = (provider, callback)=>{
     app.auth().signInWithPopup(provider).then(callback, (error)=>{
       this.setState({
         LoginMessage: error.message
@@ -328,10 +323,37 @@ class App extends Component {
       });
     });
   }
-  authHandler(authData){
+  getUserAv = (userId)=>{
+    base.fetch(`users/${ userId }`, {
+        context: this,
+        asArray: true,
+        then(data){
+          let len = data.length;
+          if( len !== 0){
+            let fl = data[0][0];
+            let avURL = data[0];
+            if(fl === "h"){
+              this.setState({
+                avatar: avURL
+              });
+              localStorage.setItem('avatar', avURL);
+            }else{
+              storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
+                this.setState({
+                  avatar: data
+                });
+                localStorage.setItem('avatar', data);
+              });
+            }
+          }
+        }
+    });  
+  }
+  authHandler = (authData)=>{
     const uid= authData.user.uid;
     const name= authData.user.displayName;
     const email= authData.user.email;
+    this.getUserAv(uid);
     this.setState({
       uid: uid,
       email: email,
@@ -351,7 +373,7 @@ class App extends Component {
     }
     localStorage.setItem('playlist', JSON.stringify(this.state.playlist));
   }
-  renderLogin(){
+  renderLogin = ()=>{
     const fbAuth = new Firebase.auth.FacebookAuthProvider();
     const googleAuth = new Firebase.auth.GoogleAuthProvider();
     const Reg = <span className="link" onClick={()=>this.goToReg()}>Register</span>;
@@ -368,7 +390,7 @@ class App extends Component {
       </div>
     )
   }
-  logout() {
+  logout = ()=>{
     app.auth().signOut().then(()=>{
       this.setState({
         uid:null,
@@ -376,15 +398,22 @@ class App extends Component {
         email: null,
         dname:null,
         Lpass:null,
-        settings: null
+        home:true,
+        friends: null,
+        settings: null,
+        avatar: null
       });
+      localStorage.removeItem("avatar");
       let uid = this.state.uid;
       let exists = this.state.exists || null;
       let dname = this.state.dname;
       let Lemail = this.state.Lemail;
       let email = this.state.email;
-      let states = [uid, exists,email,dname,Lemail];
-      let statesS = ['uid', 'exists','email','dname','Lemail'];
+      let home = this.state.home;
+      let friends = this.state.friends;
+      let settings = this.state.settings;
+      let states = [uid,exists,email,dname,Lemail,home,friends,settings];
+      let statesS = ['uid', 'exists','email','dname','Lemail','home','friends','settings'];
       let len = states.length;
       for(var count=0;count<len; count++){
         localStorage.setItem(statesS[count], states[count]);
@@ -392,34 +421,56 @@ class App extends Component {
       console.log("user signed out!");
     })
   }
-  settings(){
+  settings = ()=>{
     localStorage.setItem('settings', true);
+    localStorage.setItem('home', null);
+    localStorage.setItem('friends', null);
     this.setState({
-      settings: true
+      settings: true,
+      home: null,
+      friends: null
     });
   }
-  home(){
+  home = ()=>{
     localStorage.setItem('settings', null);
-    this.setState({
-      settings: null
-    });
-  } 
+    localStorage.setItem('home', true);
+    localStorage.setItem('friends', null);
+      this.setState({
+        settings: null,
+        home: true,
+        friends: null
+      });
+  }
+  friends = ()=>{
+    localStorage.setItem('settings', null);
+    localStorage.setItem('home', null);
+    localStorage.setItem('friends', true);
+      this.setState({
+        settings: null,
+        home: null,
+        friends: true
+      });
+  }
   render() {
     const logout = <span className="logout" onClick={this.logout}>Logout</span>;
     const settings = <span className="link" onClick={this.settings} >Settings</span>
-    const header = <Header dname={ this.state.dname } userId={ this.state.uid } home={this.home} settings={settings} logout={logout}/>;
+    const header = <Header dname={ this.state.dname } userId={ this.state.uid } friends={ this.friends } home={ this.home } settings={settings} logout={logout}/>;
     let feedBack = this.state.hidden === true?"hidden":"feedBack";
     if(this.state.uid !== null) {
-      if(this.state.settings === null)
+      if(this.state.home === true )
       {
         return(
           <div className="Home">
-            <Home header={header} logout={logout} dname={this.state.dname} uid={ this.state.uid } email={this.state.email} settings={settings} />
+            <Home avatar={ this.state.avatar } header={header} logout={logout} dname={this.state.dname} uid={ this.state.uid } email={this.state.email} settings={settings} />
           </div>
         )
       }else if(this.state.settings === true){
         return(
           <Settings header={header} settings={settings} logout={logout}/>
+        )
+      }else if(this.state.friends === true){
+        return(
+          <Friends header={ header } userId={ this.state.uid } />
         )
       }
     }else if(this.state.exists === false){

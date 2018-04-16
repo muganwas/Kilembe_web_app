@@ -23,6 +23,9 @@ li{
 .icon{
   cursor: pointer;
 }
+.icon:hover::before{
+  color: #fdd806;
+}
 .main{
   display: block;
   text-align: center;
@@ -106,7 +109,7 @@ li{
 .avContainer{
   display: inline-block;
 }
-.icon{
+.nav .icon{
   float: left;
   padding: 5px 10px;
   margin: auto 0;
@@ -211,7 +214,6 @@ li{
 }
 .settings {
   border: thin solid #bdbbbb;
-  margin-top: 50px;
 }
 .clear{
   content: "";
@@ -248,7 +250,7 @@ li{
   font-size: 13px;
   font-weight: bold;
   float: left;
-  margin: 15% 0;
+  margin: 14% 0;
 }
 .avator{
   width: 30px;
@@ -257,6 +259,16 @@ li{
   float: left;
 }
 #avator{
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+.membersAv{
+  width: 30px;
+  cursor: pointer;
+  float: left;
+}
+.members{
   position: relative;
   width: 100%;
   height: auto;
@@ -317,9 +329,10 @@ li{
 }
 .courses .urls{
   display: block;
-  padding: 5px;
+  padding: 2px 2px 2px 5px;
+  margin: 1px;
   background-color: #fdd806;
-  border: thin solid #494141;
+  border: thin solid #bec1c6;
   color: #43423c;
   overflow: hidden;
   font-weight: bold;
@@ -401,4 +414,61 @@ li{
 }
 .icon-x-circle::before {
   font-size: 17px;
+}
+.sub-container{
+  padding: 10px 0;
+}
+.pfriends{
+  padding: 2px;
+}
+
+@media only screen and (max-width: 900px){
+  .playlist{
+    display: none;
+  }
+  .courses .tutorial{
+    box-sizing: border-box;
+    min-width: 50%;
+    overflow: hidden;
+    float: left;
+    padding: 5px 5px 10px 5px;
+    margin: 0 0 0 15px;
+    width: 70%;
+    height: auto;
+    background-color: #fff;
+  }
+}
+@media only screen and (max-width: 712px){
+  .courses .tutorial{
+    box-sizing: border-box;
+    min-width: 90%;
+    overflow: hidden;
+    float: left;
+    padding: 5px 5px 10px 5px;
+    margin: 0;
+    width: 100%;
+    height: auto;
+    background-color: #fff;
+  }
+  .courses div{
+    box-sizing: border-box;
+    position: relative;
+  }
+  .group{
+    box-sizing: border-box;
+    float: left;
+    padding: 0;
+    min-width: 90%;
+    width: 100%!important;
+  }
+  .courses .youtube {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%; 
+  }
+}
+@media only screen and (max-width: 455px){
+  #welcome{
+    display: none;
+  }
 }

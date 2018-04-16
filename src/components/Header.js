@@ -6,34 +6,81 @@ class Header extends Component {
         super(props);
         this.state={
             userId: this.props.userId,
-            dname: this.props.dname
+            dname: this.props.dname,
+            home: this.props.home,
+            friends: this.props.friends,
+            settings: this.props.settings,
+            logout: this.props.logout,
+            dropDownStyle: null,
+            arrStyle: null,
+            homeStyle: "menu icon icon-youtube-alt",
+            friendsStyle: "menu icon icon-torsos-all",
+            chatStyle: "menu icon icon-comments",
+            menuStyle: "menu icon icon-menu",
+            settingsIconStyle: "small icon-settings",
+            logoutIconStyle: "small icon-logout"
+
         }
     }
-    showMenu = ()=>{
-        var menu = document.getElementById('menu');
-        var arr = document.getElementById('arr');
-        if(menu.classList.contains("visible")){
-            menu.classList.remove("visible");
-            arr.classList.remove("visible");
+    componentWillMount(){
+        /*let localAv = localStorage.getItem("avatar");
+        console.log(localAv);
+        
+        let propAv = this.props.avatar;
+        if( propAv !== null && propAv !== undefined){
+            this.setState({
+                avatar: propAv
+            });
         }else{
-            menu.classList.add("visible");
-            arr.classList.add("visible");
+            this.setState({
+                avatar: localAv
+            });
+        }*/
+    }
+    componentWillReceiveProps(props){
+
+        /*let propAv = this.props.avatar;
+        if( propAv !== null && propAv !== undefined){
+            this.setState({
+                avatar: propAv
+            });
+        }*/
+    }
+    showMenu = ()=>{
+        var menu = this.state.dropDownStyle;
+        if( menu !== "visible"){
+            this.setState({
+                dropDownStyle: "visible",
+                arrStyle: "visible"
+            });
+        }else{
+            this.setState({
+                dropDownStyle: null,
+                arrStyle: null
+            });
+            
         }
     }
     render(){
+        const home = this.state.home;
+        const settings= this.state.settings;
+        const friends = this.state.friends;
+        const logout = this.state.logout;
         return (
             <div className="mainNav">
                 <ProfileImage dname={ this.state.dname } userId = { this.state.userId } />     
                 <div className="nav">    
-                    <span className="menu icon icon-home" onClick={this.props.home }></span>   
-                    <span className="menu icon icon-menu" onClick={this.showMenu}>
-                        <div id="arr">
-                            <ul id="menu">
-                                <li className="small icon-settings">
-                                    {this.props.settings}
+                    <span className={ this.state.homeStyle } onClick={ home }></span>
+                    <span className={ this.state.friendsStyle } onClick={ friends }></span>
+                    <span className={ this.state.chatStyle } onClick={ home }></span> 
+                    <span className={ this.state.menuStyle } onClick={this.showMenu}>
+                        <div id="arr" className={ this.state.arrStyle }>
+                            <ul id="menu" className={ this.state.dropDownStyle }>
+                                <li className={ this.state.settingsIconStyle }>
+                                    { settings }
                                 </li>
-                                <li className="small icon-logout">
-                                    {this.props.logout}
+                                <li className={ this.state.logoutIconStyle }>
+                                    { logout }
                                 </li>
                             </ul>
                         </div>

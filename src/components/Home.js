@@ -1,20 +1,68 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import Rebase from 're-base';
+import firebase from 'firebase';
 import app from '../base';
 import Courses from './courses';
-import Donate from './Donate';
+import Footer from './Footer';
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
+var storage = firebase.storage();
+var storageRef = storage.ref();
 
 class Home extends Component {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {
             courses: {}
         };
     }
-    componentWillMount(){
+    getImage = ()=>{
+        return new Promise((resolve, reject)=>{
+            let userId = this.props.uid;
+            base.fetch(`users/${ userId }`, {
+                context: this,
+                asArray: true,
+                then(data){
+                    let len = data.length;
+                    if( len !== 0){
+                        let fl = data[0][0];
+                        let avURL = data[0];
+                        if(fl === "h"){
+                            this.setState({
+                            avatar: avURL
+                            });
+                            localStorage.setItem('avatar', avURL);
+                        }else{
+                            storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
+                            this.setState({
+                                avatar: data,
+                            });
+                            localStorage.setItem('avatar', data);
+                            });
+                        }
+                    }else{
+                        storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
+                            this.setState({
+                                avatar: data,
+                            });
+                            localStorage.setItem('avatar', data);
+                        }); 
+                    }
+                }
+            });
+        });
+    }
+    postInfo = ()=>{
+        let userID = this.props.uid;
+        let userRef = usersRef.child(userID);
+        userRef.set({
+            email: localStorage.getItem('email'),
+            dname: localStorage.getItem('dname'),
+            uid: localStorage.getItem('uid'),
+            avatar: localStorage.getItem("avatar")
+        });
+    }
+    componentDidMount(){
         var currUser = app.auth().currentUser;
         var courses = [];
         var videos = [];
@@ -36,41 +84,34 @@ class Home extends Component {
                     urls: videos
                 }); 
             } 
-        });
-        const userID = this.props.dname;
-        console.log(userID);
-        base.fetch(`users/${ userID }`, {
-            context: this,
-            asArray: true
-        }).then((data)=>{
-            let length = data.length;
-            if(length!==0 && length!==null) {
-                let kTitle = ['dname', 'uid', 'email'];
-                for(var count =0; count<length; count++){
-                    base.syncState(`users/${ userID }/${kTitle[count]}`, {
-                        context: this,
-                        state: `${kTitle[count]}`
+        });        
+    }
+    componentWillMount(){
+        const userID = this.props.uid;
+        const avatar = this.props.avatar;
+        const storAv = localStorage.getItem("avatar");
+        if((avatar !== null && avatar !== undefined) || (storAv !== null && storAv!== undefined)){
+            base.fetch(`users/${ userID }`, {
+                context: this,
+                asArray: true
+            }).then((data)=>{
+                let length = data.length;
+                if(length===0 || length===null) {
+                    let userRef = usersRef.child(userID);
+                    userRef.set({
+                        email: localStorage.getItem('email'),
+                        dname: localStorage.getItem('dname'),
+                        uid: localStorage.getItem('uid'),
+                        avatar: localStorage.getItem("avatar") || avatar
                     });
                 }
-            }
-        });          
+            });
+        }else{
+            this.getImage();
+            setTimeout(()=>{this.postInfo()}, 2000);
+        }
     }
-    render(){  
-        const userID = this.props.uid;
-        base.fetch(`users/${ userID }`, {
-            context: this,
-            asArray: true
-        }).then((data)=>{
-            let length = data.length;
-            if(length===0 || length===null) {
-                let userRef = usersRef.child(userID);
-                userRef.set({
-                    email: localStorage.getItem('email'),
-                    dname: localStorage.getItem('dname'),
-                    uid: localStorage.getItem('uid')
-                });
-            }
-        });
+    render(){   
         return (
             <div className="container">
                 {this.props.header}
@@ -85,12 +126,9 @@ class Home extends Component {
                         </div>
                     </div>
                 </div>
-                <div className="swagg">A React Single Page Application by <Link to="https://www.upwork.com/freelancers/~01edb2b7356420e161">Muganwas</Link>   
-                </div>
-                <Donate/>               
+                <Footer />                               
             </div>
         )
     }
 }
-
 export default Home;

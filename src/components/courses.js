@@ -61,6 +61,7 @@ class Courses extends Component {
             <div className="item" key={key}>
                 <ReactCSSTransitionGroup transitionName = "example"
                 transitionAppear = {true} transitionAppearTimeout = {500}
+                transitionEnter = { false }
                 transitionLeave = {true} transitionLeaveTimeout = {500}  
                 >
                     <div className="text">{key}</div><div onClick={ ()=>{this.removeItem(key)} } className="ex icon-x-circle"></div>
@@ -90,11 +91,8 @@ class Courses extends Component {
         
         return(
             <div key={key}>
-                <div className="course">
-                    { courseName }
-                </div>
                 <div onClick={ this.goToUrl } id={ courseUrl } title={ courseName } className={ this.state.linkStyle }>
-                    { courseName + " Video" }
+                    { courseName }
                 </div>
                 <div className="clear"></div>
             </div>
@@ -137,7 +135,7 @@ class Courses extends Component {
                         { Object.keys(chcker).map(this.showCourses) }
                     </div>
                     <div className="tutorial">
-                    <header>Course Video</header>
+                        <header>Course Video</header>
                         <iframe className="youtube" title="tutorial video" src={ this.videoSource() }
                         frameBorder="0" allowFullScreen></iframe>
                     </div>

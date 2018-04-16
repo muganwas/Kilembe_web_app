@@ -1,59 +1,99 @@
 import React, { Component } from 'react';
 import firebase from 'firebase';
+import Rebase from 're-base';
+import app from '../base';
+let base = Rebase.createClass(app.database());
 var storage = firebase.storage();
 var storageRef = storage.ref();
 
 class ProfileImage extends Component {
     constructor(props){
-        super(props);
+        super(props); 
         this.state={
             userId: this.props.userId,
             dname: this.props.dname,
-            levelId: ""
+            levelId: "",
+            picState: "roundPic hidden"
         }
     }
-    componentWillMount(){
+    
+    componentWillMount(){ 
         this.getImage();
+        /*let propAv = this.props.avatar;
+        let avatar = localStorage.getItem("avatar");
+        if(propAv !== null && propAv !== undefined){
+            this.setState({
+                avatar: propAv,
+                picState: "roundPic"
+            });
+        }else{
+            this.setState({
+                avatar: avatar,
+                picState: "roundPic"
+            });
+        }*/ 
+    }
+    /*
+    componentDidMount(){
+        
+        if(this.state.uploaded === true){
+            this.synState();
+        }
+        //this.getImage();
+    }
+    */
+    synState = ()=>{
+        let userId = this.props.userId;
+        base.syncState(`users/${ userId }/avatar`, {
+            context: this,
+            state: 'avatar'
+        });
     }
     getImage = ()=>{
-        var userId = this.state.userId;
-        var extArr = ['jpg', 'jpeg', 'png', 'gif', 'bs'];
-        var len = extArr.length;
-        var count = 0;
-        for(count; count < len; count++){
-            if(count <= 3) {
-                let ext = extArr[count];
-                storageRef.child(`${ userId }/avatar.${ext}`).getDownloadURL().then((url)=>{
-                    storageRef.child(`${ userId }/avatar.${ext}`).getDownloadURL().then((url)=>{
+        let userId = this.props.userId;
+        base.fetch(`users/${ userId }`, {
+            context: this,
+            asArray: true,
+            then(data){
+                let len = data.length;
+                if( len !== 0){
+                    let fl = data[0][0];
+                    let avURL = data[0];
+                    if(fl === "h"){
                         this.setState({
-                            avatar: url
+                        avatar: avURL,
+                        picState: "roundPic",
+                        imessage: "",
+                        levelId: "level hidden"
                         });
-                    }, (error)=>{
+                        localStorage.setItem('avatar', avURL);
+                        this.synState();
+                    }else{
+                        storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
                         this.setState({
-                            imessage: error,
-                            levelId: "level"
-                        });
-                        console.log(error)
-                    }).then(()=>{
-                        this.setState({
+                            avatar: data,
+                            picState: "roundPic",
                             imessage: "",
-                            levelId: ""
-                        })
-                    });
-                });
-            }else{
-                storageRef.child('general/avatar.jpg').getDownloadURL().then((url)=>{
-                    this.setState({
-                        avatar: url
-                    })
-                }).catch((error)=>{
-                    this.setState({
-                        imessage: error,
-                        levelId: "level"
-                    });
-                }); 
-            }   
-        }
+                            levelId: "level hidden"
+                        });
+                        localStorage.setItem('avatar', data);
+                        this.synState();
+                        });
+                    }
+                }else{
+                    storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
+                        this.setState({
+                            avatar: data,
+                            picState: "roundPic",
+                            imessage: "",
+                            levelId: "level hidden"
+                        });
+                        localStorage.setItem('avatar', data);
+                        this.synState();
+                    }); 
+                }
+            }
+        });
     }
     uploadAv = (e)=>{
         let userId = this.state.userId;
@@ -64,16 +104,25 @@ class ProfileImage extends Component {
         if(fnameExt === "jpg" || fnameExt === "png" || fnameExt === "jpeg" || fnameExt === "gif"){
             let newAvRef = storageRef.child(`${ userId }/avatar.${ fnameExt }`);
             newAvRef.put(file).then(()=>{
-                this.setState({
-                    imessage: 'Upload Complete',
-                    levelId: "level"
+                storageRef.child(`${ userId }/avatar.${fnameExt}`).getDownloadURL().then((url)=>{
+                    //localStorage.setItem('avatar', url);
+                    this.setState({
+                        avatar: url,
+                        picState: "roundPic",
+                        imessage: "Upload Complete",
+                        levelId: "level",
+                        ext: fnameExt,
+                        uploaded: true
+                    });
+                    setTimeout(()=>{
+                        this.getImage();
+                    }, 3000);
                 });
-                setTimeout(this.getImage(), 2000);
             }, ()=>{
                 this.setState({
                     imessage: 'There was an error!, try again.',
                     levelId: "level"
-                })
+                });
             });
         }else{
             this.setState({
@@ -86,7 +135,6 @@ class ProfileImage extends Component {
         let uploadB = document.getElementById('hs');
         uploadB.click();
     }
-
     render(){
         var image = this.state.avatar;
         return (
@@ -95,7 +143,7 @@ class ProfileImage extends Component {
                 <div className="avator">
                     <form method="POST" encType="multipart/form-data">
                         <input className="hidden" type="file" id="hs" name="avator" onChange={ this.uploadAv } ></input>
-                        <div className="roundPic">
+                        <div className={ this.state.picState }>
                             <img id="avator" alt="click to change Avatar" title="click to change Avatar" src = { image } onClick={ this.clickUploadAv }/>
                         </div>
                     </form>

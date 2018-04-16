@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Rebase from 're-base';
 import app from '../base';
+import Footer from './Footer';
 let base = Rebase.createClass(app.database());
 
 class Settings extends Component {
@@ -65,12 +66,13 @@ class Settings extends Component {
                 <div className="container">
                     { this.props.header }
                     <div className="settings content">
-                        <span onClick={ this.disabled } className="icon icon-pencil">Settings </span>
+                        <span onClick={ this.disabled } className="icon icon-pencil">Profile</span>
                         <span className="settingT">Your Email Address: </span> <span className="settingD"><input type="text" defaultValue={()=>this.state.email } placeholder={ this.state.email } disabled="true" /></span>
                         <span className="settingT">Your Display Name: </span> <span className="settingD"><input className="icon" type="text" defaultValue={ this.state.dname } placeholder={ this.state.dname } onChange={ this.changeDname } disabled={ this.state.disabled }/></span>
                         <span className="settingT">Your User Id: </span> <span className="settingD"><input className="icon" type="text" defaultValue={ this.state.uid } placeholder={ this.state.uid } onChange={ this.changeUid } disabled={ this.state.disabled }/></span>
                         <button onClick={ this.save }  className="icon icon-floppy" disabled={ this.state.disabled }></button>
                     </div>
+                    <Footer />
                 </div>
             </div>
         )
