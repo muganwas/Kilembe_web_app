@@ -21,7 +21,11 @@ li{
   list-style: none;
 }
 .icon{
+  display: inline-block;
   cursor: pointer;
+}
+.medium-icon, .medium-icon::before{
+  font-size: 15px;
 }
 .icon:hover::before{
   color: #fdd806;
@@ -209,11 +213,15 @@ li{
 .mainNav .small {
   font-size: 11px;
 }
-.Home .content {
-  padding: 0;
-}
 .settings {
   border: thin solid #bdbbbb;
+}
+.settings input[type="text"]{
+  color: #3a3a3a;
+}
+.settings .info{
+  float: left;
+  color: #282828;
 }
 .clear{
   content: "";
@@ -242,9 +250,22 @@ li{
   background-color: #fdd806;
   padding: 2px 5px;
 }
-.Home .settingD input {
+.Home .settingD::after{
+  clear: both;
+  content: "";
+  display: block;
+}
+.Home .settingD input[type="text"] {
   width: 300px;
   padding: 2px;
+}
+.Home .settingD input[type="checkbox"]{
+  float: left;
+}
+#about{
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100px;
 }
 #welcome{
   font-size: 13px;
@@ -265,6 +286,8 @@ li{
 }
 .membersAv{
   width: 30px;
+  max-height: 40px;
+  min-height: 30px;
   cursor: pointer;
   float: left;
 }
@@ -290,6 +313,9 @@ li{
   transition: all 0.2s ease-in;
 }
 .roundPic {
+  width: 30px;
+  max-height: 40px;
+  min-height: 30px;
   border: thin solid #c9c9c9;
   position: relative;
   overflow: hidden;
@@ -302,18 +328,18 @@ li{
   contain: "";
   clear: both;
 }
-.courses{
+.content{
   font-size: 13px;
-  background-color: #ece3e2;
-  border: thin solid #bdbbbb;
-  padding: 0 30px 20px;
-  margin: 0;
+  background-color: #ffffff;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  padding: 5px 30px 20px;
+  margin: 2px;
 }
-.courses .group{
+.content .group{
   float:left;
   width: 25%;
 }
-.courses header {
+.content header {
   display: block;
   width: 50%;
   float: left;
@@ -321,13 +347,13 @@ li{
   font-weight: bold;
   cursor: pointer;
 }
-.courses .bod {
+.content .bod {
   min-width: 50%;
   float: left;
   color: #43423c;
   cursor: pointer;
 }
-.courses .urls{
+.content .urls{
   display: block;
   padding: 2px 2px 2px 5px;
   margin: 1px;
@@ -338,10 +364,10 @@ li{
   font-weight: bold;
   cursor: pointer;
 }
-.courses .urls:hover{
+.content .urls:hover{
   background-color: #caf8ca;
 }
-.courses .course {
+.content .course {
   display: block;
   padding: 5px;
   background-color: #494141;
@@ -349,7 +375,7 @@ li{
   color: #fff;
   margin: 2px 0;
 }
-.courses .tutorial{
+.content .tutorial{
   min-width: 50%;
   overflow: hidden;
   float: left;
@@ -357,9 +383,9 @@ li{
   margin: 0 0 0 15px;
   width: 50%;
   height: 315px;
-  background-color: #fff;
+  box-shadow: 0 0.5px 0 0 #ffffff inset, 0 1px 2px 0 #B3B3B3;
 }
-.courses .youtube {
+.content .youtube {
   box-sizing: content-box;
   width: 100%;
   height: 100%; 
@@ -385,7 +411,7 @@ li{
   box-sizing: content-box;
   width:18%;
   float: left;
-  background-color: #fff;
+  box-shadow: 0 0.5px 0 0 #ffffff inset, 0 1px 2px 0 #B3B3B3;
   padding: 5px;
 }
 .playlist .item {
@@ -417,16 +443,115 @@ li{
 }
 .sub-container{
   padding: 10px 0;
+  text-align: center;
 }
 .pfriends{
-  padding: 2px;
-}
+    font-size: 13px;
+    font-weight: bold;
+    margin: 5% 10px;
 
+}
+.people{
+  text-align: left;
+  box-sizing: content-box;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+  position: relative;
+  display: inline-block;
+  min-width: 200px;
+  min-height: 40px;
+  max-height: 45px;
+  margin: 5px;
+  padding: 5px;
+  cursor: pointer;
+  z-index: 1000;
+}
+.people:hover{
+  box-shadow: 0 1px #FFFFFF inset, 0 1px 3px rgba(34, 25, 25, 0.4);
+}
+.people>div{
+  display: inline-block;
+}
+.nav-button-container{
+  box-sizing: border-box;
+  background: #fdd806;
+  padding: 0 5px 0 0;
+  border-radius: 1px;
+  display: inline-block;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+}
+.nav-button{
+  position: relative;
+  display: inline-block;
+  min-height: 15px;
+  min-width: 50px;
+  margin:0;
+  text-align: center;
+}
+.ficon::before{
+  color: #fff;
+  background: #494141;
+  position: relative;
+  display: inline-block;
+  min-height: 15px;
+  padding: 5px;
+  vertical-align: middle;
+  text-align: left;
+}
+.ficon{
+  margin: 2px 0;
+}
+.currUserDits{
+  margin: 5px 0;
+  padding: 20px 10px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+}
+.currUserDits #right{
+  display: inline-block;
+  float: left;
+  margin: 10px 0 auto 20px;
+  padding: 5px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+}
+.currUserDits #center{
+  float: left;
+  margin: 5px 0 auto 20px;
+  padding: 5px;
+}
+.currUserDits #left{
+  float: left;
+}
+.currUserDits .roundPic{
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.currUserDits .membersAv{
+  width: 100px;
+  max-height: 130px;
+  min-height: 100px;
+  cursor: pointer;
+  float: left;
+}
+.currUserDits .ficon{
+  display: block;
+  text-transform: capitalize;
+}
+.currUserDits .ficon span{
+  display: inline-block;
+  margin: 0 2px;
+}
+.currUserDits::after{
+  clear: both;
+  content: "";
+  display: block;
+}
 @media only screen and (max-width: 900px){
   .playlist{
     display: none;
   }
-  .courses .tutorial{
+  .content .tutorial{
     box-sizing: border-box;
     min-width: 50%;
     overflow: hidden;
@@ -439,7 +564,7 @@ li{
   }
 }
 @media only screen and (max-width: 712px){
-  .courses .tutorial{
+  .content .tutorial{
     box-sizing: border-box;
     min-width: 90%;
     overflow: hidden;
@@ -450,7 +575,7 @@ li{
     height: auto;
     background-color: #fff;
   }
-  .courses div{
+  .content div{
     box-sizing: border-box;
     position: relative;
   }
@@ -461,7 +586,7 @@ li{
     min-width: 90%;
     width: 100%!important;
   }
-  .courses .youtube {
+  .content .youtube {
     box-sizing: border-box;
     width: 100%;
     height: 100%; 

@@ -19,32 +19,7 @@ class Header extends Component {
             menuStyle: "menu icon icon-menu",
             settingsIconStyle: "small icon-settings",
             logoutIconStyle: "small icon-logout"
-
         }
-    }
-    componentWillMount(){
-        /*let localAv = localStorage.getItem("avatar");
-        console.log(localAv);
-        
-        let propAv = this.props.avatar;
-        if( propAv !== null && propAv !== undefined){
-            this.setState({
-                avatar: propAv
-            });
-        }else{
-            this.setState({
-                avatar: localAv
-            });
-        }*/
-    }
-    componentWillReceiveProps(props){
-
-        /*let propAv = this.props.avatar;
-        if( propAv !== null && propAv !== undefined){
-            this.setState({
-                avatar: propAv
-            });
-        }*/
     }
     showMenu = ()=>{
         var menu = this.state.dropDownStyle;
@@ -62,25 +37,21 @@ class Header extends Component {
         }
     }
     render(){
-        const home = this.state.home;
-        const settings= this.state.settings;
-        const friends = this.state.friends;
-        const logout = this.state.logout;
         return (
             <div className="mainNav">
                 <ProfileImage dname={ this.state.dname } userId = { this.state.userId } />     
                 <div className="nav">    
-                    <span className={ this.state.homeStyle } onClick={ home }></span>
-                    <span className={ this.state.friendsStyle } onClick={ friends }></span>
-                    <span className={ this.state.chatStyle } onClick={ home }></span> 
-                    <span className={ this.state.menuStyle } onClick={this.showMenu}>
+                    <span className={ this.state.homeStyle } onClick={ this.state.home }></span>
+                    <span className={ this.state.friendsStyle } onClick={ this.state.friends }></span>
+                    <span className={ this.state.chatStyle }></span> 
+                    <span className={ this.state.menuStyle } onClick={ this.showMenu }>
                         <div id="arr" className={ this.state.arrStyle }>
                             <ul id="menu" className={ this.state.dropDownStyle }>
                                 <li className={ this.state.settingsIconStyle }>
-                                    { settings }
+                                    { this.state.settings }
                                 </li>
                                 <li className={ this.state.logoutIconStyle }>
-                                    { logout }
+                                    { this.state.logout }
                                 </li>
                             </ul>
                         </div>

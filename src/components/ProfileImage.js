@@ -19,35 +19,15 @@ class ProfileImage extends Component {
     
     componentWillMount(){ 
         this.getImage();
-        /*let propAv = this.props.avatar;
-        let avatar = localStorage.getItem("avatar");
-        if(propAv !== null && propAv !== undefined){
-            this.setState({
-                avatar: propAv,
-                picState: "roundPic"
-            });
-        }else{
-            this.setState({
-                avatar: avatar,
-                picState: "roundPic"
-            });
-        }*/ 
     }
-    /*
-    componentDidMount(){
-        
-        if(this.state.uploaded === true){
-            this.synState();
-        }
-        //this.getImage();
-    }
-    */
     synState = ()=>{
         let userId = this.props.userId;
-        base.syncState(`users/${ userId }/avatar`, {
-            context: this,
-            state: 'avatar'
-        });
+        if(this.state.avatar !== undefined && this.state.avatar !== null){
+            base.syncState(`users/${ userId }/avatar`, {
+                context: this,
+                state: 'avatar'
+            });
+        }
     }
     getImage = ()=>{
         let userId = this.props.userId;
@@ -56,9 +36,9 @@ class ProfileImage extends Component {
             asArray: true,
             then(data){
                 let len = data.length;
-                if( len !== 0){
-                    let fl = data[0][0];
-                    let avURL = data[0];
+                if( len !== 0 && len !== undefined){
+                    let fl = data[1][0];
+                    let avURL = data[1];
                     if(fl === "h"){
                         this.setState({
                         avatar: avURL,
@@ -70,14 +50,14 @@ class ProfileImage extends Component {
                         this.synState();
                     }else{
                         storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
-                        this.setState({
-                            avatar: data,
-                            picState: "roundPic",
-                            imessage: "",
-                            levelId: "level hidden"
-                        });
-                        localStorage.setItem('avatar', data);
-                        this.synState();
+                            this.setState({
+                                avatar: data,
+                                picState: "roundPic",
+                                imessage: "",
+                                levelId: "level hidden"
+                            });
+                            localStorage.setItem('avatar', data);
+                            this.synState();
                         });
                     }
                 }else{
@@ -105,7 +85,6 @@ class ProfileImage extends Component {
             let newAvRef = storageRef.child(`${ userId }/avatar.${ fnameExt }`);
             newAvRef.put(file).then(()=>{
                 storageRef.child(`${ userId }/avatar.${fnameExt}`).getDownloadURL().then((url)=>{
-                    //localStorage.setItem('avatar', url);
                     this.setState({
                         avatar: url,
                         picState: "roundPic",
@@ -136,7 +115,6 @@ class ProfileImage extends Component {
         uploadB.click();
     }
     render(){
-        var image = this.state.avatar;
         return (
             <div className="avContainer">
                 <span id={ this.state.levelId }>{ this.state.imessage }</span>
@@ -144,7 +122,7 @@ class ProfileImage extends Component {
                     <form method="POST" encType="multipart/form-data">
                         <input className="hidden" type="file" id="hs" name="avator" onChange={ this.uploadAv } ></input>
                         <div className={ this.state.picState }>
-                            <img id="avator" alt="click to change Avatar" title="click to change Avatar" src = { image } onClick={ this.clickUploadAv }/>
+                            <img id="avator" alt="Your Avatar" title="click to change Avatar" src = { this.state.avatar } onClick={ this.clickUploadAv }/>
                         </div>
                     </form>
                 </div>

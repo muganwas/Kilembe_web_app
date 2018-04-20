@@ -15,28 +15,24 @@ class Courses extends Component {
 
     }
     componentWillMount(){
-        let userID= this.props.userID;
-        if(userID !== null && userID !== undefined){
-            base.syncState(`users/${ userID }/playlist`, {
+        if(this.props.userID !== null && this.props.userID !== undefined){
+            base.syncState(`users/${ this.props.userID }/playlist`, {
                 context: this,
                 state: 'playlist'
             });
         }  
     }
-    componentDidUpdate(){
-        let vids = this.props.videos;
-        let courz = this.props.courses;
-        if(vids !== null && vids !== undefined){
+    componentDidUpdate(){;
+        if(this.props.videos !== null && this.props.videos !== undefined){
             let kaState = this.state.courses;
             if(kaState === undefined){
                 this.setState({
-                    videos: vids,
-                    courses: courz
+                    videos: this.props.videos,
+                    courses: this.props.courses
                 });
             }
         }
     }
-    //alternative to binding
     goToUrl = (event)=>{
         let courseUrl = event.target.id;
         let playlist = this.props.playLProp || {};
@@ -57,7 +53,6 @@ class Courses extends Component {
     }
     showPlayList = (key)=>{
         return( 
-            
             <div className="item" key={key}>
                 <ReactCSSTransitionGroup transitionName = "example"
                 transitionAppear = {true} transitionAppearTimeout = {500}
@@ -67,8 +62,7 @@ class Courses extends Component {
                     <div className="text">{key}</div><div onClick={ ()=>{this.removeItem(key)} } className="ex icon-x-circle"></div>
                     <div className="clear"></div>
                 </ReactCSSTransitionGroup>  
-            </div>   
-                
+            </div>         
         )
 
     }
@@ -83,7 +77,7 @@ class Courses extends Component {
             return notThere;
         }
     }
-    showCourses(key){
+    showCourses = (key)=>{
         let vids = this.state.videos;
         let courz = this.state.courses;
         let courseName = courz[key];
@@ -126,13 +120,12 @@ class Courses extends Component {
         }
     }
     render(){
-        let chcker = this.state.videos;
         let plstk = this.state.playlist || {};
-        if(chcker !== undefined){  
+        if(this.state.videos !== undefined){  
             return(
                 <div>
                     <div className="group">
-                        { Object.keys(chcker).map(this.showCourses) }
+                        { Object.keys( this.state.videos ).map(this.showCourses) }
                     </div>
                     <div className="tutorial">
                         <header>Course Video</header>

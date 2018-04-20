@@ -25,6 +25,7 @@ class App extends Component {
       settings: null,
       friends: null
     }
+    this.baseState = this.state;
   }
   componentWillMount(){
     let uid = localStorage.getItem("uid")==="null"?null:localStorage.getItem("uid");
@@ -311,7 +312,7 @@ class App extends Component {
     });
   }
   authenticate = (provider, callback)=>{
-    app.auth().signInWithPopup(provider).then(callback, (error)=>{
+    app.auth().signInWithPopup(provider).then(callback).catch((error)=>{
       this.setState({
         LoginMessage: error.message
       }, ()=>{
@@ -330,8 +331,8 @@ class App extends Component {
         then(data){
           let len = data.length;
           if( len !== 0){
-            let fl = data[0][0];
-            let avURL = data[0];
+            let fl = data[1][0];
+            let avURL = data[1];
             if(fl === "h"){
               this.setState({
                 avatar: avURL
@@ -403,20 +404,10 @@ class App extends Component {
         settings: null,
         avatar: null
       });
-      localStorage.removeItem("avatar");
-      let uid = this.state.uid;
-      let exists = this.state.exists || null;
-      let dname = this.state.dname;
-      let Lemail = this.state.Lemail;
-      let email = this.state.email;
-      let home = this.state.home;
-      let friends = this.state.friends;
-      let settings = this.state.settings;
-      let states = [uid,exists,email,dname,Lemail,home,friends,settings];
-      let statesS = ['uid', 'exists','email','dname','Lemail','home','friends','settings'];
-      let len = states.length;
+      let statesS = ['uid', 'exists','email','dname','Lemail','home','friends','settings', 'avatar'];
+      let len = statesS.length;
       for(var count=0;count<len; count++){
-        localStorage.setItem(statesS[count], states[count]);
+        localStorage.removeItem(statesS[count]);
       }
       console.log("user signed out!");
     })
@@ -456,7 +447,7 @@ class App extends Component {
     const settings = <span className="link" onClick={this.settings} >Settings</span>
     const header = <Header dname={ this.state.dname } userId={ this.state.uid } friends={ this.friends } home={ this.home } settings={settings} logout={logout}/>;
     let feedBack = this.state.hidden === true?"hidden":"feedBack";
-    if(this.state.uid !== null) {
+    if(this.state.uid !== null && this.state.uid !== undefined) {
       if(this.state.home === true )
       {
         return(
@@ -470,7 +461,7 @@ class App extends Component {
         )
       }else if(this.state.friends === true){
         return(
-          <Friends header={ header } userId={ this.state.uid } />
+          <Friends dname={ this.state.dname } header={ header } userId={ this.state.uid } />
         )
       }
     }else if(this.state.exists === false){

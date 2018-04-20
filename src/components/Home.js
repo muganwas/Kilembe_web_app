@@ -25,8 +25,9 @@ class Home extends Component {
                 then(data){
                     let len = data.length;
                     if( len !== 0){
-                        let fl = data[0][0];
-                        let avURL = data[0];
+                        let fl = data[1][0];
+                        let avURL = data[1];
+                        //easiest way I could figure out to check for an upload avatar url
                         if(fl === "h"){
                             this.setState({
                             avatar: avURL
@@ -59,7 +60,9 @@ class Home extends Component {
             email: localStorage.getItem('email'),
             dname: localStorage.getItem('dname'),
             uid: localStorage.getItem('uid'),
-            avatar: localStorage.getItem("avatar")
+            about: " ",
+            shareEmailAddress: false,
+            avatar: localStorage.getItem("avatar") === undefined?this.props.avatar === undefined?{}: this.props.avatar : localStorage.getItem("avatar")
         });
     }
     componentDidMount(){
@@ -87,22 +90,21 @@ class Home extends Component {
         });        
     }
     componentWillMount(){
-        const userID = this.props.uid;
-        const avatar = this.props.avatar;
-        const storAv = localStorage.getItem("avatar");
-        if((avatar !== null && avatar !== undefined) || (storAv !== null && storAv!== undefined)){
-            base.fetch(`users/${ userID }`, {
+        if((this.props.avatar !== null && this.props.avatar !== undefined) || (localStorage.getItem("avatar") !== null && localStorage.getItem("avatar") !== undefined)){
+            base.fetch(`users/${ this.props.uid }`, {
                 context: this,
                 asArray: true
             }).then((data)=>{
                 let length = data.length;
                 if(length===0 || length===null) {
-                    let userRef = usersRef.child(userID);
+                    let userRef = usersRef.child(this.props.uid);
                     userRef.set({
                         email: localStorage.getItem('email'),
                         dname: localStorage.getItem('dname'),
                         uid: localStorage.getItem('uid'),
-                        avatar: localStorage.getItem("avatar") || avatar
+                        about: "share some about your self",
+                        shareEmailAddress: false,
+                        avatar: localStorage.getItem("avatar") || this.props.avatar
                     });
                 }
             });
@@ -116,15 +118,8 @@ class Home extends Component {
             <div className="container">
                 {this.props.header}
                 <div className="content">
-                <div id="paypal-button"></div>
-                <div className="clear"></div>
-                    <div className="clear"></div>
-                    <div className="left-col">
-                        <div className="courses">
-                            <h4>Available Courses</h4>
-                            <Courses userID={this.props.uid} videos={ this.state.urls } courses = { this.state.courses } />
-                        </div>
-                    </div>
+                    <h4>Available Courses</h4>
+                    <Courses userID={this.props.uid} videos={ this.state.urls } courses = { this.state.courses } />
                 </div>
                 <Footer />                               
             </div>
