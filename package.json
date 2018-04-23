@@ -1,11 +1,12 @@
 {
   "name": "kilembe_school",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "school app",
-  "homepage": "https://kilembeschool.aliendynamic.com",
+  "homepage": "https://kilembeschoool.aliendynamic.com",
   "main": "index.js",
   "private": true,
   "dependencies": {
+    "firebase": "^4.13.0",
     "rc-progress": "^2.2.5",
     "react": "^16.2.0",
     "react-addons-css-transition-group": "^15.6.2",

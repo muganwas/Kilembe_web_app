@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Footer from './Footer';
 import Rebase from 're-base';
 import app from '../base';
+import UserDetails from './UserDetails';
 let base = Rebase.createClass(app.database());
 //let usersRef = app.database().ref('users');
 
@@ -13,7 +14,8 @@ class Friends extends Component {
             users: {},
             peopleListStyle: "people",
             general: true,
-            specific: false
+            specific: false,
+            friends: {}
         }
     }
     componentWillMount(){
@@ -41,20 +43,21 @@ class Friends extends Component {
         });
     }
     userDetail = (key)=>{
+        let newUsers = {...this.state.users}
         this.setState({
             general: false,
             specific: true,
-            currUserId: (this.state.users)[key].uid,
-            currUserDname: (this.state.users)[key].dname,
-            currUserAvUrl: (this.state.users)[key].avatar,
-            currUserEmail: (this.state.users)[key].shareEmailAddress === true?(this.state.users)[key].email:"Email Address is hidden",
-            currUserAbout: (this.state.users)[key].about,
-            currUserSharePref: (this.state.users)[key].shareEmailAddress
+            currUserId: newUsers[key].uid,
+            currUserDname: newUsers[key].dname,
+            currUserAvUrl: newUsers[key].avatar,
+            currUserEmail: newUsers[key].shareEmailAddress === true?newUsers[key].email:"Email Address is hidden",
+            currUserAbout: newUsers[key].about,
+            currUserSharePref: newUsers[key].shareEmailAddress
         });
     }
     getUsers = (key) => {
         let loggedInUser = this.state.userId;
-        let users = this.state.users;
+        let users = {...this.state.users};
         let uCount = users.length;
         let userImg = users[key].avatar;
         let dname = users[key].dname;
@@ -85,37 +88,19 @@ class Friends extends Component {
             )
         }else{
             return(
-                <div className="Home">
-                    <div className="container">
-                        { this.props.header }
-                        <div className="content">
-                            <div className="ficon icon-left-open-mini nav-button-container" onClick={ ()=>{this.backToUsers()} }>
-                                <span className="nav-button">Back</span>
-                            </div>
-                            <div className="currUserDits">
-                                <div id="left">
-                                    <div className="roundPic membersAv"><img alt={ this.state.currUserDname } className="members" src={ this.state.currUserAvUrl } /></div>
-                                </div>
-                                <div id="center">
-                                    <div id="displayName">
-                                        <div className="ficon nav-button-container icon-megaphone"><span>{ this.state.currUserDname }</span></div>  
-                                    </div>
-                                    <div id={ this.state.currUserEmail }>
-                                        <div className="ficon nav-button-container icon-mail"><span>{ this.state.currUserEmail }</span></div> 
-                                    </div>
-                                    <div id="add-user">
-                                        <div className="ficon nav-button-container icon-user-add"><span> Add Friend</span></div> 
-                                    </div>
-                                </div>
-                                <div id="right">
-                                    <span className="icon-quote"></span>
-                                    <div id="about-me">{ this.state.currUserAbout }</div>
-                                </div>
-                            </div>
-                        </div>
-                        <Footer />
-                    </div>
-                </div>
+               <UserDetails 
+                 friends = { this.state.friends } 
+                 header = { this.props.header }
+                 addFriendState = { this.state.addFriendState }
+                 currUserSharePref = { this.state.currUserSharePref } 
+                 currUserAbout = { this.state.currUserAbout } 
+                 currUserEmail = { this.state.currUserEmail } 
+                 currUserDname = { this.state.currUserDname } 
+                 currUserAvUrl = { this.state.currUserAvUrl } 
+                 currUserId={ this.state.currUserId } 
+                 userId={ this.state.userId } 
+                 backToUsers = { this.backToUsers } 
+                 userDetail = { this.userDetail } />
             )
         } 
     }

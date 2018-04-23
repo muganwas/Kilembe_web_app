@@ -18,6 +18,8 @@ class App extends Component {
   
   constructor(props){
     super(props);
+    this.authHandler = this.authHandler.bind(this);
+    this.authenticate = this.authenticate.bind(this);
     this.state = {
       uid: null,
       hidden: true,
@@ -236,7 +238,7 @@ class App extends Component {
           });
         }
       });
-    }, (error)=>{
+    }).catch((error)=>{
       this.setState({
         LoginMessage: error.message,
         exists: false
@@ -260,7 +262,7 @@ class App extends Component {
           });
         }
       });
-    }, (error)=>{
+    }).catch((error)=>{
       this.setState({
         LoginMessage: error.message,
         exists: false
@@ -298,7 +300,7 @@ class App extends Component {
         localStorage.setItem(statesS[count], states[count]);
       }
       localStorage.setItem('playlist', JSON.stringify(this.state.playlist));
-    }, (error)=>{
+    }).catch((error)=>{
       console.log(error.message)
       this.setState({
         LoginMessage: "Please confirm your cridentials, reset your password or signup."
@@ -311,8 +313,9 @@ class App extends Component {
       });
     });
   }
-  authenticate = (provider, callback)=>{
+  authenticate(provider, callback){
     app.auth().signInWithPopup(provider).then(callback).catch((error)=>{
+      console.log(error);
       this.setState({
         LoginMessage: error.message
       }, ()=>{
@@ -350,7 +353,8 @@ class App extends Component {
         }
     });  
   }
-  authHandler = (authData)=>{
+  authHandler(authData){
+    console.log(authData);
     const uid= authData.user.uid;
     const name= authData.user.displayName;
     const email= authData.user.email;

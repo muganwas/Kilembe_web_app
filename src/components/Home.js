@@ -102,7 +102,7 @@ class Home extends Component {
                         email: localStorage.getItem('email'),
                         dname: localStorage.getItem('dname'),
                         uid: localStorage.getItem('uid'),
-                        about: "share some about your self",
+                        about: " ",
                         shareEmailAddress: false,
                         avatar: localStorage.getItem("avatar") || this.props.avatar
                     });

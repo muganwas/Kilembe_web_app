@@ -508,7 +508,6 @@ li{
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
 }
 .currUserDits #right{
-  display: inline-block;
   float: left;
   margin: 10px 0 auto 20px;
   padding: 5px;
@@ -592,7 +591,29 @@ li{
     height: 100%; 
   }
 }
+@media only screen and (max-width: 550px){
+  .currUserDits #center{
+    float: left;
+    margin: 5px 0 auto 5px;
+    padding: 5px;
+  }
+  .Home .settingD input[type="text"] {
+    max-width: 300px;
+    width: 98%;
+    padding: 2px;
+  }
+}
 @media only screen and (max-width: 455px){
+  #devLink{
+    width: 100%;
+    color: #000000;
+    position: absolute;
+    bottom: 0;
+    left: 5%;
+  }
+  #devLink::before{
+    content: "Developed By "
+  }
   #welcome{
     display: none;
   }
