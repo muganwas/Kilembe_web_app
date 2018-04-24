@@ -4,7 +4,7 @@ import Rebase from 're-base';
 import app from '../base';
 import UserDetails from './UserDetails';
 let base = Rebase.createClass(app.database());
-//let usersRef = app.database().ref('users');
+let usersRef = app.database().ref('users');
 
 class Friends extends Component {
     constructor(props){
@@ -15,7 +15,9 @@ class Friends extends Component {
             peopleListStyle: "people",
             general: true,
             specific: false,
-            friends: {}
+            responseRequired: "respond",
+            outGoingRequests: [],
+            inComingRequests: []
         }
     }
     componentWillMount(){
@@ -29,6 +31,35 @@ class Friends extends Component {
                     users: data
                 });
             }
+        });
+    }
+    componentDidMount(){
+        let userRef = usersRef.child(`${this.props.userId}/friends`);
+        userRef.once('value').then((snapshot)=>{
+            let uFriends = snapshot.val();
+            if(uFriends !== null && uFriends !== undefined){
+                this.setState({
+                    friends: uFriends
+                });
+            }
+        });
+        let userRef1 = usersRef.child(`${this.props.userId}/friends`);
+        userRef1.once('value').then((snapshot)=>{
+            let outGoingRequests = [];
+            let inComingRequests = [];
+            snapshot.forEach((pFriend)=>{
+                if(pFriend.val().direction === "outgoing" && pFriend.val().accepted === false){
+                    outGoingRequests.push(pFriend.key);
+                    this.setState({
+                        outGoingRequests
+                    })
+                }else if(pFriend.val().direction === "incoming" && pFriend.val().accepted === false){
+                    inComingRequests.push(pFriend.key);
+                    this.setState({
+                        inComingRequests
+                    })
+                }
+            });
         });
     }
     backToUsers = ()=>{
@@ -55,6 +86,18 @@ class Friends extends Component {
             currUserSharePref: newUsers[key].shareEmailAddress
         });
     }
+    incoming = (key)=>{
+        let incoming = this.state.inComingRequests;
+        let len = incoming.length;
+        let count = 0;
+        for(count; count < len; count++){
+            let users = {...this.state.users};
+            let currUser = users[key].uid;
+            if(incoming[count] === currUser){
+                return <span className={ this.state.responseRequired }>Response Required</span>;
+            }
+        } 
+    }
     getUsers = (key) => {
         let loggedInUser = this.state.userId;
         let users = {...this.state.users};
@@ -65,7 +108,7 @@ class Friends extends Component {
         if(uCount !== 0 && loggedInUser !== userId){
             return(
                 <div title={ dname } id={ userId } key={key} className={ this.state.peopleListStyle } onClick={ ()=>{ this.userDetail(key)} }>
-                    <div className="roundPic membersAv"><img alt={ key } className="members" src={ userImg } /></div><div className="pfriends">{ users[key].dname }</div>
+                    <div className="roundPic membersAv"><img alt={ key } className="members" src={ userImg } /></div><div className="pfriends">{ users[key].dname }{ this.incoming(key) }</div>
                 </div>
             )
         }
@@ -89,7 +132,6 @@ class Friends extends Component {
         }else{
             return(
                <UserDetails 
-                 friends = { this.state.friends } 
                  header = { this.props.header }
                  addFriendState = { this.state.addFriendState }
                  currUserSharePref = { this.state.currUserSharePref } 

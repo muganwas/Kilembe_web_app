@@ -25,7 +25,7 @@ class App extends Component {
       hidden: true,
       home: true,
       settings: null,
-      friends: null
+      appUsers: null
     }
     this.baseState = this.state;
   }
@@ -37,7 +37,7 @@ class App extends Component {
     let reset = localStorage.getItem("reset")==="null"?null:localStorage.getItem("reset")==="true"?true:localStorage.getItem("reset");
     let settings = localStorage.getItem("settings")==="null"?null:localStorage.getItem("settings")==="true"?true:localStorage.getItem("settings");
     let home = localStorage.getItem("home")==="null"?null:localStorage.getItem("home")==="true"?true:true;
-    let friends = localStorage.getItem("friends")==="null"?null:localStorage.getItem("friends")==="true"?true:localStorage.getItem("friends");
+    let appUsers = localStorage.getItem("appUsers")==="null"?null:localStorage.getItem("appUsers")==="true"?true:localStorage.getItem("appUsers");
     if(uid !== null && exists === null) {
       this.setState({
         uid: uid,
@@ -46,7 +46,7 @@ class App extends Component {
         exists: exists,
         settings: settings,
         home: home,
-        friends: friends
+        appUsers: appUsers
       });
     }else if(uid === null && exists !==null){
       this.setState({
@@ -404,11 +404,11 @@ class App extends Component {
         dname:null,
         Lpass:null,
         home:true,
-        friends: null,
+        appUsers: null,
         settings: null,
         avatar: null
       });
-      let statesS = ['uid', 'exists','email','dname','Lemail','home','friends','settings', 'avatar'];
+      let statesS = ['uid', 'exists','email','dname','Lemail','home','appUsers','settings', 'avatar'];
       let len = statesS.length;
       for(var count=0;count<len; count++){
         localStorage.removeItem(statesS[count]);
@@ -419,37 +419,37 @@ class App extends Component {
   settings = ()=>{
     localStorage.setItem('settings', true);
     localStorage.setItem('home', null);
-    localStorage.setItem('friends', null);
+    localStorage.setItem('appUsers', null);
     this.setState({
       settings: true,
       home: null,
-      friends: null
+      appUsers: null
     });
   }
   home = ()=>{
     localStorage.setItem('settings', null);
     localStorage.setItem('home', true);
-    localStorage.setItem('friends', null);
+    localStorage.setItem('appUsers', null);
       this.setState({
         settings: null,
         home: true,
-        friends: null
+        appUsers: null
       });
   }
-  friends = ()=>{
+  appUsers = ()=>{
     localStorage.setItem('settings', null);
     localStorage.setItem('home', null);
-    localStorage.setItem('friends', true);
+    localStorage.setItem('appUsers', true);
       this.setState({
         settings: null,
         home: null,
-        friends: true
+        appUsers: true
       });
   }
   render() {
     const logout = <span className="logout" onClick={this.logout}>Logout</span>;
     const settings = <span className="link" onClick={this.settings} >Settings</span>
-    const header = <Header dname={ this.state.dname } userId={ this.state.uid } friends={ this.friends } home={ this.home } settings={settings} logout={logout}/>;
+    const header = <Header dname={ this.state.dname } userId={ this.state.uid } appUsers={ this.appUsers } home={ this.home } settings={settings} logout={logout}/>;
     let feedBack = this.state.hidden === true?"hidden":"feedBack";
     if(this.state.uid !== null && this.state.uid !== undefined) {
       if(this.state.home === true )
@@ -463,7 +463,7 @@ class App extends Component {
         return(
           <Settings header={header} settings={settings} logout={logout}/>
         )
-      }else if(this.state.friends === true){
+      }else if(this.state.appUsers === true){
         return(
           <Friends dname={ this.state.dname } header={ header } userId={ this.state.uid } />
         )

@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import ProfileImage from './ProfileImage';
+//import Rebase from 're-base';
+import app from '../base';
+//let base = Rebase.createClass(app.database());
+let usersRef = app.database().ref('users');
 
 class Header extends Component {
     constructor(props){
@@ -8,7 +12,7 @@ class Header extends Component {
             userId: this.props.userId,
             dname: this.props.dname,
             home: this.props.home,
-            friends: this.props.friends,
+            appUsers: this.props.appUsers,
             settings: this.props.settings,
             logout: this.props.logout,
             dropDownStyle: null,
@@ -18,8 +22,25 @@ class Header extends Component {
             chatStyle: "menu icon icon-comments",
             menuStyle: "menu icon icon-menu",
             settingsIconStyle: "small icon-settings",
-            logoutIconStyle: "small icon-logout"
+            logoutIconStyle: "small icon-logout",
+            notificationClass: "fas fa-circle alert hidden",
+            friendAction: false
         }
+    }
+    componentWillMount(){
+        let userRef = usersRef.child(`${this.props.userId}/friends`);
+        userRef.once('value').then((snapshot)=>{
+            snapshot.forEach((itemSnapshot)=>{
+                //let itemKey= itemSnapshot.key;
+                let itemVal= itemSnapshot.val();
+                if(itemVal.direction === "incoming" && itemVal.accepted === false){
+                    this.setState({
+                        friendAction: true,
+                        notificationClass: "fas fa-circle alert"
+                    });
+                }
+            });
+        });
     }
     showMenu = ()=>{
         var menu = this.state.dropDownStyle;
@@ -42,7 +63,7 @@ class Header extends Component {
                 <ProfileImage dname={ this.state.dname } userId = { this.state.userId } />     
                 <div className="nav">    
                     <span className={ this.state.homeStyle } onClick={ this.state.home }></span>
-                    <span className={ this.state.friendsStyle } onClick={ this.state.friends }></span>
+                    <span className={ this.state.friendsStyle } onClick={ this.state.appUsers }><span className={ this.state.notificationClass }></span></span>
                     <span className={ this.state.chatStyle }></span> 
                     <span className={ this.state.menuStyle } onClick={ this.showMenu }>
                         <div id="arr" className={ this.state.arrStyle }>

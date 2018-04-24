@@ -53,10 +53,10 @@ class Home extends Component {
             });
         });
     }
-    postInfo = ()=>{
+    updateInfo = ()=>{
         let userID = this.props.uid;
         let userRef = usersRef.child(userID);
-        userRef.set({
+        userRef.update({
             email: localStorage.getItem('email'),
             dname: localStorage.getItem('dname'),
             uid: localStorage.getItem('uid'),
@@ -96,7 +96,7 @@ class Home extends Component {
                 asArray: true
             }).then((data)=>{
                 let length = data.length;
-                if(length===0 || length===null) {
+                if(length===0 || length===null || length === undefined) {
                     let userRef = usersRef.child(this.props.uid);
                     userRef.set({
                         email: localStorage.getItem('email'),
@@ -110,7 +110,7 @@ class Home extends Component {
             });
         }else{
             this.getImage();
-            setTimeout(()=>{this.postInfo()}, 2000);
+            setTimeout(()=>{this.updateInfo()}, 2000);
         }
     }
     render(){   

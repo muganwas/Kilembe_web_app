@@ -11,7 +11,6 @@ class UserDetails extends Component {
         this.backToUsers = this.props.backToUsers;
         this.UserDetails = this.props.UserDetails;
         this.state = {
-            friends: this.props.friends || {},
             addFriendState: "Add Friend",
         }
     }
@@ -19,7 +18,6 @@ class UserDetails extends Component {
         if(this.props.currUserId !== undefined){
             let userRef = usersRef.child(`${this.props.currUserId}/friends`);
             userRef.once('value').then((snapshot)=>{
-                //console.log(snapshot.val());
                 if(snapshot.val() !== null ){
                     let requestStatus = snapshot.val()[this.props.userId];
                     if(requestStatus !== undefined){
