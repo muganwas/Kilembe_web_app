@@ -17,13 +17,27 @@ class UserDetails extends Component {
     componentWillMount(){
         if(this.props.currUserId !== undefined){
             let userRef = usersRef.child(`${this.props.currUserId}/friends`);
+            let userRef1 = usersRef.child(`${this.props.userId}/friends`);
+            userRef1.once('value').then((snapshot)=>{
+                if(snapshot.val() !== null ){
+                    let requestStatus = snapshot.val()[this.props.currUserId];
+                    if(requestStatus !== undefined){
+                        let preciseStatus = requestStatus["accepted"];
+                        let direction = requestStatus["direction"];
+                        this.setState({
+                            friendRequestStatus: preciseStatus,
+                            direction: direction
+                        });
+                    }
+                }
+            });
             userRef.once('value').then((snapshot)=>{
                 if(snapshot.val() !== null ){
                     let requestStatus = snapshot.val()[this.props.userId];
                     if(requestStatus !== undefined){
                         let preciseStatus = requestStatus["accepted"];
                         this.setState({
-                            addFriendState: preciseStatus===true?"Friend":"Request Pending"
+                            addFriendState: preciseStatus===true?"UnFriend":"Revoke Request",
                         });
                     }
                 }
@@ -33,6 +47,55 @@ class UserDetails extends Component {
                 state: 'friends'
             });
         } 
+    }
+    respondToIncoming = (e)=>{
+        let clicked = e.target.id;
+        if(clicked === "accept"){
+            let userRef = usersRef.child(`${this.props.userId}/friends`);
+            userRef.child(`${this.props.currUserId}`).update({
+                "direction": "incoming",
+                "accepted" : true
+            });
+            let userRef1 = usersRef.child(`${this.props.currUserId}/friends`);
+            userRef1.child(`${this.props.userId}`).update({
+                "direction": "outgoing",
+                "accepted" : true
+            });
+            (this.props.changeResponseClass)();
+            this.setState({
+                friendRequestStatus: true,
+                addFriendState: "UnFriend"
+            })
+        }else if(clicked === "reject"){
+            let userRef1 = usersRef.child(`${this.props.currUserId}/friends/${this.props.userId}`);
+            let userRef2 = usersRef.child(`${this.props.userId}/friends/${this.props.currUserId}`);
+            userRef1.remove();
+            userRef2.remove();
+            (this.props.changeResponseClass)();
+            this.setState({
+                direction: null,
+                friendRequestStatus: null,
+                addFriendState: "Rejected"
+            })
+        }
+    }
+    respondOrRequest = ()=>{
+        if(this.state.direction === "incoming" && this.state.friendRequestStatus === false){
+            return <div id={ this.props.currUserId } className="ficon icon-user-add">
+                <span id="accept" className="respondB" onClick={ this.respondToIncoming }>
+                    Accept
+                </span>
+                <span id="reject" className="respondB" onClick={ this.respondToIncoming }>
+                    Reject
+                </span>
+            </div> 
+        }else{
+            return <div id={ this.props.currUserId } className="ficon nav-button-container icon-user-add" onClick={ this.sendFriendReq }>
+                <span id={ this.props.currUserId }>
+                    {this.state.addFriendState}
+                </span>
+            </div> 
+        }
     }
     sendFriendReq = (e)=>{
         let newFriend = e.target.id;
@@ -109,7 +172,7 @@ class UserDetails extends Component {
                                     <div className="ficon nav-button-container icon-mail"><span>{ this.props.currUserEmail }</span></div> 
                                 </div>
                                 <div id="add-user">
-                                    <div id={ this.props.currUserId } className="ficon nav-button-container icon-user-add" onClick={ this.sendFriendReq }><span id={ this.props.currUserId }>{this.state.addFriendState}</span></div> 
+                                    { this.respondOrRequest() }
                                 </div>
                             </div>
                             <div id="right">

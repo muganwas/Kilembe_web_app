@@ -450,7 +450,6 @@ li{
     font-size: 13px;
     font-weight: bold;
     margin: 5% 10px;
-
 }
 .people{
   text-align: left;
@@ -501,6 +500,8 @@ li{
   text-align: left;
 }
 .ficon{
+  position: relative;
+  box-sizing: border-box;
   margin: 2px 0;
 }
 .currUserDits{
@@ -554,20 +555,36 @@ li{
   font-size: 10px;
   z-index: 10000;
 }
-.respond{
-  box-sizing: border-box;
-  font-size: 10px;
-  display: block;
+.alert-main{
   position: absolute;
-  max-width: 60px;
-  padding: 3px;
-  right: 5px;
   top: 5px;
-  color: #3a3a3a;
+  right: 5px;
+  color: #fdd806;
+  font-size: 17px;
+  z-index: 10000;
+}
+.alert-main::before{
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+}
+.alert-main:hover::before{
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+}
+.respondB{
+  position: absolute;
   text-align: center;
-  background: rgba(253, 216, 6, 0.7);
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
-  border-radius: 3px;
+  box-sizing: border-box;
+  display: inline-block;
+  background: #fdd806;
+  padding: 5px;
+  width: 42%;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+.respondB:first-child{
+  left: 21px;
+}
+.respondB:last-child{
+  right: -1px;
 }
 @media only screen and (max-width: 900px){
   .playlist{
@@ -613,6 +630,17 @@ li{
     width: 100%;
     height: 100%; 
   }
+  .pfriends{
+    min-width: 70%;
+    float: right;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 5% 5px;
+  }
+  .alert-main{
+    top: -10px;
+    right: -5px;
+  } 
 }
 @media only screen and (max-width: 550px){
   .currUserDits #center{

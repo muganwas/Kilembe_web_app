@@ -354,7 +354,6 @@ class App extends Component {
     });  
   }
   authHandler(authData){
-    console.log(authData);
     const uid= authData.user.uid;
     const name= authData.user.displayName;
     const email= authData.user.email;

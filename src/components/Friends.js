@@ -15,7 +15,7 @@ class Friends extends Component {
             peopleListStyle: "people",
             general: true,
             specific: false,
-            responseRequired: "respond",
+            responseRequired: "fas fa-bell alert-main",
             outGoingRequests: [],
             inComingRequests: []
         }
@@ -86,6 +86,11 @@ class Friends extends Component {
             currUserSharePref: newUsers[key].shareEmailAddress
         });
     }
+    changeResponseClass = ()=>{
+        this.setState({
+            responseRequired: ""
+        });
+    }
     incoming = (key)=>{
         let incoming = this.state.inComingRequests;
         let len = incoming.length;
@@ -94,7 +99,7 @@ class Friends extends Component {
             let users = {...this.state.users};
             let currUser = users[key].uid;
             if(incoming[count] === currUser){
-                return <span className={ this.state.responseRequired }>Response Required</span>;
+                return <span className={ this.state.responseRequired }></span>;
             }
         } 
     }
@@ -107,8 +112,14 @@ class Friends extends Component {
         let userId = users[key].uid;
         if(uCount !== 0 && loggedInUser !== userId){
             return(
-                <div title={ dname } id={ userId } key={key} className={ this.state.peopleListStyle } onClick={ ()=>{ this.userDetail(key)} }>
-                    <div className="roundPic membersAv"><img alt={ key } className="members" src={ userImg } /></div><div className="pfriends">{ users[key].dname }{ this.incoming(key) }</div>
+                <div title={ dname } id={ userId } key={key} className={ this.state.peopleListStyle } onClick={ ()=>{ this.userDetail(key) } }>
+                    <div className="roundPic membersAv">
+                        <img alt={ key } className="members" src={ userImg } />
+                    </div>
+                    <div className="pfriends">
+                        { users[key].dname }
+                        { this.incoming(key) }
+                    </div>
                 </div>
             )
         }
@@ -131,7 +142,8 @@ class Friends extends Component {
             )
         }else{
             return(
-               <UserDetails 
+               <UserDetails
+                 changeResponseClass = { this.changeResponseClass }
                  header = { this.props.header }
                  addFriendState = { this.state.addFriendState }
                  currUserSharePref = { this.state.currUserSharePref } 
