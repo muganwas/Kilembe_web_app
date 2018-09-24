@@ -1,5 +1,10 @@
 /*icon mods*/
 @import './font-awsome/fontawesome-all.css';
+.divider{
+  display: block;
+  height: 5px;
+  background-color: #fff;
+}
 #facebook {
   background-color: #3b5998;
   color: #fff;
@@ -35,6 +40,9 @@ li{
   display: block;
   text-align: center;
 }
+.form{
+  margin: 0 50px;
+}
 .App{
   box-sizing: border-box;
   display: inline-block;
@@ -44,7 +52,7 @@ li{
   background-size: 40%;
   background-position: 50px 20px;
   margin: 10% 0;
-  padding: 70px 50px 50px;
+  padding: 100px 0 50px 0;
   border-radius: 5px;
   width: 350px;
 }
@@ -225,7 +233,7 @@ li{
   color: #282828;
 }
 .clear{
-  content: "";
+  content: " ";
   clear: both;
 }
 .save{
@@ -451,6 +459,41 @@ li{
     font-weight: bold;
     margin: 5% 10px;
 }
+.messaging{
+  box-sizing: border-box;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+}
+.friends{
+  box-sizing: border-box;
+  width: 25%;
+  padding: 10px 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.15);
+}
+.friend{
+  box-sizing: border-box;
+  padding: 10px;
+  display: block;
+  height: 60px;
+  margin: 10px 0;
+}
+.friend:hover{
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.friend .name{
+  text-transform: capitalize;
+  display: inline-block;
+  padding: 10px 5px 10px 10px;
+  font-size: 12px;
+}
+.friend .membersAv{
+  width: 30px;
+  max-height: 40px;
+  min-height: 30px;
+  cursor: pointer;
+  float: left;
+}
 .people{
   text-align: left;
   box-sizing: content-box;
@@ -589,6 +632,9 @@ li{
 @media only screen and (max-width: 900px){
   .playlist{
     display: none;
+  }
+  .friends{
+    width: 35%;
   }
   .content .tutorial{
     box-sizing: border-box;

@@ -1,6 +1,7 @@
 const defaultState = {
     info: {
-      menu: "Main-Menu"
+      menu: "Main-Menu",
+      chatkitUser: {}
     },
     fetching: false,
     fetched: false,

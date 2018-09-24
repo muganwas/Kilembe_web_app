@@ -13,6 +13,7 @@ class Header extends Component {
             dname: this.props.dname,
             home: this.props.home,
             appUsers: this.props.appUsers,
+            messaging: this.props.messaging,
             settings: this.props.settings,
             logout: this.props.logout,
             dropDownStyle: null,
@@ -64,7 +65,7 @@ class Header extends Component {
                 <div className="nav">    
                     <span className={ this.state.homeStyle } onClick={ this.state.home }></span>
                     <span className={ this.state.friendsStyle } onClick={ this.state.appUsers }><span className={ this.state.notificationClass }></span></span>
-                    <span className={ this.state.chatStyle }></span> 
+                    <span className={ this.state.chatStyle } onClick={ this.state.messaging }></span> 
                     <span className={ this.state.menuStyle } onClick={ this.showMenu }>
                         <div id="arr" className={ this.state.arrStyle }>
                             <ul id="menu" className={ this.state.dropDownStyle }>

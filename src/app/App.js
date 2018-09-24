@@ -1,4 +1,9 @@
 import React, { Component } from 'react';
+
+//redux
+import { connect } from 'react-redux';
+import { dispatchedGenInfo } from './redux/dispatchers';
+
 import './styles/App.css';
 import app from './base';
 import Firebase from 'firebase';
@@ -9,11 +14,18 @@ import Reset from './components/Reset';
 import Signup from './components/Signup';
 import Settings from './components/Settings';
 import Header from './components/Header';
+import Messaging from './components/Messaging/Messaging';
 import Friends from './components/Friends';
 let base = Rebase.createClass(app.database());
 var storage = Firebase.storage();
 var storageRef = storage.ref();
 
+@connect((store)=>{
+  return{
+    genInfo: store.genInfo,
+    chatkitUser: store.genInfo.info.chatkitUser
+  }
+})
 class App extends Component {
   
   constructor(props){
@@ -25,7 +37,8 @@ class App extends Component {
       hidden: true,
       home: true,
       settings: null,
-      appUsers: null
+      appUsers: null,
+      messaging: null
     }
     this.baseState = this.state;
   }
@@ -38,6 +51,7 @@ class App extends Component {
     let settings = localStorage.getItem("settings")==="null"?null:localStorage.getItem("settings")==="true"?true:localStorage.getItem("settings");
     let home = localStorage.getItem("home")==="null"?null:localStorage.getItem("home")==="true"?true:true;
     let appUsers = localStorage.getItem("appUsers")==="null"?null:localStorage.getItem("appUsers")==="true"?true:localStorage.getItem("appUsers");
+    let messaging = localStorage.getItem("messaging")==="null"?null:localStorage.getItem("messaging")==="true"?true:localStorage.getItem("messaging");
     if(uid !== null && exists === null) {
       this.setState({
         uid: uid,
@@ -46,7 +60,8 @@ class App extends Component {
         exists: exists,
         settings: settings,
         home: home,
-        appUsers: appUsers
+        appUsers: appUsers,
+        messaging: messaging
       });
     }else if(uid === null && exists !==null){
       this.setState({
@@ -56,6 +71,14 @@ class App extends Component {
       this.setState({
         reset: reset
       });
+    }
+  }
+
+  componentDidMount(){
+    let len = Object.keys(this.props.chatkitUser).length;
+    if(len === 0){
+      let genInfo = JSON.parse(sessionStorage.getItem('genInfo'));
+      this.props.dispatch(dispatchedGenInfo(genInfo))
     }
   }
  
@@ -278,6 +301,8 @@ class App extends Component {
   eAuthenticate = (temail, password)=>{
     app.auth().signInWithEmailAndPassword(temail, password).then(()=>{
       let currUser = app.auth().currentUser;
+      this.fetchToken(currUser);
+      localStorage.setItem('currentUser', JSON.stringify(currUser));
       let uid = currUser.uid;
       let email = currUser.email;
       let Rname = email.split('@');
@@ -353,7 +378,22 @@ class App extends Component {
         }
     });  
   }
+
+  fetchToken = (currUser)=>{
+    currUser.getIdToken(true).then((idToken)=>{
+      let genInfo = {...this.props.genInfo.info};
+      genInfo.chatkitUser.token = idToken;
+      sessionStorage.setItem('genInfo', JSON.stringify(genInfo));
+      this.props.dispatch(dispatchedGenInfo(genInfo));
+    }).catch(function(error) {
+      console.log(error)
+    });
+  }
+
   authHandler(authData){
+    let currentUser = app.auth().currentUser;
+    this.fetchToken(currentUser);
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
     const uid= authData.user.uid;
     const name= authData.user.displayName;
     const email= authData.user.email;
@@ -384,7 +424,7 @@ class App extends Component {
     const pReset = <span className="link" onClick={()=>this.goToReset()}>Forgot Passowrd</span>;
     let feedBack = this.state.hidden === true?"hidden":"feedBack";
     return(
-      <div>
+      <div className="form">
         <span><h3>Sign in</h3></span>
         <span className={ feedBack }>{this.state.LoginMessage}</span>
         <Login onsubmit={this.handleLogin} userEmail={this.handleEmail} pass={this.handlePass}/>
@@ -407,7 +447,8 @@ class App extends Component {
         settings: null,
         avatar: null
       });
-      let statesS = ['uid', 'exists','email','dname','Lemail','home','appUsers','settings', 'avatar'];
+      sessionStorage.removeItem('genInfo');
+      let statesS = ['uid', 'exists','email','dname','Lemail','home','appUsers','settings', 'avatar', 'currentUser'];
       let len = statesS.length;
       for(var count=0;count<len; count++){
         localStorage.removeItem(statesS[count]);
@@ -445,10 +486,22 @@ class App extends Component {
         appUsers: true
       });
   }
+  messaging = ()=>{
+    localStorage.setItem('settings', null);
+    localStorage.setItem('home', null);
+    localStorage.setItem('appUsers', null);
+    localStorage.setItem('messaging', true);
+      this.setState({
+        settings: null,
+        home: null,
+        appUsers: null,
+        messaging: true
+      });
+  }
   render() {
     const logout = <span className="logout" onClick={this.logout}>Logout</span>;
     const settings = <span className="link" onClick={this.settings} >Settings</span>
-    const header = <Header dname={ this.state.dname } userId={ this.state.uid } appUsers={ this.appUsers } home={ this.home } settings={settings} logout={logout}/>;
+    const header = <Header dname={ this.state.dname } userId={ this.state.uid } appUsers={ this.appUsers } messaging={ this.messaging } home={ this.home } settings={settings} logout={logout}/>;
     let feedBack = this.state.hidden === true?"hidden":"feedBack";
     if(this.state.uid !== null && this.state.uid !== undefined) {
       if(this.state.home === true )
@@ -466,16 +519,22 @@ class App extends Component {
         return(
           <Friends dname={ this.state.dname } header={ header } userId={ this.state.uid } />
         )
+      }else if(this.state.messaging === true){
+        return(
+          <Messaging dname={ this.state.dname } header={ header } userId={ this.state.uid } />
+        )
       }
     }else if(this.state.exists === false){
       return(
         <div className="App">
+        <div className="divider"></div>
           <Signup feedback={feedBack} message={this.state.LoginMessage} onsignup={this.handleSignup} userEmail={this.handleEmail} pass={this.handlePass} conPass={this.handlePassConf} reset={this.goToReset} onLogin={this.goToLogin} />
         </div>
       )
     }else if(this.state.reset === true) {
       return(
         <div className="App">
+        <div className="divider"></div>
           <Reset feedback={feedBack} onReset={this.handleReset} message={this.state.LoginMessage}  userEmail={this.handleEmail} toReg={this.goToReg} onLogin={this.goToLogin}/>
         </div>
       )
@@ -483,6 +542,7 @@ class App extends Component {
     }else{
       return (
         <div className="App">
+        <div className="divider"></div>
           {this.renderLogin()}
         </div>
       )
