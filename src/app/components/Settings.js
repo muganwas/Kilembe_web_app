@@ -39,6 +39,10 @@ class Settings extends Component {
                     context: this,
                     state: 'shareEmailAddress'
                 });
+                base.syncState(`users/${ localStorage.getItem('uid') }/chatkit_uid`, {
+                    context: this,
+                    state: 'chatkit_uid'
+                });
             }
         });
     }
@@ -78,6 +82,7 @@ class Settings extends Component {
                         <span className="settingT">Your Email Address: </span> <span className="settingD"><input id="email" type="text" value={ this.state.email } disabled="true" /></span>
                         <span className="settingT">Your Display Name: </span> <span className="settingD"><input id="dname" className="icon" type="text" value={ this.state.dname } onChange={ this.changeEntry } disabled={ this.state.disabled }/></span>
                         <span className="settingT">Your User Id: </span> <span className="settingD"><input id="uid" className="icon" type="text" value={ this.state.uid } onChange={ this.changeEntry } disabled={ this.state.disabled }/></span>
+                        <span className="settingT">Chatkit Uid: </span> <span className="settingD"><input id="chatkit_uid" className="icon" type="text" value={ this.state.chatkit_uid } onChange={ this.changeEntry } disabled={ this.state.disabled }/></span>
                         <span className="settingT">About Me: </span> <span className="settingD"><textarea id="about"  className="icon" value={ this.state.about } onChange={ this.changeEntry } disabled={ this.state.disabled }/></span>
                         <span className="settingT">Share Email Address: </span> <span className="settingD"><input id="shareEmailAddress" className="icon" type="checkbox" onChange={ this.changeShareStatus } disabled={ this.state.disabled } checked={ this.state.shareEmailAddress }/> <span className="info">check to share email address with other users</span></span>
                         <button onClick={ this.save }  className="icon icon-floppy" disabled={ this.state.disabled }></button>

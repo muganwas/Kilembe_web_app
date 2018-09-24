@@ -4,7 +4,7 @@ class Signup extends Component {
 
     render(){
         return (
-            <div>
+            <div className="form">
             <span><h3>Sign Up</h3></span>
             <span className={ this.props.feedback }>{this.props.message}</span>
                 <span><input id="email" placeholder="Email address" type="text" onChange={this.props.userEmail}/></span>
