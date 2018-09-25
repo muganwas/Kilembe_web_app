@@ -140,16 +140,16 @@ class Messaging extends Component {
         let friends = this.props.genInfo.info.friends;
         let uid = friends[key].key;
         let avatar = friends[key].avatar;
+        let allUsers= this.props.allUsers;
         return (
             <div key={key} className="friend">
                 <div className="left">
                     <div className="roundPic membersAv">
                         <img alt={ uid } className="members" src = { avatar } />
                     </div>
-                    <div className="name">{ this.props.allUsers[uid].dname }</div>
+                    <div className="name">{ allUsers?allUsers[uid].dname:null }</div>
                     <div className="clear"></div>
                 </div>
-                
             </div>
         )
     }
@@ -163,7 +163,7 @@ class Messaging extends Component {
                     <div className="messaging">
                         <div className="friends">
                             <h3>Friends</h3>
-                            { this.props.genInfo.info.friends?Object.keys(friends).map(this.displayFriends):null }
+                            { friends?Object.keys(friends).map(this.displayFriends):null }
                         </div>
                     </div>
                     <Footer />
