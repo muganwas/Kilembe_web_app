@@ -397,7 +397,7 @@ class App extends Component {
   authHandler(authData){
     let currentUser = app.auth().currentUser;
     let info = this.props.genInfo.info;
-    info.loggedInUser = currUser;
+    info.loggedInUser = currentUser;
     this.props.dispatch(dispatchedGenInfo(info));
     this.fetchToken(currentUser);
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
