@@ -1,10 +1,18 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import ProfileImage from './ProfileImage';
-//import Rebase from 're-base';
+import axios from 'axios';
+import Rebase from 're-base';
 import app from '../base';
-//let base = Rebase.createClass(app.database());
+let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 
+@connect((store)=>{
+    return {
+        genInfo: store.genInfo,
+        info: store.genInfo.info
+    }
+})
 class Header extends Component {
     constructor(props){
         super(props);
@@ -42,6 +50,33 @@ class Header extends Component {
                 }
             });
         });
+    }
+
+    componentDidMount(){
+        //check if setup for messaging
+        let fetched = this.props.genInfo.fetched;
+        let uid = this.props.userId;
+        if(fetched === true){
+            base.fetch(`users/${ uid }/chatkit_uid`, {
+                context: this,
+                asArray: false
+            }).then((data)=>{
+                let len = Object.keys(data).length;
+                if(len === 0){
+                    let url = process.env.CHATKIT_CREATE_USER + this.props.userId + "&name="+ this.props.dname;
+                    axios(url)
+                    .then((res)=>{
+                        let chatkit_id = res.data.id;
+                        usersRef.child(uid).update({
+                            chatkit_uid: chatkit_id
+                        });
+                    })
+                    .catch((err)=>{
+                        console.log(err)
+                    });
+                }
+            });
+        }
     }
     showMenu = ()=>{
         var menu = this.state.dropDownStyle;

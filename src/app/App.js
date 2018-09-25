@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 //redux
 import { connect } from 'react-redux';
@@ -301,6 +302,9 @@ class App extends Component {
   eAuthenticate = (temail, password)=>{
     app.auth().signInWithEmailAndPassword(temail, password).then(()=>{
       let currUser = app.auth().currentUser;
+      let info = this.props.genInfo.info;
+      info.loggedInUser = currUser;
+      this.props.dispatch(dispatchedGenInfo(info));
       this.fetchToken(currUser);
       localStorage.setItem('currentUser', JSON.stringify(currUser));
       let uid = currUser.uid;
@@ -392,6 +396,9 @@ class App extends Component {
 
   authHandler(authData){
     let currentUser = app.auth().currentUser;
+    let info = this.props.genInfo.info;
+    info.loggedInUser = currUser;
+    this.props.dispatch(dispatchedGenInfo(info));
     this.fetchToken(currentUser);
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     const uid= authData.user.uid;

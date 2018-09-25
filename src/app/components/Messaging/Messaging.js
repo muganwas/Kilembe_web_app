@@ -30,10 +30,6 @@ class Messaging extends Component {
 
     componentWillMount(){
         let uid = this.props.userId;
-        this.fetchAllUsers();
-        this.fetchFriends(uid).then((rez)=>{
-            this.getAvatar();
-        })
         base.fetch(`users/${ uid }/chatkit_uid`, {
             context: this,
             asArray: false
@@ -43,7 +39,7 @@ class Messaging extends Component {
                 let url = process.env.CHATKIT_CREATE_USER + this.props.userId + "&name="+ this.props.dname;
                 axios(url)
                 .then((res)=>{
-                    chatkit_id = res.data.id;
+                    let chatkit_id = res.data.id;
                     usersRef.child(this.props.userId).update({
                         chatkit_uid: chatkit_id
                     });
@@ -52,6 +48,10 @@ class Messaging extends Component {
                     console.log(err)
                 });
             }else{
+                this.fetchAllUsers();
+                this.fetchFriends(uid).then((rez)=>{
+                    this.getAvatar();
+                });
                 let url = process.env.CHATKIT_TOKEN_PROVIDER + data;
                 chatManager = new ChatManager({
                     instanceLocator: process.env.CHATKIT_INSTANCE_LOCATOR,
@@ -141,13 +141,15 @@ class Messaging extends Component {
         let uid = friends[key].key;
         let avatar = friends[key].avatar;
         let allUsers= this.props.allUsers;
+        let dname;
+        allUsers? dname = allUsers[uid].dname: dname = null;
         return (
             <div key={key} className="friend">
                 <div className="left">
                     <div className="roundPic membersAv">
                         <img alt={ uid } className="members" src = { avatar } />
                     </div>
-                    <div className="name">{ allUsers?allUsers[uid].dname:null }</div>
+                    <div className="name">{ dname?dname:null }</div>
                     <div className="clear"></div>
                 </div>
             </div>
