@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const port = process.env.PORT || 8080;
@@ -11,4 +12,5 @@ app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname + '/public/index.html'));
 });
 
+console.log("server at: " + port);
 app.listen(port);
