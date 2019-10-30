@@ -1,0 +1,14 @@
+{ 
+    "en": {
+        "error.emailFormat":"Wrong email format",
+        "error.passwordLength":"Password too short",
+        "error.noCredentials":"Fill in email and password",
+        "error.loginFailure":"Something went wrong, try again please."
+    },
+    "fr": {
+        "error.emailFormat":"Wrong email format",
+        "error.passwordLength":"Password too short",
+        "error.noCredentials":"Fill in email and password",
+        "error.loginFailure":"Something went wrong, try again please."
+    }
+}

@@ -1,0 +1,14 @@
+export { default as UserDetails } from './UserDetails/UserDetails';
+export { default as Signup } from './Signup/Signup';
+export { default as Settings } from './Settings/Settings';
+export { default as Reset } from './Reset/Reset';
+export { default as ProfileImage } from './ProfileImage/ProfileImage';
+export { default as NotFound } from './NotFound/NotFound';
+export { default as Messaging } from './Messaging/Messaging';
+export { default as Login } from './Login/Login';
+export { default as Home } from './Home/Home';
+export { default as Header } from './Header/Header';
+export { default as Friends } from './Friends/Friends';
+export { default as Footer } from './Footer/Footer';
+export { default as Donate } from './Donate/Donate';
+export { default as Courses } from './Courses/courses'; 

@@ -1,3 +1,4 @@
+import { FETCH_GEN_PENDING, FETCH_GEN_REJECTED, FETCH_GEN_FULFILLED } from '../actions';
 const defaultState = {
     info: {
       menu: "Main-Menu",
@@ -9,21 +10,21 @@ const defaultState = {
   }
   const genInfoReducer = (state = defaultState, action)=>{
       switch(action.type){
-          case "FETCH_GEN_PENDING":{
+          case FETCH_GEN_PENDING:{
             return {...state,
               fetched: false,
               error: null,
               fetching: true
             }
           }
-          case "FETCH_GEN_REJECTED":{
+          case FETCH_GEN_REJECTED:{
             return {...state,
               fetching: false,
               fetched: false,
               error: action.payload
             }
           }
-          case "FETCH_GEN_FULFILLED":{
+          case FETCH_GEN_FULFILLED:{
             return {...state,
               fetched: true,
               fetching: false,

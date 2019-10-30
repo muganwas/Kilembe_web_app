@@ -3,20 +3,20 @@ import axios from 'axios';
 
 //redux
 import { connect } from 'react-redux';
-import { dispatchedGenInfo } from './redux/dispatchers';
+import { dispatchedGenInfo } from './redux/dispatchers/genDispatchers';
 
 import './styles/App.css';
 import app from './base';
 import Firebase from 'firebase';
 import Rebase from 're-base';
-import Home from './components/Home';
-import Login from './components/Login';
-import Reset from './components/Reset';
-import Signup from './components/Signup';
-import Settings from './components/Settings';
-import Header from './components/Header';
+import Home from './components/Home/Home';
+import Login from './components/Login/Login';
+import Reset from './components/Reset/Reset';
+import Signup from './components/Signup/Signup';
+import Settings from './components/Settings/Settings';
+import Header from './components/Header/Header';
 import Messaging from './components/Messaging/Messaging';
-import Friends from './components/Friends';
+import Friends from './components/Friends/Friends';
 let base = Rebase.createClass(app.database());
 var storage = Firebase.storage();
 var storageRef = storage.ref();
@@ -434,7 +434,7 @@ class App extends Component {
       <div className="form">
         <span><h3>Sign in</h3></span>
         <span className={ feedBack }>{this.state.LoginMessage}</span>
-        <Login onsubmit={this.handleLogin} userEmail={this.handleEmail} pass={this.handlePass}/>
+        <Login onsubmit={this.handleLogin} handleEmail={this.handleEmail} handlePass={this.handlePass}/>
         { Reg }  { pReset }
         <span><button id="facebook" className="icon-facebook-squared" onClick={()=>this.authenticate(fbAuth, this.authHandler)}> &nbsp;Sign in with Facebook</button></span>
         <span><button id="google" className="icon-google" onClick={()=>this.authenticate(googleAuth, this.authHandler)}> &nbsp;Sign in with Google</button></span>

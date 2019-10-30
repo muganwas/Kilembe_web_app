@@ -65,7 +65,9 @@ module.exports = {
 	resolve: {
 		alias: {
 			app: path.resolve(__dirname, 'src/app'),
-			Extras: path.resolve(__dirname, 'src/app/extras'),
+			reduxFiles: path.resolve(__dirname, 'src/app/redux'),
+			misc: path.resolve(__dirname, 'src/app/misc'),
+			extras: path.resolve(__dirname, 'src/app/extras'),
 			components: path.resolve(__dirname, 'src/app/components'),
 			views: path.resolve(__dirname, 'src/app/views'),
 			actions: path.resolve(__dirname, 'src/app/actions'),

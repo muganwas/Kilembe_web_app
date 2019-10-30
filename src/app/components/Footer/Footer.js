@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import Donate from './Donate';
+import Donate from '../Donate/Donate';
 
 class Footer extends Component {
     render(){

@@ -2,32 +2,113 @@ import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route, Switch} from 'react-router-dom';
 import store from './store';
-import { Provider } from 'react-redux';
+import { Provider } from 'react-intl-redux';
 import './styles/index.css';
 import './styles/styles.css';
 import './styles/animations.css';
 import App from './App';
+import { 
+    UserDetails,
+    Signup,
+    Settings,
+    Reset,
+    NotFound,
+    Messaging,
+    Login,
+    Home,
+    Friends,
+    Courses
+} from 'components';
 import registerServiceWorker from './registerServiceWorker';
-import NotFound from './components/NotFound';
 
 let mPoint = document.getElementById('root');
 
-let mainComponent = ()=>{
+let MainComponent = ()=>{
 	return(
 		<Provider store={store}>
 			<App/>
 		</Provider>
 	)
 }
+let CoursesComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<Courses/>
+		</Provider>
+	)
+}
+let FriendsComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<Friends/>
+		</Provider>
+	)
+}
+let HomeComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<Home/>
+		</Provider>
+	)
+}
+let LoginComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<Login/>
+		</Provider>
+	)
+}
+let SignupComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<Signup/>
+		</Provider>
+	)
+}
+let ResetComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<Reset/>
+		</Provider>
+	)
+}
+let SettingsComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<Settings/>
+		</Provider>
+	)
+}
+let UserDetailsComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<UserDetails/>
+		</Provider>
+	)
+}
+let MessagingComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<Messaging/>
+		</Provider>
+	)
+}
 var Root = ()=>{
     return(
         <BrowserRouter basename = "/" >
-            <div className="main">
-                <Switch>
-                    <Route exact path="/" component={ mainComponent } />
-                    <Route component={ NotFound } />
-                </Switch>
-            </div>
+			<Switch>
+				<Route exact path="/" component={ MainComponent } />
+				<Route exact path="/login" component={ LoginComponent } />
+				<Route exact path="/signup" component={ SignupComponent } />
+				<Route exact path="/reset" component={ ResetComponent } />
+				<Route exact path="/home" component={ HomeComponent } />
+				<Route exact path="/messaging" component={ MessagingComponent } />
+				<Route exact path="/details" component={ UserDetailsComponent } />
+				<Route exact path="/settings" component={ SettingsComponent } />
+				<Route exact path="/courses" component={ CoursesComponent } />
+				<Route exact path="/friends" component={ FriendsComponent } />
+				<Route component={ NotFound } />
+			</Switch>
         </BrowserRouter>
     )
 }

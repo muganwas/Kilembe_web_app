@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import firebase from 'firebase';
 import Rebase from 're-base';
-import app from '../base';
+import app from '../../base';
 let base = Rebase.createClass(app.database());
 var storage = firebase.storage();
 var storageRef = storage.ref();

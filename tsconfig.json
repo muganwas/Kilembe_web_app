@@ -2,7 +2,6 @@
     "compilerOptions": {
         "experimentalDecorators": true,
         "allowJs": true,
-        "outDir": "./public",
-        "outFile": "./public/app/build.js"
+        "outDir": "./public"
     }
 }

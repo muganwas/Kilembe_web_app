@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { dispatchedGenInfo } from '../../redux/dispatchers';
+import { dispatchedGenInfo } from '../../redux/dispatchers/genDispatchers';
 import { ChatManager, TokenProvider } from '@pusher/chatkit';
-import Footer from '../Footer';
+import Footer from '../Footer/Footer';
 import Rebase from 're-base';
 import app from '../../base';
 import './css/main.css';

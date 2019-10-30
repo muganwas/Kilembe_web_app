@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import Rebase from 're-base';
 import firebase from 'firebase';
-import app from '../base';
-import Courses from './courses';
-import Footer from './Footer';
+import app from '../../base';
+import Courses from '../Courses/courses';
+import Footer from '../Footer/Footer';
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 var storage = firebase.storage();

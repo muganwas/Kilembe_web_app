@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Rebase from 're-base';
-import app from '../base';
+import app from '../../base';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');

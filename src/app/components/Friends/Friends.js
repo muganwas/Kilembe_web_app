@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Footer from './Footer';
+import Footer from '../Footer/Footer';
 import Rebase from 're-base';
-import app from '../base';
-import UserDetails from './UserDetails';
+import app from '../../base';
+import UserDetails from '../UserDetails/UserDetails';
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 

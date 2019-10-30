@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import ProfileImage from './ProfileImage';
+import ProfileImage from '../ProfileImage/ProfileImage';
 import axios from 'axios';
 import Rebase from 're-base';
-import app from '../base';
+import app from '../../base';
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 

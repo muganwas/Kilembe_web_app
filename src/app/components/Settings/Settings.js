@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Rebase from 're-base';
-import app from '../base';
-import Footer from './Footer';
+import app from '../../base';
+import Footer from '../Footer/Footer';
 let base = Rebase.createClass(app.database());
 
 class Settings extends Component {
