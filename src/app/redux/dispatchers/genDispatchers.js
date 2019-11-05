@@ -1,4 +1,4 @@
-import { FETCH_GEN_FULFILLED, FETCH_GEN_REJECTED } from '../actions';
+import { FETCH_GEN_FULFILLED, FETCH_GEN_REJECTED, FETCH_ID_TOKEN } from '../types';
 
 export const dispatchedGenInfo = info => {
     if(info !== undefined && info !== null){   
@@ -13,5 +13,12 @@ export const dispatchedGenInfo = info => {
                 error: "could not fetch user details"
             }
         } 
+    }
+}
+
+export const dispatchChatkitTokenId = token => {
+    return {
+        type: FETCH_ID_TOKEN,
+        payload: token
     }
 }

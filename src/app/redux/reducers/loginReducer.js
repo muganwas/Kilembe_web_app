@@ -1,4 +1,13 @@
-import { LOGIN_FULFILLED, LOGIN_REJECTED, LOGIN_PENDING, STORE_EMAIL, STORE_PASSWORD, LOGIN_ERROR_ALERT } from "../actions";
+import { 
+  LOGIN_FULFILLED, 
+  LOGIN_REJECTED, 
+  LOGIN_PENDING, 
+  STORE_EMAIL, 
+  STORE_PASSWORD, 
+  LOGIN_ERROR_ALERT,
+  LOGIN_CONFIRMED
+} from "../types";
+
 const defaultState = {
   email: null,
   password: null,
@@ -22,6 +31,7 @@ const defaultState = {
             return {...state,
               fetching: false,
               fetched: false,
+              info: null,
               messageId: action.payload,
               error: true
             }
@@ -41,7 +51,16 @@ const defaultState = {
           case LOGIN_ERROR_ALERT:{
             return {...state,
               error: true,
+              loggedIn: false,
+              fetching: false,
+              fetched: true,
               messageId: action.payload
+            }
+          }
+          case LOGIN_CONFIRMED:{
+            return {
+              ...state,
+              loggedIn: true
             }
           }
           case LOGIN_FULFILLED:{

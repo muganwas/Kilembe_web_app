@@ -1,55 +1,94 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import { FormattedMessage } from 'react-intl';
+import { 
+  FormattedMessage, 
+  injectIntl
+} from 'react-intl';
 import PropTypes from 'prop-types';
-import Firebase from 'firebase';
-import LoginForm from './Login';
+import Firebase from 'firebase/app';
+import LoginForm from './LoginForm';
 import { 
   handleEmail, 
   handlePassword, 
+  fetchToken,
   handleLogin, 
   authenticate, 
-  authHandler 
+  authHandler,
 } from 'reduxFiles/dispatchers/authDispatchers';
+import { Link, Redirect } from 'react-router-dom';
 
-const Login = props=>{
-  const { error, messageId } = props;
+class Login extends Component {
+  render(){
+    const { 
+      error, 
+      messageId, 
+      thirdPartyAuthentication, 
+      thirdPartyAuthHandler, 
+      fetchIdToken,
+      loggedIn,
+      intl 
+    } = this.props;
+    if(loggedIn){
+      return <Redirect to={"/home"} />;
+    }
+    const loginLabel = intl.formatMessage({id:"auth.loginLabel"});
+    const signupLabel = intl.formatMessage({id:"auth.signupLabel"});
+    const forgotPasswordLabel = intl.formatMessage({id:"auth.forgotPasswordLabel"});
+    const facebookLoginLabel = intl.formatMessage({id:"auth.facebookLoginLabel"});
+    const googleLoginLabel = intl.formatMessage({id:"auth.googleLoginLabel"});
+    const fbAuth = new Firebase.auth.FacebookAuthProvider();
+    const googleAuth = new Firebase.auth.GoogleAuthProvider();
 
-  const goTo = (location) => {
-    let history = useHistory();
-    history.push(location);
+    return(
+      <div className="App">
+        <span className="divider"></span>
+        <div className="form">
+          <span><h3>{ loginLabel }</h3></span>
+          { error?<span className={ 'feedback' }><FormattedMessage id={ messageId } /></span>: null }
+          <LoginForm { ...this.props }/>
+          <Link className="link span" to = { "/signup" }>{ signupLabel }</Link> 
+          <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
+          <span><button id="facebook" className="icon-facebook-squared" onClick={ ()=>thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler, fetchIdToken ) }>{ facebookLoginLabel }</button></span>
+          <span><button id="google" className="icon-google" onClick={ ()=>thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler, fetchIdToken ) }>{ googleLoginLabel }</button></span>
+        </div>
+      </div>
+    )
   }
-
-  const fbAuth = new Firebase.auth.FacebookAuthProvider();
-  const googleAuth = new Firebase.auth.GoogleAuthProvider();
-  const Signup = <span className="link" onClick={ goTo("/signup") }>Signup</span>;
-  const ResetPassword = <span className="link" onClick={ goTo("/reset") }>Forgot Passowrd</span>;
-  //set feedback span class
-  let feedBack = error?
-  "hidden":
-  "feedBack";
-  return(
-    <div className="form">
-      <span><h3>Sign in</h3></span>
-      <span className={ feedBack }><FormattedMessage id={ messageId } /></span>
-      <LoginForm onsubmit={ handleLogin } handleEmail={ handleEmail } handlePass={ handlePassword }/>
-      { Signup }  { ResetPassword }
-      <span><button id="facebook" className="icon-facebook-squared" onClick={ authenticate(fbAuth, authHandler) }> &nbsp;Sign in with Facebook</button></span>
-      <span><button id="google" className="icon-google" onClick={ authenticate(googleAuth, authHandler) }> &nbsp;Sign in with Google</button></span>
-    </div>
-  )
 }
 
 Login.propTypes = {
   error: PropTypes.bool.isRequired,
-  messageId: PropTypes.string.isRequired
+  messageId: PropTypes.string,
+  loggedIn: PropTypes.bool.isRequired
 }
-mapStateToProps = state=>{
+const mapStateToProps = state => {
   return {
     messageId: state.loginInfo.messageId,
-    error: state.loginInfo.error
+    error: state.loginInfo.error,
+    loggedIn: state.loginInfo.loggedIn
   }
 }
-export default connect(mapStateToProps)(Login);
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchIdToken: (currentUser, userInfo) => {
+      dispatch(fetchToken(currentUser, userInfo));
+    },
+    emailOnChange: event => {
+      dispatch(handleEmail(event));
+    },
+    passwordOnChange: event => {
+      dispatch(handlePassword(event));
+    },
+    onSubmit: () => {
+      dispatch(handleLogin());
+    },
+    thirdPartyAuthentication: (auth, authHandler, fetchToken) => {
+      dispatch(authenticate(auth, authHandler, fetchToken));
+    },
+    thirdPartyAuthHandler: (authData, fetchToken) => {
+      dispatch(authHandler(authData, fetchToken));
+    }
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(injectIntl(Login));
 

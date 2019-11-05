@@ -1,9 +1,9 @@
-import { FETCH_GEN_PENDING, FETCH_GEN_REJECTED, FETCH_GEN_FULFILLED } from '../actions';
+import { FETCH_GEN_PENDING, FETCH_GEN_REJECTED, FETCH_GEN_FULFILLED, FETCH_ID_TOKEN } from '../types';
 const defaultState = {
     info: {
-      menu: "Main-Menu",
       chatkitUser: {}
     },
+    menu: "Main-Menu",
     fetching: false,
     fetched: false,
     error: null
@@ -22,6 +22,11 @@ const defaultState = {
               fetching: false,
               fetched: false,
               error: action.payload
+            }
+          }
+          case FETCH_ID_TOKEN:{
+            return {...state,
+              info: { ...state.info, chatkitUser: { id: action.payload } } 
             }
           }
           case FETCH_GEN_FULFILLED:{

@@ -1,87 +1,72 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-
+import PropTypes from 'prop-types';
+//import axios from 'axios';
 //redux
 import { connect } from 'react-redux';
-import { dispatchedGenInfo } from './redux/dispatchers/genDispatchers';
+import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
+import { confirmToken } from 'reduxFiles/dispatchers/authDispatchers';
 
 import './styles/App.css';
 import app from './base';
 import Firebase from 'firebase';
 import Rebase from 're-base';
-import Home from './components/Home/Home';
-import Login from './components/Login/Login';
-import Reset from './components/Reset/Reset';
-import Signup from './components/Signup/Signup';
-import Settings from './components/Settings/Settings';
-import Header from './components/Header/Header';
-import Messaging from './components/Messaging/Messaging';
-import Friends from './components/Friends/Friends';
-let base = Rebase.createClass(app.database());
-var storage = Firebase.storage();
-var storageRef = storage.ref();
+import {
+  Home,
+  Login,
+  Reset,
+  Signup,
+  Settings,
+  Header,
+  Messaging,
+  Friends
+} from 'components';
+import { withRouter } from 'react-router-dom';
 
-@connect((store)=>{
-  return{
-    genInfo: store.genInfo,
-    chatkitUser: store.genInfo.info.chatkitUser
-  }
-})
+const base = Rebase.createClass(app.database());
+const storage = Firebase.storage();
+const storageRef = storage.ref();
+
 class App extends Component {
-  
-  constructor(props){
-    super(props);
-    this.authHandler = this.authHandler.bind(this);
-    this.authenticate = this.authenticate.bind(this);
-    this.state = {
-      uid: null,
-      hidden: true,
-      home: true,
-      settings: null,
-      appUsers: null,
-      messaging: null
-    }
-    this.baseState = this.state;
-  }
-  componentWillMount(){
-    let uid = localStorage.getItem("uid")==="null"?null:localStorage.getItem("uid");
-    let dname = localStorage.getItem("dname")==="null"?null:localStorage.getItem("dname");
-    let email = localStorage.getItem("email")==="null"?null:localStorage.getItem("email");
-    let exists = localStorage.getItem("exists")==="null"?null:localStorage.getItem("exists")==="false"?false:localStorage.getItem("exists");
-    let reset = localStorage.getItem("reset")==="null"?null:localStorage.getItem("reset")==="true"?true:localStorage.getItem("reset");
-    let settings = localStorage.getItem("settings")==="null"?null:localStorage.getItem("settings")==="true"?true:localStorage.getItem("settings");
-    let home = localStorage.getItem("home")==="null"?null:localStorage.getItem("home")==="true"?true:true;
-    let appUsers = localStorage.getItem("appUsers")==="null"?null:localStorage.getItem("appUsers")==="true"?true:localStorage.getItem("appUsers");
-    let messaging = localStorage.getItem("messaging")==="null"?null:localStorage.getItem("messaging")==="true"?true:localStorage.getItem("messaging");
-    if(uid !== null && exists === null) {
-      this.setState({
-        uid: uid,
-        dname: dname,
-        email: email,
-        exists: exists,
-        settings: settings,
-        home: home,
-        appUsers: appUsers,
-        messaging: messaging
-      });
-    }else if(uid === null && exists !==null){
-      this.setState({
-        exists: exists
-      });
-    }else if(uid === null && reset === true){
-      this.setState({
-        reset: reset
-      });
-    }
-  }
 
   componentDidMount(){
-    let len = Object.keys(this.props.chatkitUser).length;
+    let storedInfo = sessionStorage.getItem("genInfo");
+    //if stored info is present pickout session token
+    let sessionToken = storedInfo?JSON.parse(storedInfo).chatkitUser.token:null;
+    let { checkSessionValidity, chatkitUser } = this.props;
+
+    let uid = localStorage.getItem("uid")==="null"?
+    null:
+    localStorage.getItem("uid");
+
+    let exists = localStorage.getItem("exists")==="null"?
+    null:
+    localStorage.getItem("exists")==="false"?
+    false:
+    localStorage.getItem("exists");
+    
+    /**Determine page to redirect to */
+    if(uid !== null) {
+      //check if user session is still valid
+      checkSessionValidity(sessionToken);
+      this.goTo("/home");
+    }else if(uid === null && exists === null){
+      this.goTo("/login");
+    }else if(uid === null && exists === false ){
+      this.goTo("/signup");
+    }
+
+    let len = chatkitUser?Object.keys(chatkitUser).length:0;
     if(len === 0){
+      /**Fetch chatkit info from local storage */
       let genInfo = JSON.parse(sessionStorage.getItem('genInfo'));
-      this.props.dispatch(dispatchedGenInfo(genInfo))
+      this.props.sendGenInfo(genInfo);
     }
   }
+
+  goTo = (location) => {
+    const { history } = this.props;
+    history.push(location);
+  } 
  
   handleLogin = (event)=>{
     event.preventDefault();
@@ -101,6 +86,7 @@ class App extends Component {
       });
     }     
   }
+
   handleReset = ()=>{
     let email = this.state.email;
     if(email !== null && email !== ""){ 
@@ -117,6 +103,7 @@ class App extends Component {
       });
     }     
   }
+
   handleSignup = ()=>{
     let email = this.state.email;
     let password = this.state.Lpass;
@@ -141,6 +128,7 @@ class App extends Component {
       });
     }     
   }
+
   handleEmail = (event)=>{
     let emailregex = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
     let emailAdd = event.target.value;
@@ -171,6 +159,7 @@ class App extends Component {
       })
     }
   }
+
   handlePass = (event)=>{
     let pass = event.target.value;
     let passLen = pass.length;
@@ -198,6 +187,7 @@ class App extends Component {
       });
     }
   }
+
   handlePassConf = (event)=>{
     let cPass = event.target.value;
     if(cPass !== null) {
@@ -226,6 +216,7 @@ class App extends Component {
       }
     } 
   }
+
   goToLogin = ()=>{
     this.setState({
       exists: null,
@@ -234,6 +225,7 @@ class App extends Component {
     localStorage.setItem('exists', null);
     localStorage.setItem('reset', null);
   }
+
   goToReset = ()=>{
     this.setState({
       reset: true,
@@ -242,6 +234,7 @@ class App extends Component {
     localStorage.setItem('reset', true);
     localStorage.setItem('exists', null);
   }
+
   goToReg = ()=>{
     this.setState({
       exists: false,
@@ -250,6 +243,7 @@ class App extends Component {
     localStorage.setItem('exists', false);
     localStorage.setItem('reset', null);
   }
+
   eSignup = (email, password)=>{
     app.auth().createUserWithEmailAndPassword(email, password).then(()=>{
       this.setState({
@@ -275,6 +269,7 @@ class App extends Component {
       });
     });
   }
+
   eReset = (email)=>{
     app.auth().sendPasswordResetEmail(email).then(()=>{
       this.setState({
@@ -298,13 +293,14 @@ class App extends Component {
         }
       });
     });
-  } 
+  }
+
   eAuthenticate = (temail, password)=>{
     app.auth().signInWithEmailAndPassword(temail, password).then(()=>{
       let currUser = app.auth().currentUser;
       let info = this.props.genInfo.info;
       info.loggedInUser = currUser;
-      this.props.dispatch(dispatchedGenInfo(info));
+      this.props.sendGenInfo(info);
       this.fetchToken(currUser);
       localStorage.setItem('currentUser', JSON.stringify(currUser));
       let uid = currUser.uid;
@@ -342,7 +338,7 @@ class App extends Component {
       });
     });
   }
-  authenticate(provider, callback){
+  authenticate = (provider, callback) => {
     app.auth().signInWithPopup(provider).then(callback).catch((error)=>{
       console.log(error);
       this.setState({
@@ -388,17 +384,17 @@ class App extends Component {
       let genInfo = {...this.props.genInfo.info};
       genInfo.chatkitUser.token = idToken;
       sessionStorage.setItem('genInfo', JSON.stringify(genInfo));
-      this.props.dispatch(dispatchedGenInfo(genInfo));
+      this.props.sendGenInfo(genInfo);
     }).catch(function(error) {
       console.log(error)
     });
   }
 
-  authHandler(authData){
+  authHandler = (authData)=>{
     let currentUser = app.auth().currentUser;
     let info = this.props.genInfo.info;
     info.loggedInUser = currentUser;
-    this.props.dispatch(dispatchedGenInfo(info));
+    this.props.sendGenInfo(info);
     this.fetchToken(currentUser);
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     const uid= authData.user.uid;
@@ -441,28 +437,7 @@ class App extends Component {
       </div>
     )
   }
-  logout = ()=>{
-    app.auth().signOut().then(()=>{
-      this.setState({
-        uid:null,
-        Lemail:null,
-        email: null,
-        dname:null,
-        Lpass:null,
-        home:true,
-        appUsers: null,
-        settings: null,
-        avatar: null
-      });
-      sessionStorage.removeItem('genInfo');
-      let statesS = ['uid', 'exists','email','dname','Lemail','home','appUsers','settings', 'avatar', 'currentUser'];
-      let len = statesS.length;
-      for(var count=0;count<len; count++){
-        localStorage.removeItem(statesS[count]);
-      }
-      console.log("user signed out!");
-    })
-  }
+
   settings = ()=>{
     localStorage.setItem('settings', true);
     localStorage.setItem('home', null);
@@ -506,55 +481,34 @@ class App extends Component {
       });
   }
   render() {
-    const logout = <span className="logout" onClick={this.logout}>Logout</span>;
-    const settings = <span className="link" onClick={this.settings} >Settings</span>
-    const header = <Header dname={ this.state.dname } userId={ this.state.uid } appUsers={ this.appUsers } messaging={ this.messaging } home={ this.home } settings={settings} logout={logout}/>;
-    let feedBack = this.state.hidden === true?"hidden":"feedBack";
-    if(this.state.uid !== null && this.state.uid !== undefined) {
-      if(this.state.home === true )
-      {
-        return(
-          <div className="Home">
-            <Home avatar={ this.state.avatar } header={header} logout={logout} dname={this.state.dname} uid={ this.state.uid } email={this.state.email} settings={settings} />
-          </div>
-        )
-      }else if(this.state.settings === true){
-        return(
-          <Settings header={header} settings={settings} logout={logout}/>
-        )
-      }else if(this.state.appUsers === true){
-        return(
-          <Friends dname={ this.state.dname } header={ header } userId={ this.state.uid } />
-        )
-      }else if(this.state.messaging === true){
-        return(
-          <Messaging dname={ this.state.dname } header={ header } userId={ this.state.uid } />
-        )
-      }
-    }else if(this.state.exists === false){
-      return(
-        <div className="App">
-        <div className="divider"></div>
-          <Signup feedback={feedBack} message={this.state.LoginMessage} onsignup={this.handleSignup} userEmail={this.handleEmail} pass={this.handlePass} conPass={this.handlePassConf} reset={this.goToReset} onLogin={this.goToLogin} />
-        </div>
-      )
-    }else if(this.state.reset === true) {
-      return(
-        <div className="App">
-        <div className="divider"></div>
-          <Reset feedback={feedBack} onReset={this.handleReset} message={this.state.LoginMessage}  userEmail={this.handleEmail} toReg={this.goToReg} onLogin={this.goToLogin}/>
-        </div>
-      )
-
-    }else{
-      return (
-        <div className="App">
-        <div className="divider"></div>
-          {this.renderLogin()}
-        </div>
-      )
-    }   
+    return false;
   }
 }
 
-export default App;
+App.propTypes = {
+  genInfo: PropTypes.object,
+  info: PropTypes.object,
+  loginInfo: PropTypes.object,
+  chatkitUser: PropTypes.object
+}
+const mapStateToProps = state => {
+  return {
+    genInfo: state.genInfo,
+    info: state.genInfo.info,
+    chatkitUser: state.genInfo.info.chatkitUser,
+    loginInfo: state.loginInfo
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    checkSessionValidity: sessionToken => {
+      dispatch(confirmToken(sessionToken));
+    },
+    sendGenInfo: genInfo => {
+      dispatch(dispatchedGenInfo(genInfo));
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App));

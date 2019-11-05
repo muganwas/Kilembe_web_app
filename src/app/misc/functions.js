@@ -1,8 +1,8 @@
 import Rebase from 're-base';
-import app from '../../base';
+import app from '../base';
 const base = Rebase.createClass(app.database());
 
-export const getUserAv = (userId)=>{
+export const getUserAvatar = (userId)=>{
     return new Promise(resolve => {
         base.fetch(`users/${ userId }`, {
             context: this,

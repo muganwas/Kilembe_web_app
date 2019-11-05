@@ -1,25 +1,47 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import firebase from 'firebase';
 import Rebase from 're-base';
 import app from '../../base';
+import { getUserAvatar } from 'misc/functions';
+
 let base = Rebase.createClass(app.database());
 var storage = firebase.storage();
 var storageRef = storage.ref();
 
 class ProfileImage extends Component {
-    constructor(props){
-        super(props); 
+    constructor(){
+        super(); 
         this.state={
-            userId: this.props.userId,
-            dname: this.props.dname,
             levelId: "",
+            imessage: null,
             picState: "roundPic hidden"
         }
     }
-    
-    componentWillMount(){ 
-        this.getImage();
+
+    componentDidMount(){
+        let { genInfo } = this.props;
+        let { info: { avURL, displayName, uid } } = genInfo;
+        //console.log(dname)
+        if(!avURL){
+            let storedInfo = sessionStorage.getItem('genInfo');
+            storedInfo = storedInfo?JSON.parse(storedInfo):null;
+            if( storedInfo ){
+                let { avURL, displayName  } = storedInfo;
+                this.setState({ avatar:avURL, picState: "roundPic", dname: displayName });
+            }else
+                this.getImage();
+        }else{
+            this.setState({ 
+                avatar:avURL, 
+                dname: displayName,
+                picState: "roundPic",
+                userId:uid
+            });
+        }
     }
+    
     synState = ()=>{
         let userId = this.props.userId;
         if(this.state.avatar !== undefined && this.state.avatar !== null){
@@ -30,51 +52,19 @@ class ProfileImage extends Component {
         }
     }
     getImage = ()=>{
-        let userId = this.props.userId;
-        base.fetch(`users/${ userId }`, {
-            context: this,
-            asArray: true,
-            then(data){
-                let len = data.length;
-                if( len !== 0 && len !== undefined){
-                    let fl = data[1][0];
-                    let avURL = data[1];
-                    if(fl === "h"){
-                        this.setState({
-                        avatar: avURL,
-                        picState: "roundPic",
-                        imessage: "",
-                        levelId: "level hidden"
-                        });
-                        localStorage.setItem('avatar', avURL);
-                        this.synState();
-                    }else{
-                        storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
-                            this.setState({
-                                avatar: data,
-                                picState: "roundPic",
-                                imessage: "",
-                                levelId: "level hidden"
-                            });
-                            localStorage.setItem('avatar', data);
-                            this.synState();
-                        });
-                    }
-                }else{
-                    storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
-                        this.setState({
-                            avatar: data,
-                            picState: "roundPic",
-                            imessage: "",
-                            levelId: "level hidden"
-                        });
-                        localStorage.setItem('avatar', data);
-                        this.synState();
-                    }); 
-                }
-            }
+        let { genInfo } = this.props;
+        let { info: { uid } } = genInfo;
+        getUserAvatar(uid).
+        then(url=>{
+            this.setState({
+            avatar: url,
+            picState: "roundPic",
+            imessage: "",
+            levelId: "level hidden"
+            });
         });
     }
+    
     uploadAv = (e)=>{
         let userId = this.state.userId;
         let file = e.target.files[0];
@@ -115,21 +105,35 @@ class ProfileImage extends Component {
         uploadB.click();
     }
     render(){
+        let { avatar, picState, imessage, levelId, dname } = this.state;
+        //console.log(dname)
         return (
             <div className="avContainer">
-                <span id={ this.state.levelId }>{ this.state.imessage }</span>
+                { imessage?<span id={ levelId }>{ imessage }</span>:null }
                 <div className="avator">
                     <form method="POST" encType="multipart/form-data">
                         <input className="hidden" type="file" id="hs" name="avator" onChange={ this.uploadAv } ></input>
-                        <div className={ this.state.picState }>
-                            <img id="avator" alt="Your Avatar" title="click to change Avatar" src = { this.state.avatar } onClick={ this.clickUploadAv }/>
+                        <div className={ picState }>
+                            { avatar?<img id="avator" alt="Your Avatar" title="click to change Avatar" src = { avatar } onClick={ this.clickUploadAv }/>: null }
                         </div>
                     </form>
                 </div>
-                <span id="welcome">{ this.state.dname || this.props.dname }</span>
+                <span id="welcome">{ dname }</span>
             </div>
         )
     }
 }
 
-export default ProfileImage;
+ProfileImage.propTypes = {
+    avURL: PropTypes.string,
+    genInfo: PropTypes.object
+}
+
+const mapStateToProps = state => {
+    return {
+        avURL: state.loginInfo.avURL,
+        genInfo: state.genInfo
+    }
+}
+
+export default connect(mapStateToProps)(ProfileImage);

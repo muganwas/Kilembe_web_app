@@ -1,13 +1,21 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Rebase from 're-base';
-import firebase from 'firebase';
+import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import app from '../../base';
-import Courses from '../Courses/courses';
-import Footer from '../Footer/Footer';
+import { confirmToken } from 'reduxFiles/dispatchers/authDispatchers';
+import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
+import { 
+    Courses,
+    Header,
+    Footer
+} from 'components';
+import { getUserAvatar } from 'misc/functions';
+
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
-var storage = firebase.storage();
-var storageRef = storage.ref();
+
 
 class Home extends Component {
     constructor(props){
@@ -16,56 +24,90 @@ class Home extends Component {
             courses: {}
         };
     }
-    getImage = ()=>{
-        return new Promise((resolve, reject)=>{
-            let userId = this.props.uid;
-            base.fetch(`users/${ userId }`, {
+    
+    componentDidMount(){
+        this.fetchCourses();
+        let { genInfo } = this.props;
+        let { info: { avURL } } = genInfo;
+        //console.log("genInfo")
+        //console.log(genInfo);
+        if(!avURL){
+            this.fetchGenInfoFromSessionStorage().then(res=>{
+                if(res === "not dispatched"){
+                    this.logout();
+                }  
+            });
+        }  
+    }
+
+    componentDidUpdate(){
+        let { genInfo: { info: { uid, avURL } } } = this.props;
+        let avatar = avURL;
+        if((avatar !== null && avatar !== undefined) || (localStorage.getItem("avatar") !== null && localStorage.getItem("avatar") !== undefined)){
+            base.fetch(`users/${ uid }`, {
                 context: this,
-                asArray: true,
-                then(data){
-                    let len = data.length;
-                    if( len !== 0){
-                        let fl = data[1][0];
-                        let avURL = data[1];
-                        //easiest way I could figure out to check for an upload avatar url
-                        if(fl === "h"){
-                            this.setState({
-                            avatar: avURL
-                            });
-                            localStorage.setItem('avatar', avURL);
-                        }else{
-                            storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
-                            this.setState({
-                                avatar: data,
-                            });
-                            localStorage.setItem('avatar', data);
-                            });
-                        }
-                    }else{
-                        storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
-                            this.setState({
-                                avatar: data,
-                            });
-                            localStorage.setItem('avatar', data);
-                        }); 
-                    }
+                asArray: true
+            }).then((data)=>{
+                let length = data.length;
+                if(length === 0 || length === null || length === undefined) {
+                    console.log("uid " + uid)
+                    let userRef = usersRef.child(uid);
+                    userRef.set({
+                        email: localStorage.getItem('email'),
+                        dname: localStorage.getItem('dname'),
+                        uid: localStorage.getItem('uid'),
+                        about: " ",
+                        shareEmailAddress: false,
+                        avatar: localStorage.getItem("avatar") || avatar
+                    });
                 }
             });
+        }else{
+            getUserAvatar(uid);
+            //setTimeout(()=>{this.updateInfo()}, 2000);
+        }
+    }
+
+    logout = ()=>{
+        let { genInfo, updateGenInfo } = this.props;
+        genInfo.info = {};
+        app.auth().signOut().then(()=>{
+            sessionStorage.removeItem('genInfo');
+            localStorage.clear();
+            updateGenInfo(genInfo);
+            console.log("user signed out!");
+            this.goTo('/');
         });
     }
+
+    fetchGenInfoFromSessionStorage = () => {
+        return new Promise(resolve=> {
+            let { updateGenInfo } = this.props;
+            let storedInfo = sessionStorage.getItem('genInfo');
+            storedInfo = storedInfo?JSON.parse(storedInfo):null;
+            if(storedInfo){
+                updateGenInfo(storedInfo);
+                resolve("dispatched")
+            }else{
+                resolve("not dispatched");
+            }
+        });
+    }
+
     updateInfo = ()=>{
-        let userID = this.props.uid;
-        let userRef = usersRef.child(userID);
+        let { getnInfo: { info: { uid, avatar } } } = this.props;
+        let userRef = usersRef.child(uid);
         userRef.update({
             email: localStorage.getItem('email'),
             dname: localStorage.getItem('dname'),
             uid: localStorage.getItem('uid'),
             about: " ",
             shareEmailAddress: false,
-            avatar: localStorage.getItem("avatar") === undefined?this.props.avatar === undefined?{}: this.props.avatar : localStorage.getItem("avatar")
+            avatar: localStorage.getItem("avatar") === undefined?avatar === undefined?{}:avatar : localStorage.getItem("avatar")
         });
     }
-    componentDidMount(){
+
+    fetchCourses = () => {
         var currUser = app.auth().currentUser;
         var courses = [];
         var videos = [];
@@ -89,34 +131,16 @@ class Home extends Component {
             } 
         });        
     }
-    componentWillMount(){
-        if((this.props.avatar !== null && this.props.avatar !== undefined) || (localStorage.getItem("avatar") !== null && localStorage.getItem("avatar") !== undefined)){
-            base.fetch(`users/${ this.props.uid }`, {
-                context: this,
-                asArray: true
-            }).then((data)=>{
-                let length = data.length;
-                if(length===0 || length===null || length === undefined) {
-                    let userRef = usersRef.child(this.props.uid);
-                    userRef.set({
-                        email: localStorage.getItem('email'),
-                        dname: localStorage.getItem('dname'),
-                        uid: localStorage.getItem('uid'),
-                        about: " ",
-                        shareEmailAddress: false,
-                        avatar: localStorage.getItem("avatar") || this.props.avatar
-                    });
-                }
-            });
-        }else{
-            this.getImage();
-            setTimeout(()=>{this.updateInfo()}, 2000);
-        }
-    }
+
+    goTo = (location) => {
+        const { history } = this.props;
+        history.push(location);
+    } 
+
     render(){   
         return (
-            <div className="container">
-                {this.props.header}
+            <div className="container Home">
+                <Header logout = { this.logout } goTo={ this.goTo } />
                 <div className="content">
                     <h4>Available Courses</h4>
                     <Courses userID={this.props.uid} videos={ this.state.urls } courses = { this.state.courses } />
@@ -126,4 +150,28 @@ class Home extends Component {
         )
     }
 }
-export default Home;
+
+Home.propTypes = {
+    genInfo: PropTypes.object.isRequired,
+    info: PropTypes.object.isRequired
+}
+
+const mapStateToProps = state => {
+    return {
+        genInfo: state.genInfo,
+        info: state.genInfo.info
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        confirmUserToken: userToken => {
+            dispatch(confirmToken(userToken));
+        },
+        updateGenInfo: genInfo => {
+            dispatch(dispatchedGenInfo(genInfo));
+        }
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(withRouter(Home));

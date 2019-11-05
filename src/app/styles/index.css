@@ -56,7 +56,7 @@ li{
   border-radius: 5px;
   width: 350px;
 }
-.App span{
+.App span, .span {
   display: block;
   padding: 2px 5px;
   text-align: left;
