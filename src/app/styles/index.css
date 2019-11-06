@@ -629,6 +629,9 @@ li{
 .respondB:last-child{
   right: -1px;
 }
+#devName {
+  padding: 0px 5px;
+}
 @media only screen and (max-width: 900px){
   .playlist{
     display: none;

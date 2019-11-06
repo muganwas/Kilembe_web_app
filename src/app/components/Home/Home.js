@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Rebase from 're-base';
+import { FormattedMessage } from "react-intl";
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import app from '../../base';
@@ -18,10 +19,10 @@ let usersRef = app.database().ref('users');
 
 
 class Home extends Component {
-    constructor(props){
-        super(props);
+    constructor(){
+        super();
         this.state = {
-            courses: {}
+            courses: []
         };
     }
     
@@ -29,8 +30,6 @@ class Home extends Component {
         this.fetchCourses();
         let { genInfo } = this.props;
         let { info: { avURL } } = genInfo;
-        //console.log("genInfo")
-        //console.log(genInfo);
         if(!avURL){
             this.fetchGenInfoFromSessionStorage().then(res=>{
                 if(res === "not dispatched"){
@@ -43,14 +42,13 @@ class Home extends Component {
     componentDidUpdate(){
         let { genInfo: { info: { uid, avURL } } } = this.props;
         let avatar = avURL;
-        if((avatar !== null && avatar !== undefined) || (localStorage.getItem("avatar") !== null && localStorage.getItem("avatar") !== undefined)){
+        if( avatar || (localStorage.getItem("avatar") && localStorage.getItem("avatar"))){
             base.fetch(`users/${ uid }`, {
                 context: this,
                 asArray: true
             }).then((data)=>{
                 let length = data.length;
                 if(length === 0 || length === null || length === undefined) {
-                    console.log("uid " + uid)
                     let userRef = usersRef.child(uid);
                     userRef.set({
                         email: localStorage.getItem('email'),
@@ -94,7 +92,7 @@ class Home extends Component {
         });
     }
 
-    updateInfo = ()=>{
+    updateInfo = () => {
         let { getnInfo: { info: { uid, avatar } } } = this.props;
         let userRef = usersRef.child(uid);
         userRef.update({
@@ -137,13 +135,15 @@ class Home extends Component {
         history.push(location);
     } 
 
-    render(){   
+    render(){  
+        let { urls, courses } = this.state;
+        let { info: { uid } } = this.props;
         return (
             <div className="container Home">
                 <Header logout = { this.logout } goTo={ this.goTo } />
                 <div className="content">
-                    <h4>Available Courses</h4>
-                    <Courses userID={this.props.uid} videos={ this.state.urls } courses = { this.state.courses } />
+                    <h4><FormattedMessage id={"home.coursesTitle"} /></h4>
+                    <Courses userID={ uid } videos={ urls } courses = { courses } />
                 </div>
                 <Footer />                               
             </div>
@@ -153,7 +153,9 @@ class Home extends Component {
 
 Home.propTypes = {
     genInfo: PropTypes.object.isRequired,
-    info: PropTypes.object.isRequired
+    info: PropTypes.object.isRequired,
+    confirmUserToken: PropTypes.func.isRequired,
+    updateGenInfo: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => {

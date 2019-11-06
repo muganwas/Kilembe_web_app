@@ -5,12 +5,17 @@
         "auth.facebookLoginLabel": " Login with Facebook",
         "auth.googleLoginLabel": " Login with Google",
         "auth.forgotPasswordLabel": "Forgot Password",
+        "courses.videoTitle": "Course Video",
+        "dev.name": "Muganwas",
         "error.emailFormat":"Wrong email format",
         "error.passwordLength":"Password too short",
         "error.noCredentials":"Fill in email and password",
         "error.networkError":"There was a connection issue. try again later.",
         "error.loginFailure":"Something went wrong, try again please.",
-        "error.sessionExpired":"Session expired, please sign in again."
+        "error.sessionExpired":"Session expired, please sign in again.",
+        "home.coursesTitle": "Available Courses",
+        "playlist.title":"Your playlist",
+        "site.copyrightText": "©2018 Kilembe School"
     },
     "fr": {
         "auth.loginLabel": "Sign in",
@@ -18,11 +23,16 @@
         "auth.facebookLoginLabel": " Login with Facebook",
         "auth.googleLoginLabel": " Login with Google",
         "auth.forgotPasswordLabel": "Forgot Password",
+        "courses.videoTitle": "Course Video",
+        "dev.name": "Muganwas",
         "error.emailFormat":"Wrong email format",
         "error.passwordLength":"Password too short",
         "error.noCredentials":"Fill in email and password",
         "error.networkError":"There was a connection issue. try again later.",
         "error.loginFailure":"Something went wrong, try again please.",
-        "error.sessionExpired":"Session expired, please sign in again."
+        "error.sessionExpired":"Session expired, please sign in again.",
+        "home.coursesTitle": "Available Courses",
+        "playlist.title":"Your playlist",
+        "site.copyrightText": "©2018 Kilembe School"
     }
 }

@@ -172,7 +172,6 @@ export const confirmToken = (tokeId) => {
         axios.post(url).then(result => {
             let { data: { error: { code, message } } } = result;
             if(code === "auth/argument-error"){
-                console.log(message);
                 dispatch(loginErrorAlert("error.sessionExpired"));
             }else{
                 dispatch(loginConfirmed());

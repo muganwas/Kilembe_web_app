@@ -28,6 +28,7 @@ class Login extends Component {
       loggedIn,
       intl 
     } = this.props;
+    //go home if logged in
     if(loggedIn){
       return <Redirect to={"/home"} />;
     }
@@ -44,12 +45,32 @@ class Login extends Component {
         <span className="divider"></span>
         <div className="form">
           <span><h3>{ loginLabel }</h3></span>
-          { error?<span className={ 'feedback' }><FormattedMessage id={ messageId } /></span>: null }
+          { 
+            error?
+            <span className={ 'feedback' }><FormattedMessage id={ messageId } /></span>: 
+            null 
+          }
           <LoginForm { ...this.props }/>
           <Link className="link span" to = { "/signup" }>{ signupLabel }</Link> 
           <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
-          <span><button id="facebook" className="icon-facebook-squared" onClick={ ()=>thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler, fetchIdToken ) }>{ facebookLoginLabel }</button></span>
-          <span><button id="google" className="icon-google" onClick={ ()=>thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler, fetchIdToken ) }>{ googleLoginLabel }</button></span>
+          <span>
+            <button 
+              id="facebook" 
+              className="icon-facebook-squared" 
+              onClick={ ()=>thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler, fetchIdToken ) }
+            >
+              { facebookLoginLabel }
+            </button>
+          </span>
+          <span>
+            <button 
+              id="google" 
+              className="icon-google" 
+              onClick={ ()=>thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler, fetchIdToken ) }
+            >
+              { googleLoginLabel }
+            </button>
+          </span>
         </div>
       </div>
     )

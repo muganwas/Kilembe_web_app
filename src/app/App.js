@@ -338,6 +338,7 @@ class App extends Component {
       });
     });
   }
+
   authenticate = (provider, callback) => {
     app.auth().signInWithPopup(provider).then(callback).catch((error)=>{
       console.log(error);
@@ -352,6 +353,7 @@ class App extends Component {
       });
     });
   }
+
   getUserAv = (userId)=>{
     base.fetch(`users/${ userId }`, {
         context: this,
@@ -421,17 +423,17 @@ class App extends Component {
     localStorage.setItem('playlist', JSON.stringify(this.state.playlist));
   }
   renderLogin = ()=>{
+    let { hidden } = this.state;
     const fbAuth = new Firebase.auth.FacebookAuthProvider();
     const googleAuth = new Firebase.auth.GoogleAuthProvider();
-    const Reg = <span className="link" onClick={()=>this.goToReg()}>Register</span>;
-    const pReset = <span className="link" onClick={()=>this.goToReset()}>Forgot Passowrd</span>;
-    let feedBack = this.state.hidden === true?"hidden":"feedBack";
+    let feedBack = hidden?"hidden":"feedBack";
     return(
       <div className="form">
         <span><h3>Sign in</h3></span>
         <span className={ feedBack }>{this.state.LoginMessage}</span>
         <Login onsubmit={this.handleLogin} handleEmail={this.handleEmail} handlePass={this.handlePass}/>
-        { Reg }  { pReset }
+        <span className="link" onClick={()=>this.goToReg()}>Register</span>
+        <span className="link" onClick={()=>this.goToReset()}>Forgot Passowrd</span>
         <span><button id="facebook" className="icon-facebook-squared" onClick={()=>this.authenticate(fbAuth, this.authHandler)}> &nbsp;Sign in with Facebook</button></span>
         <span><button id="google" className="icon-google" onClick={()=>this.authenticate(googleAuth, this.authHandler)}> &nbsp;Sign in with Google</button></span>
       </div>

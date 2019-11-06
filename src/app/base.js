@@ -2,10 +2,10 @@ import Firebase from 'firebase';
 
 const app = Firebase.initializeApp({
     apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: "kilembe-school.firebaseapp.com",
-    databaseURL: "https://kilembe-school.firebaseio.com",
-    projectId: "kilembe-school",
-    storageBucket: "kilembe-school.appspot.com",
+    authDomain: process.env.AUTH_DOMAIN,
+    databaseURL: process.env.DATABASE_URL,
+    projectId: process.env.PROJECT_ID,
+    storageBucket: process.env.STORAGE_BUCKET,
     messagingSenderId: process.env.MESSAGE_SENDER_ID
 });
 export default app;
