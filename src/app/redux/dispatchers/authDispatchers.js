@@ -214,7 +214,6 @@ export const logout = genInfo =>{
             dispatch(dispatchedGenInfo(genInfo));
             dispatch(logoutConfirmed());
             console.log("user signed out!");
-            //goTo('/');
         });
     }
 }

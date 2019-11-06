@@ -18,7 +18,7 @@
     "@types/redux-api-middleware": "^3.0.7",
     "@types/redux-logger": "^3.0.7",
     "axios": "^0.18.1",
-    "case-sensitive-paths-webpack-plugin": "^2.1.2",
+    "case-sensitive-paths-webpack-plugin": "^2.2.0",
     "dotenv-webpack": "^1.5.7",
     "eslint": "^4.19.1",
     "eslint-config-defaults": "^9.0.0",

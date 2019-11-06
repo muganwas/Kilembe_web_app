@@ -1,8 +1,9 @@
 const path = require('path');
 //const CleanWebpackPlugin = require('clean-webpack-plugin');
 const webpack = require('webpack');
-var Dotenv = require('dotenv-webpack');
+const Dotenv = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 var DIST_DIR = path.resolve(__dirname, "./public");
 var SRC_DIR = path.resolve(__dirname, "./src");
@@ -45,7 +46,8 @@ module.exports = {
 		]
 	},
     plugins: [
-        //new CleanWebpackPlugin(['dist/*.*']),
+		//new CleanWebpackPlugin(['dist/*.*']),
+		new CaseSensitivePathsPlugin(),
         new HtmlWebpackPlugin({
             title: 'Production'
 		}),

@@ -28,7 +28,7 @@ class Home extends Component {
     
     componentDidMount(){
         this.fetchCourses();
-        let { loginInfo, signOut } = this.props;
+        let { loginInfo, signOut, genInfo } = this.props;
         let { loggedIn } = loginInfo;
         if(!loggedIn){
             this.fetchGenInfoFromSessionStorage().then(res=>{
