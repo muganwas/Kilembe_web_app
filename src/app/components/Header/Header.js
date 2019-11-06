@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { ProfileImage } from 'components';
 import axios from 'axios';
 import Rebase from 're-base';
 import app from '../../base';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
+import { logout, loginConfirmed, } from 'reduxFiles/dispatchers/authDispatchers';
+
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 
@@ -15,6 +18,7 @@ class Header extends Component {
         this.state={
             dropDownStyle: null,
             arrStyle: null,
+            loginStyle: "menu icon icon-home",
             homeStyle: "menu icon icon-youtube-alt",
             friendsStyle: "menu icon icon-torsos-all",
             chatStyle: "menu icon icon-comments",
@@ -30,18 +34,23 @@ class Header extends Component {
         const { 
             info: { uid, loggedIn }, 
             genInfo, 
-            updateGenInfo 
+            updateGenInfo,
+            confirmLoggedIn
         } = this.props;
         let { info: { avURL } } = genInfo;
-        let storedInfo = sessionStorage.getItem('genInfo');
-            storedInfo = storedInfo?JSON.parse(storedInfo):null;
         //dispatch local storage genInfo to props
-        if(storedInfo && !avURL){
+        if(!loggedIn){
+            let storedInfo = sessionStorage.getItem('genInfo');
+            storedInfo = storedInfo?
+            JSON.parse(storedInfo):
+            null;
             let newGenInfo = { ...genInfo };
             newGenInfo.info = { ...storedInfo };
-            updateGenInfo(newGenInfo);
-        }
-        if(loggedIn){
+            if(!avURL && storedInfo){
+                confirmLoggedIn();
+                updateGenInfo(newGenInfo);
+            }
+        }else{
             this.createChatKitUser();
             let userRef = usersRef.child(`${uid}/friends`);
             userRef.once('value').then((snapshot)=>{
@@ -101,10 +110,17 @@ class Header extends Component {
         }
     }
 
+    goTo = (location) => {
+        const { history } = this.props;
+        history.push(location);
+    } 
+
     render(){
-        const { info: { uid, dname }, logout, goTo } = this.props;
+        const { info: { uid, dname }, signOut, genInfo, loginInfo } = this.props;
+        const { loggedIn } = loginInfo;
         const { 
-            notificationClass, 
+            notificationClass,
+            loginStyle, 
             homeStyle, 
             friendsStyle, 
             chatStyle, 
@@ -114,26 +130,37 @@ class Header extends Component {
             settingsIconStyle,
             logoutIconStyle
         } = this.state;
+        const notFoundPath = loggedIn?
+        "/home":
+        "/";
         return (
             <div className="mainNav">
-                <ProfileImage dname={ dname } userId = { uid } />     
+                { loggedIn? 
+                <ProfileImage dname={ dname } userId = { uid } />:
+                null }    
+                { loggedIn?
                 <div className="nav">    
-                    <span className={ homeStyle } onClick={ ()=>goTo("/home") }></span>
-                    <span className={ friendsStyle } onClick={ ()=>goTo("/friends") }><span className={ notificationClass }></span></span>
-                    <span className={ chatStyle } onClick={ ()=>goTo("/messaging") }></span> 
+                    <span className={ homeStyle } onClick={ ()=>this.goTo("/home") }></span>
+                    <span className={ friendsStyle } onClick={ ()=>this.goTo("/friends") }>
+                        <span className={ notificationClass }></span>
+                    </span>
+                    <span className={ chatStyle } onClick={ ()=>this.goTo("/messaging") }></span> 
                     <span className={ menuStyle } onClick={ this.showMenu }>
                         <div id="arr" className={ arrStyle }>
                             <ul id="menu" className={ dropDownStyle }>
                                 <li className={ settingsIconStyle }>
-                                    <span className="link" onClick={ ()=>goTo("/settings") } >Settings</span>
+                                    <span className="link" onClick={ ()=>this.goTo("/settings") } >Settings</span>
                                 </li>
                                 <li className={ logoutIconStyle }>
-                                    <span className="logout" onClick={ ()=>logout() } >Logout</span>
+                                    <span className="logout" onClick={ ()=>signOut(genInfo, this.goTo) } >Logout</span>
                                 </li>
                             </ul>
                         </div>
                     </span> 
-                </div>
+                </div>:
+                <div>
+                    <span className={ loginStyle } onClick={ ()=>this.goTo(notFoundPath) }></span>
+                </div> }
             </div>
         )
     }
@@ -142,14 +169,14 @@ class Header extends Component {
 Header.propTypes = {
     genInfo: PropTypes.object,
     info: PropTypes.object,
-    logout: PropTypes.func.isRequired,
-    goTo: PropTypes.func.isRequired
+    signOut: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => {
     return {
         genInfo: state.genInfo,
-        info: state.genInfo.info
+        info: state.genInfo.info,
+        loginInfo: state.loginInfo
     }
 }
 
@@ -157,8 +184,14 @@ const mapDispatchToProps = dispatch => {
     return {
         updateGenInfo: genInfo => {
             dispatch(dispatchedGenInfo(genInfo));
+        },
+        confirmLoggedIn: () => {
+            dispatch(loginConfirmed());
+        },
+        signOut: genInfo => {
+            dispatch(logout(genInfo));
         }
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Header);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Header));

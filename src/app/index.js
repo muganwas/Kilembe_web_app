@@ -30,13 +30,6 @@ let MainComponent = ()=>{
 		</Provider>
 	)
 }
-let CoursesComponent = ()=>{
-	return(
-		<Provider store={store}>
-			<Courses/>
-		</Provider>
-	)
-}
 let FriendsComponent = ()=>{
 	return(
 		<Provider store={store}>
@@ -79,17 +72,18 @@ let SettingsComponent = ()=>{
 		</Provider>
 	)
 }
-let UserDetailsComponent = ()=>{
-	return(
-		<Provider store={store}>
-			<UserDetails/>
-		</Provider>
-	)
-}
 let MessagingComponent = ()=>{
 	return(
 		<Provider store={store}>
 			<Messaging/>
+		</Provider>
+	)
+}
+
+let NotFoundComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<NotFound/>
 		</Provider>
 	)
 }
@@ -103,11 +97,9 @@ var Root = ()=>{
 				<Route exact path="/reset" component={ ResetComponent } />
 				<Route exact path="/home" component={ HomeComponent } />
 				<Route exact path="/messaging" component={ MessagingComponent } />
-				<Route exact path="/details" component={ UserDetailsComponent } />
 				<Route exact path="/settings" component={ SettingsComponent } />
-				<Route exact path="/courses" component={ CoursesComponent } />
 				<Route exact path="/friends" component={ FriendsComponent } />
-				<Route component={ NotFound } />
+				<Route component={ NotFoundComponent } />
 			</Switch>
         </BrowserRouter>
     )

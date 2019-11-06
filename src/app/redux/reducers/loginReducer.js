@@ -5,7 +5,8 @@ import {
   STORE_EMAIL, 
   STORE_PASSWORD, 
   LOGIN_ERROR_ALERT,
-  LOGIN_CONFIRMED
+  LOGIN_CONFIRMED,
+  LOGOUT_CONFIRMED
 } from "../types";
 
 const defaultState = {
@@ -42,6 +43,20 @@ const defaultState = {
               error: false
             }
           }
+
+          case LOGOUT_CONFIRMED:{
+            return {
+              email: null,
+              password: null,
+              info: null,
+              messageId: null,
+              loggedIn: false,
+              fetching: false,
+              fetched: false,
+              error: false
+            }
+          }
+
           case STORE_PASSWORD:{
             return {...state,
               password: action.payload,

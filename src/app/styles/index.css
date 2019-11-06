@@ -122,6 +122,14 @@ li{
 .avContainer{
   display: inline-block;
 }
+.nav.logged-out{
+  float: none;
+}
+.nav.logged-out::after{
+  clear: both;
+  content: " ";
+  display: block;
+}
 .nav .icon{
   float: left;
   padding: 5px 10px;

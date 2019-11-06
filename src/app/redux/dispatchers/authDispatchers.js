@@ -10,7 +10,8 @@ import {
     LOGIN_REJECTED, 
     STORE_EMAIL, STORE_PASSWORD, 
     LOGIN_ERROR_ALERT, 
-    LOGIN_CONFIRMED 
+    LOGIN_CONFIRMED,
+    LOGOUT_CONFIRMED
 } from '../types';
 
 const confirmTokenURL = process.env.CONFIRM_FIREBASE_TOKEN;
@@ -43,6 +44,12 @@ export const loginFulfilled = userInfo => {
 export const loginConfirmed = () => {
     return {
         type: LOGIN_CONFIRMED
+    }
+}
+
+export const logoutConfirmed = () => {
+    return {
+        type: LOGOUT_CONFIRMED
     }
 }
 
@@ -170,8 +177,10 @@ export const confirmToken = (tokeId) => {
     return dispatch => {
         const url = confirmTokenURL + tokeId;
         axios.post(url).then(result => {
-            let { data: { error: { code, message } } } = result;
-            if(code === "auth/argument-error"){
+            let { data } = result;
+            let { error } = data;
+
+            if( error.code && code === "auth/argument-error"){
                 dispatch(loginErrorAlert("error.sessionExpired"));
             }else{
                 dispatch(loginConfirmed());
@@ -194,4 +203,18 @@ export const fetchToken = (currUser, userInfo)=>{
             console.log(error);
         });
     } 
+}
+
+export const logout = genInfo =>{
+    return dispatch => {
+        genInfo.info = {};
+        app.auth().signOut().then(()=>{
+            sessionStorage.removeItem('genInfo');
+            localStorage.clear();
+            dispatch(dispatchedGenInfo(genInfo));
+            dispatch(logoutConfirmed());
+            console.log("user signed out!");
+            //goTo('/');
+        });
+    }
 }

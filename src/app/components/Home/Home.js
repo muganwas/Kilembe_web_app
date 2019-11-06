@@ -5,7 +5,7 @@ import { FormattedMessage } from "react-intl";
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import app from '../../base';
-import { confirmToken } from 'reduxFiles/dispatchers/authDispatchers';
+import { confirmToken, loginConfirmed, logout } from 'reduxFiles/dispatchers/authDispatchers';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { 
     Courses,
@@ -28,62 +28,56 @@ class Home extends Component {
     
     componentDidMount(){
         this.fetchCourses();
-        let { genInfo } = this.props;
-        let { info: { avURL } } = genInfo;
-        if(!avURL){
+        let { loginInfo, signOut } = this.props;
+        let { loggedIn } = loginInfo;
+        if(!loggedIn){
             this.fetchGenInfoFromSessionStorage().then(res=>{
                 if(res === "not dispatched"){
-                    this.logout();
+                    signOut(genInfo);
                 }  
             });
         }  
     }
 
     componentDidUpdate(){
-        let { genInfo: { info: { uid, avURL } } } = this.props;
+        let { genInfo: { info: { uid, avURL } }, loginInfo: { loggedIn }  } = this.props;
         let avatar = avURL;
-        if( avatar || (localStorage.getItem("avatar") && localStorage.getItem("avatar"))){
-            base.fetch(`users/${ uid }`, {
-                context: this,
-                asArray: true
-            }).then((data)=>{
-                let length = data.length;
-                if(length === 0 || length === null || length === undefined) {
-                    let userRef = usersRef.child(uid);
-                    userRef.set({
-                        email: localStorage.getItem('email'),
-                        dname: localStorage.getItem('dname'),
-                        uid: localStorage.getItem('uid'),
-                        about: " ",
-                        shareEmailAddress: false,
-                        avatar: localStorage.getItem("avatar") || avatar
-                    });
-                }
-            });
-        }else{
-            getUserAvatar(uid);
-            //setTimeout(()=>{this.updateInfo()}, 2000);
+        if(!loggedIn)
+            this.goTo("/");
+        else{
+            if( avatar || (localStorage.getItem("avatar") && localStorage.getItem("avatar"))){
+                base.fetch(`users/${ uid }`, {
+                    context: this,
+                    asArray: true
+                }).then((data)=>{
+                    let length = data.length;
+                    if(length === 0 || length === null || length === undefined) {
+                        let userRef = usersRef.child(uid);
+                        userRef.set({
+                            email: localStorage.getItem('email'),
+                            dname: localStorage.getItem('dname'),
+                            uid: localStorage.getItem('uid'),
+                            about: " ",
+                            shareEmailAddress: false,
+                            avatar: localStorage.getItem("avatar") || avatar
+                        });
+                    }
+                });
+            }else{
+                getUserAvatar(uid);
+                //setTimeout(()=>{this.updateInfo()}, 2000);
+            }
         }
-    }
-
-    logout = ()=>{
-        let { genInfo, updateGenInfo } = this.props;
-        genInfo.info = {};
-        app.auth().signOut().then(()=>{
-            sessionStorage.removeItem('genInfo');
-            localStorage.clear();
-            updateGenInfo(genInfo);
-            console.log("user signed out!");
-            this.goTo('/');
-        });
     }
 
     fetchGenInfoFromSessionStorage = () => {
         return new Promise(resolve=> {
-            let { updateGenInfo } = this.props;
+            let { updateGenInfo, confirmLoggedIn, loginInfo: { loggedIn } } = this.props;
             let storedInfo = sessionStorage.getItem('genInfo');
             storedInfo = storedInfo?JSON.parse(storedInfo):null;
             if(storedInfo){
+                if(!loggedIn)
+                    confirmLoggedIn();
                 updateGenInfo(storedInfo);
                 resolve("dispatched")
             }else{
@@ -140,7 +134,7 @@ class Home extends Component {
         let { info: { uid } } = this.props;
         return (
             <div className="container Home">
-                <Header logout = { this.logout } goTo={ this.goTo } />
+                <Header />
                 <div className="content">
                     <h4><FormattedMessage id={"home.coursesTitle"} /></h4>
                     <Courses userID={ uid } videos={ urls } courses = { courses } />
@@ -154,6 +148,7 @@ class Home extends Component {
 Home.propTypes = {
     genInfo: PropTypes.object.isRequired,
     info: PropTypes.object.isRequired,
+    loginInfo: PropTypes.object.isRequired,
     confirmUserToken: PropTypes.func.isRequired,
     updateGenInfo: PropTypes.func.isRequired
 }
@@ -161,7 +156,8 @@ Home.propTypes = {
 const mapStateToProps = state => {
     return {
         genInfo: state.genInfo,
-        info: state.genInfo.info
+        info: state.genInfo.info,
+        loginInfo: state.loginInfo
     }
 }
 
@@ -169,6 +165,12 @@ const mapDispatchToProps = dispatch => {
     return {
         confirmUserToken: userToken => {
             dispatch(confirmToken(userToken));
+        },
+        confirmLoggedIn: () => {
+            dispatch(loginConfirmed());
+        },
+        signOut: genInfo => {
+            dispatch(logout(genInfo));
         },
         updateGenInfo: genInfo => {
             dispatch(dispatchedGenInfo(genInfo));
