@@ -1,0 +1,69 @@
+{
+  "addons": [
+
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "AUTH_DOMAIN": {
+      "required": true
+    },
+    "CHATKIT_CREATE_USER": {
+      "required": true
+    },
+    "CHATKIT_INSTANCE_LOCATOR": {
+      "required": true
+    },
+    "CHATKIT_TOKEN_PROVIDER": {
+      "required": true
+    },
+    "CONFIRM_FIREBASE_TOKEN": {
+      "required": true
+    },
+    "DATABASE_URL": {
+      "required": true
+    },
+    "DEV_EMAIL_ADDRESS": {
+      "required": true
+    },
+    "DEV_PROFILE_URL": {
+      "required": true
+    },
+    "ENV": {
+      "required": true
+    },
+    "FIREBASE_API_KEY": {
+      "required": true
+    },
+    "MESSAGE_SENDER_ID": {
+      "required": true
+    },
+    "PAYPAL_URL": {
+      "required": true
+    },
+    "PORT": {
+      "required": true
+    },
+    "PROJECT_ID": {
+      "required": true
+    },
+    "STORAGE_BUCKET": {
+      "required": true
+    },
+    "VAPID_KEY": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "name": "Kilembe_web_app",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
