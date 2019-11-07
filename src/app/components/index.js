@@ -11,4 +11,4 @@ export { default as Header } from './Header/Header';
 export { default as Friends } from './Friends/Friends';
 export { default as Footer } from './Footer/Footer';
 export { default as Donate } from './Donate/Donate';
-export { default as Courses } from './Courses/Courses'; 
+export { default as Courses } from './Courses/CoursesList'; 

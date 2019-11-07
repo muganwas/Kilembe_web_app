@@ -9,7 +9,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 
-class Courses extends Component {
+class CoursesList extends Component {
     constructor(){
         super();
         this.state = {
@@ -177,7 +177,7 @@ class Courses extends Component {
     }
 }
 
-Courses.propTypes = {
+CoursesList.propTypes = {
     genInfo: PropTypes.object,
     userID: PropTypes.string,
     videos: PropTypes.array,
@@ -189,4 +189,4 @@ const mapStateToProps = state => {
         genInfo: state.genInfo
     }
 }
-export default connect(mapStateToProps)(Courses);
+export default connect(mapStateToProps)(CoursesList);

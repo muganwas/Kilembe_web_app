@@ -8,7 +8,6 @@ import './styles/styles.css';
 import './styles/animations.css';
 import App from './App';
 import { 
-    UserDetails,
     Signup,
     Settings,
     Reset,
@@ -16,8 +15,7 @@ import {
     Messaging,
     Login,
     Home,
-    Friends,
-    Courses
+    Friends
 } from 'components';
 import registerServiceWorker from './registerServiceWorker';
 
