@@ -87,7 +87,7 @@ class Home extends Component {
     }
 
     updateInfo = () => {
-        let { getnInfo: { info: { uid, avatar } } } = this.props;
+        let { genInfo: { info: { uid, avatar } } } = this.props;
         let userRef = usersRef.child(uid);
         userRef.update({
             email: localStorage.getItem('email'),
@@ -131,7 +131,7 @@ class Home extends Component {
 
     render(){  
         let { urls, courses } = this.state;
-        let { info: { uid } } = this.props;
+        let { genInfo: { info: { uid } } } = this.props;
         return (
             <div className="container Home">
                 <Header />
@@ -147,7 +147,6 @@ class Home extends Component {
 
 Home.propTypes = {
     genInfo: PropTypes.object.isRequired,
-    info: PropTypes.object.isRequired,
     loginInfo: PropTypes.object.isRequired,
     confirmUserToken: PropTypes.func.isRequired,
     updateGenInfo: PropTypes.func.isRequired
@@ -156,7 +155,6 @@ Home.propTypes = {
 const mapStateToProps = state => {
     return {
         genInfo: state.genInfo,
-        info: state.genInfo.info,
         loginInfo: state.loginInfo
     }
 }

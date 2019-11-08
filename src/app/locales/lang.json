@@ -13,6 +13,8 @@
         "error.networkError":"There was a connection issue. try again later.",
         "error.loginFailure":"Something went wrong, try again please.",
         "error.sessionExpired":"Session expired, please sign in again.",
+        "error.invalidPassword":"Email and password don't match",
+        "error.passwordMatchError":"Your passwords don't match",
         "home.coursesTitle": "Available Courses",
         "playlist.title":"Your playlist",
         "site.copyrightText": "©2018 Kilembe School"
@@ -31,6 +33,8 @@
         "error.networkError":"There was a connection issue. try again later.",
         "error.loginFailure":"Something went wrong, try again please.",
         "error.sessionExpired":"Session expired, please sign in again.",
+        "error.invalidPassword":"Email and password don't match",
+        "error.passwordMatchError":"Your passwords don't match",
         "home.coursesTitle": "Available Courses",
         "playlist.title":"Your playlist",
         "site.copyrightText": "©2018 Kilembe School"

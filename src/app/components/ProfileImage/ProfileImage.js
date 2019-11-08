@@ -51,6 +51,7 @@ class ProfileImage extends Component {
             });
         }
     }
+
     getImage = ()=>{
         let { genInfo } = this.props;
         let { info: { uid } } = genInfo;
@@ -100,10 +101,12 @@ class ProfileImage extends Component {
             });
         }
     }
+
     clickUploadAv = ()=>{
         let uploadB = document.getElementById('hs');
         uploadB.click();
     }
+    
     render(){
         let { avatar, picState, imessage, levelId, dname } = this.state;
         //console.log(dname)

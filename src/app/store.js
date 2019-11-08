@@ -10,8 +10,9 @@ import '@formatjs/intl-relativetimeformat/polyfill';
 import '@formatjs/intl-relativetimeformat/dist/locale-data/en';
 import '@formatjs/intl-relativetimeformat/dist/locale-data/fr'
 import promise from 'redux-promise-middleware';
-import genInfoReducer from './redux/reducers/genInfoReducer';
-import loginReducer from './redux/reducers/loginReducer';
+import genInfoReducer from 'reduxFiles/reducers/genInfoReducer';
+import loginReducer from 'reduxFiles/reducers/loginReducer';
+import signupReducer from 'reduxFiles/reducers/signupReducer'
 
 Moment.globalMoment = moment;
 
@@ -42,7 +43,8 @@ const initialState = {
 const allReducers = combineReducers({
     genInfo: genInfoReducer,
     intl: intlReducer,
-    loginInfo: loginReducer
+    loginInfo: loginReducer,
+    signupInfo: signupReducer
 });
 
 const store = createStore(

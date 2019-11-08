@@ -1,4 +1,9 @@
 {
     "presets": ["env", "react", "stage-3"],
-    "plugins": ["transform-decorators-legacy", "react-html-attrs", "transform-class-properties"]
+    "plugins": [
+        "transform-decorators-legacy", 
+        "react-html-attrs", 
+        "transform-class-properties",
+        "emotion"
+    ]
 }

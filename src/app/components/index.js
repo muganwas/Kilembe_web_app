@@ -1,5 +1,5 @@
 export { default as UserDetails } from './UserDetails/UserDetails';
-export { default as Signup } from './Signup/Signup';
+export { default as Signup } from './Signup';
 export { default as Settings } from './Settings/Settings';
 export { default as Reset } from './Reset/Reset';
 export { default as ProfileImage } from './ProfileImage/ProfileImage';

@@ -6,12 +6,20 @@ import { emailregex } from 'misc/constants';
 import { dispatchedGenInfo, dispatchChatkitTokenId } from 'reduxFiles/dispatchers/genDispatchers';
 import { getUserAvatar } from 'misc/functions';
 import { 
-    LOGIN_FULFILLED, 
+    LOGIN_FULFILLED,
+    LOGIN_PENDING, 
     LOGIN_REJECTED, 
     STORE_EMAIL, STORE_PASSWORD, 
     LOGIN_ERROR_ALERT, 
     LOGIN_CONFIRMED,
-    LOGOUT_CONFIRMED
+    LOGOUT_CONFIRMED,
+    SIGNUP_FULFILLED, 
+    SIGNUP_REJECTED, 
+    SIGNUP_PENDING,
+    SIGNUP_ERROR_ALERT,
+    SIGNUP_CONFIRMED,
+    PASSWORDS_MATCH,
+    PASSWORDS_MATCH_ERROR
 } from '../types';
 
 const confirmTokenURL = process.env.CONFIRM_FIREBASE_TOKEN;
@@ -27,10 +35,30 @@ export const storeEmail = email =>{
     }
 }
 
-export const storePassword = email =>{
+export const storePassword = password =>{
     return {
         type: STORE_PASSWORD,
-        payload: email
+        payload: password
+    }
+}
+
+export const confirmPasswordMatch = password =>{
+    return {
+        type: PASSWORDS_MATCH,
+        payload: password
+    }
+}
+
+export const passwordMatchError = messageId =>{
+    return {
+        type: PASSWORDS_MATCH_ERROR,
+        payload: messageId
+    }
+}
+
+export const loginPending = () => {
+    return {
+        type: LOGIN_PENDING
     }
 }
 
@@ -67,9 +95,15 @@ export const loginErrorAlert = messageId => {
     }
 }
 
-export const handleEmail = event => {
+export const signupErrorAlert = messageId => {
+    return {
+        type: SIGNUP_ERROR_ALERT,
+        payload: messageId
+    }
+}
+
+export const handleEmail = email => {
     return dispatch => {
-        let email = event.target.value;
         if(email.match(emailregex)){
             dispatch(storeEmail(email));
         }else{
@@ -81,9 +115,8 @@ export const handleEmail = event => {
     
 }
 
-export const handlePassword = event => {
+export const handlePassword = pass => {
     return dispatch => {
-        let pass = event.target.value;
         let passLen = pass.length;
         if(passLen >= 8){
             dispatch(storePassword(pass));
@@ -94,10 +127,24 @@ export const handlePassword = event => {
     }
 }
 
-export const handleLogin = (email, password)=>{
+export const handleConfirmPassword = (pass, confirmPass) => {
     return dispatch => {
-        if((email !== null && email !== "") && (password !== null && password !== "")){ 
-            eAuthenticate(email, password); 
+        let confirmPassLen  = confirmPass.length;
+        if( confirmPassLen >= 8 &&  pass === confirmPass ){
+            dispatch(confirmPasswordMatch(pass));
+        }else{
+            let messageId = "error.passwordMatchError";
+            dispatch(signupErrorAlert(messageId));
+        }
+    }
+}
+
+export const handleLogin = loginInfo => {
+    return dispatch => {
+        let { email, password } = loginInfo;
+        if(email && password){
+            dispatch(loginPending());
+            dispatch(eAuthenticate(email, password)); 
         }else{
             dispatch(loginErrorAlert("error.noCredentials"));
         } 
@@ -120,7 +167,7 @@ export const authHandler = (authData, fetchToken) => {
             const statesS = ['uid','email','displayName'];
             const len = states.length;
             dispatch(dispatchedGenInfo(userLoginInfo));
-            fetchToken(currentUser, userLoginInfo);
+            dispatch(fetchToken(currentUser, userLoginInfo));
             for(var count=0;count<len; count++){
                 localStorage.setItem(statesS[count], states[count]);
             }
@@ -143,32 +190,39 @@ export const  authenticate = (provider, callback, fetchToken) => {
     }
 }
 
-export const eAuthenticate = (email, password, fetchToken)=>{
+export const eAuthenticate = (email, password)=>{
     return dispatch => {
         app.auth().signInWithEmailAndPassword(email, password).then(()=>{
             let currUser = app.auth().currentUser;
+            let uid = currUser.uid;
             localStorage.setItem('currentUser', JSON.stringify(currUser));
             
             getUserAvatar(uid).then(url=>{
-                let uid = currUser.uid;
                 let email = currUser.email;
                 let splitEmailAdd = email.split('@');
                 let avURL = url;
                 let displayName = splitEmailAdd[0];
-                let userLoginInfo = { uid,email,displayName,avURL,chatkitUser: {} };
+                let userInfo = { uid,email,displayName,avURL,chatkitUser: {} };
                 let states = [uid,email,displayName];
                 let statesS = ['uid','email','displayName'];
                 let len = states.length;
-                fetchToken(currUser, userLoginInfo);
+                dispatch(dispatchedGenInfo(userInfo));
+                dispatch(fetchToken(currUser, userInfo));
                 for(var count=0;count<len; count++){
                     localStorage.setItem(statesS[count], states[count]);
                 }
-                dispatch(loginFulfilled(userLoginInfo));
+                dispatch(loginFulfilled(userInfo));
             });
         }).catch((error)=>{
-            let errorMessage = error.message;
-            dispatch(loginFailed("error.loginFailure"));
-            console.log(errorMessage)
+            let errorCode = error.code;
+            let errorMessage;
+            if( errorCode === "auth/wrong-password" )
+                errorMessage = "error.invalidPassword";
+            else 
+                errorMessage = "error.loginFailure";
+
+            dispatch(loginFailed(errorMessage));
+            console.log(error)
         });
     }
 }
@@ -198,6 +252,7 @@ export const fetchToken = (currUser, userInfo)=>{
             let genInfo = { ...userInfo };
             genInfo.chatkitUser.token = idToken;
             sessionStorage.setItem('genInfo', JSON.stringify(genInfo));
+            dispatch(dispatchedGenInfo(genInfo));
             dispatch(dispatchChatkitTokenId(idToken));
         }).catch(error => {
             console.log(error);

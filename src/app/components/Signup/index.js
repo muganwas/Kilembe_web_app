@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import LoginForm from './LoginForm';
+import SignupForm from './SignupForm';
 import { 
   handleEmail, 
   handlePassword, 
@@ -12,26 +12,11 @@ import {
 } from 'reduxFiles/dispatchers/authDispatchers';
 import { Redirect } from 'react-router-dom';
 
-class Login extends Component {
-  state = {
-    email: "",
-    password: ""
-  }
-
-  temporaryValuesStore = event => {
-    let value = event.target.value;
-    let id = event.target.id;
-    this.setState({ [id]:value });
-  }
-
+class Signup extends Component {
   render(){
     const { 
       loggedIn
     } = this.props;
-    const {
-      email,
-      password
-    } = this.state;
     //go home if logged in
     if(loggedIn){
       return <Redirect to={"/home"} />;
@@ -40,45 +25,37 @@ class Login extends Component {
     return(
       <div className="App">
         <span className="divider"></span>
-        <LoginForm 
-          { ...this.props }
-          tempValStore = { this.temporaryValuesStore }
-          email = { email }
-          password = { password }
-        />
+        <SignupForm { ...this.props }/>
       </div>
     )
   }
 }
 
-Login.propTypes = {
-  error: PropTypes.bool,
+Signup.propTypes = {
+  error: PropTypes.bool.isRequired,
   messageId: PropTypes.string,
   loggedIn: PropTypes.bool.isRequired
 }
-
 const mapStateToProps = state => {
   return {
     messageId: state.loginInfo.messageId,
     error: state.loginInfo.error,
-    loginInfo: state.loginInfo,
     loggedIn: state.loginInfo.loggedIn
   }
 }
-
 const mapDispatchToProps = dispatch => {
   return {
     fetchIdToken: (currentUser, userInfo) => {
       dispatch(fetchToken(currentUser, userInfo));
     },
-    dispatchEmail: event => {
+    emailOnChange: event => {
       dispatch(handleEmail(event));
     },
-    dispatchPassword: event => {
+    passwordOnChange: event => {
       dispatch(handlePassword(event));
     },
-    onSubmit: loginProps => {
-      dispatch(handleLogin(loginProps));
+    onSubmit: () => {
+      dispatch(handleLogin());
     },
     thirdPartyAuthentication: (auth, authHandler, fetchToken) => {
       dispatch(authenticate(auth, authHandler, fetchToken));
@@ -88,5 +65,5 @@ const mapDispatchToProps = dispatch => {
     }
   }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(Signup);
 
