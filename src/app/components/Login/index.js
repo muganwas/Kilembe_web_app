@@ -54,6 +54,7 @@ class Login extends Component {
 Login.propTypes = {
   error: PropTypes.bool,
   messageId: PropTypes.string,
+  loginInfo: PropTypes.object.isRequired,
   loggedIn: PropTypes.bool.isRequired
 }
 

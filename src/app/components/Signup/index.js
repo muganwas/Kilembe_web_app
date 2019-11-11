@@ -6,41 +6,55 @@ import {
   handleEmail, 
   handlePassword, 
   fetchToken,
-  handleLogin, 
-  authenticate, 
+  handleConfirmPassword,
   authHandler,
+  handleSignup
 } from 'reduxFiles/dispatchers/authDispatchers';
 import { Redirect } from 'react-router-dom';
 
 class Signup extends Component {
+  state = {
+    email: "",
+    password: "",
+    passwordConfirm: ""
+  }
+
+  temporaryValuesStore = event => {
+    let value = event.target.value;
+    let id = event.target.id;
+    this.setState({ [id]:value });
+  }
+
   render(){
-    const { 
-      loggedIn
-    } = this.props;
-    //go home if logged in
-    if(loggedIn){
-      return <Redirect to={"/home"} />;
-    }
+    const { email, password, passwordConfirm } = this.state;
 
     return(
       <div className="App">
         <span className="divider"></span>
-        <SignupForm { ...this.props }/>
+        <SignupForm 
+          { ...this.props }
+          tempValStore = { this.temporaryValuesStore }
+          email = {email}
+          password = {password}
+          passwordConfirm = {passwordConfirm}
+        />
       </div>
     )
   }
 }
 
 Signup.propTypes = {
-  error: PropTypes.bool.isRequired,
+  error: PropTypes.bool,
   messageId: PropTypes.string,
-  loggedIn: PropTypes.bool.isRequired
+  signupInfo: PropTypes.object.isRequired,
+  signedUp: PropTypes.bool.isRequired
 }
 const mapStateToProps = state => {
   return {
-    messageId: state.loginInfo.messageId,
-    error: state.loginInfo.error,
-    loggedIn: state.loginInfo.loggedIn
+    messageId: state.signupInfo.messageId,
+    error: state.signupInfo.error,
+    signupInfo: state.signupInfo,
+    signedUp: state.signupInfo.signedUp
   }
 }
 const mapDispatchToProps = dispatch => {
@@ -48,17 +62,17 @@ const mapDispatchToProps = dispatch => {
     fetchIdToken: (currentUser, userInfo) => {
       dispatch(fetchToken(currentUser, userInfo));
     },
-    emailOnChange: event => {
-      dispatch(handleEmail(event));
+    dispatchEmail: email => {
+      dispatch(handleEmail(email));
     },
-    passwordOnChange: event => {
-      dispatch(handlePassword(event));
+    dispatchPassword: password => {
+      dispatch(handlePassword(password));
     },
-    onSubmit: () => {
-      dispatch(handleLogin());
+    onSignup: (email, password) => {
+      dispatch(handleSignup(email, password));
     },
-    thirdPartyAuthentication: (auth, authHandler, fetchToken) => {
-      dispatch(authenticate(auth, authHandler, fetchToken));
+    confirmPasswordMatch: (password, confirmPassword) => {
+      dispatch(handleConfirmPassword(password, confirmPassword));
     },
     thirdPartyAuthHandler: (authData, fetchToken) => {
       dispatch(authHandler(authData, fetchToken));

@@ -73,7 +73,10 @@ const LoginForm = props => {
                 </span>
                 <span>
                     <button 
-                        onClick={ () => onSubmit(loginInfo) } 
+                        onClick={ () => {
+                            if(!error)
+                                onSubmit(loginInfo) 
+                        } } 
                         type="submit" 
                     >
                         { 

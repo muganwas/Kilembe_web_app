@@ -15,6 +15,10 @@
         "error.sessionExpired":"Session expired, please sign in again.",
         "error.invalidPassword":"Email and password don't match",
         "error.passwordMatchError":"Your passwords don't match",
+        "error.signupError":"Something went wrong, try again please.",
+        "error.emailAlreadyInUse": "Email already in use, try another.",
+        "error.userEmailNotVerified": "Your email address hasn't been verified, check your inbox for a verification email",
+        "message.successfulSignup": "You signed up successfully, check your email for a confirmation link",
         "home.coursesTitle": "Available Courses",
         "playlist.title":"Your playlist",
         "site.copyrightText": "©2018 Kilembe School"
@@ -35,6 +39,10 @@
         "error.sessionExpired":"Session expired, please sign in again.",
         "error.invalidPassword":"Email and password don't match",
         "error.passwordMatchError":"Your passwords don't match",
+        "error.signupError":"Something went wrong, try again please.",
+        "error.emailAlreadyInUse": "Email already in use, try another.",
+        "message.successfulSignup": "You signed up successfully, check your email for a confirmation link",
+        "error.userEmailNotVerified": "Your email address hasn't been verified, check your inbox for a verification email",
         "home.coursesTitle": "Available Courses",
         "playlist.title":"Your playlist",
         "site.copyrightText": "©2018 Kilembe School"

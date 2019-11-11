@@ -62,6 +62,12 @@ export const loginPending = () => {
     }
 }
 
+export const signupPending = () => {
+    return {
+        type: SIGNUP_PENDING
+    }
+}
+
 export const loginFulfilled = userInfo => {
     return {
         type: LOGIN_FULFILLED,
@@ -95,7 +101,7 @@ export const loginErrorAlert = messageId => {
     }
 }
 
-export const signupErrorAlert = messageId => {
+export const signupMessageAlert = messageId => {
     return {
         type: SIGNUP_ERROR_ALERT,
         payload: messageId
@@ -109,10 +115,10 @@ export const handleEmail = email => {
         }else{
             console.log("wrong format");
             let messageId="error.emailFormat";
+            dispatch(signupMessageAlert(messageId));
             dispatch(loginErrorAlert(messageId));
         }
     }
-    
 }
 
 export const handlePassword = pass => {
@@ -122,6 +128,7 @@ export const handlePassword = pass => {
             dispatch(storePassword(pass));
         }else{
             let messageId = "error.passwordLength";
+            dispatch(signupMessageAlert(messageId));
             dispatch(loginErrorAlert(messageId));
         }
     }
@@ -134,7 +141,7 @@ export const handleConfirmPassword = (pass, confirmPass) => {
             dispatch(confirmPasswordMatch(pass));
         }else{
             let messageId = "error.passwordMatchError";
-            dispatch(signupErrorAlert(messageId));
+            dispatch(signupMessageAlert(messageId));
         }
     }
 }
@@ -176,7 +183,7 @@ export const authHandler = (authData, fetchToken) => {
     }
 }
 
-export const  authenticate = (provider, callback, fetchToken) => {
+export const authenticate = (provider, callback, fetchToken) => {
     return dispatch => {
         app.auth().signInWithPopup(provider).then((data)=>callback(data, fetchToken)).catch((error)=>{
             console.log(error);
@@ -192,27 +199,37 @@ export const  authenticate = (provider, callback, fetchToken) => {
 
 export const eAuthenticate = (email, password)=>{
     return dispatch => {
-        app.auth().signInWithEmailAndPassword(email, password).then(()=>{
-            let currUser = app.auth().currentUser;
-            let uid = currUser.uid;
-            localStorage.setItem('currentUser', JSON.stringify(currUser));
-            
-            getUserAvatar(uid).then(url=>{
-                let email = currUser.email;
-                let splitEmailAdd = email.split('@');
-                let avURL = url;
-                let displayName = splitEmailAdd[0];
-                let userInfo = { uid,email,displayName,avURL,chatkitUser: {} };
-                let states = [uid,email,displayName];
-                let statesS = ['uid','email','displayName'];
-                let len = states.length;
-                dispatch(dispatchedGenInfo(userInfo));
-                dispatch(fetchToken(currUser, userInfo));
-                for(var count=0;count<len; count++){
-                    localStorage.setItem(statesS[count], states[count]);
-                }
-                dispatch(loginFulfilled(userInfo));
-            });
+        app.auth().signInWithEmailAndPassword(email, password).then(response=>{
+            //console.log(response)
+            const { user } = response;
+            const { emailVerified } = user;
+            let currUser = user;
+            if(emailVerified){
+                let uid = currUser.uid;
+                localStorage.setItem('currentUser', JSON.stringify(currUser));
+                getUserAvatar(uid).then(url=>{
+                    console.log(url);
+                    let email = currUser.email;
+                    let splitEmailAdd = email.split('@');
+                    let avURL = url;
+                    let displayName = splitEmailAdd[0];
+                    let userInfo = { uid,email,displayName,avURL,chatkitUser: {} };
+                    let states = [uid,email,displayName];
+                    let statesS = ['uid','email','displayName'];
+                    let len = states.length;
+                    dispatch(dispatchedGenInfo(userInfo));
+                    dispatch(fetchToken(currUser, userInfo));
+                    for(var count=0;count<len; count++){
+                        localStorage.setItem(statesS[count], states[count]);
+                    }
+                    dispatch(loginFulfilled(userInfo));
+                });
+            }else{
+                dispatch(loginFailed("error.userEmailNotVerified"));
+                user.sendEmailVerification().then(()=>{
+                    console.log("verfication email sent");
+                });
+            }
         }).catch((error)=>{
             let errorCode = error.code;
             let errorMessage;
@@ -226,6 +243,42 @@ export const eAuthenticate = (email, password)=>{
         });
     }
 }
+
+export const eSignup = (email, password)=>{
+    return dispatch => {
+        app.auth().createUserWithEmailAndPassword(email, password).then( response=>{
+            const { additionalUserInfo: { isNewUser }, user } = response;
+            const { emailVerified } = user;
+            if(isNewUser){
+                dispatch(signupMessageAlert("message.successfulSignup"));
+                !emailVerified? user.sendEmailVerification().then( () => {
+                    console.log("Confirmation email sent...")
+                }): null;
+            }
+            console.log(emailVerified);
+            //after signup
+        }).catch((error)=>{
+            //console.log(error);
+            let errorMessage;
+            let errorCode = error.code;
+            errorMessage = errorCode === "auth/email-already-in-use"?
+            "error.emailAlreadyInUse":
+            "error.signupError"
+            dispatch(signupMessageAlert(errorMessage));
+        });
+    }
+}
+
+export const handleSignup = (email, password)=>{
+    return dispatch => {
+        if(email && password){
+            dispatch(signupPending());
+            dispatch(eSignup(email, password));  
+        }else{
+            dispatch(signupMessageAlert('error.noCredentials'));
+        } 
+    }    
+  }
 
 export const confirmToken = (tokeId) => {
     return dispatch => {
