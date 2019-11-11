@@ -27,7 +27,10 @@ class Signup extends Component {
 
   render(){
     const { email, password, passwordConfirm } = this.state;
-
+    const { loggedIn } = this.props;
+    if(loggedIn)
+      <Redirect to={"/home"} />
+  
     return(
       <div className="App">
         <span className="divider"></span>
@@ -47,14 +50,16 @@ Signup.propTypes = {
   error: PropTypes.bool,
   messageId: PropTypes.string,
   signupInfo: PropTypes.object.isRequired,
-  signedUp: PropTypes.bool.isRequired
+  signedUp: PropTypes.bool.isRequired,
+  loggedIn: PropTypes.bool.isRequired
 }
 const mapStateToProps = state => {
   return {
     messageId: state.signupInfo.messageId,
     error: state.signupInfo.error,
     signupInfo: state.signupInfo,
-    signedUp: state.signupInfo.signedUp
+    signedUp: state.signupInfo.signedUp,
+    loggedIn: state.loginInfo.loggedIn
   }
 }
 const mapDispatchToProps = dispatch => {

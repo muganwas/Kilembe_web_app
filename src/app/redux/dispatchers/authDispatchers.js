@@ -13,7 +13,11 @@ import {
     LOGIN_ERROR_ALERT, 
     LOGIN_CONFIRMED,
     LOGOUT_CONFIRMED,
-    SIGNUP_FULFILLED, 
+    SIGNUP_FULFILLED,
+    RESET_FULLFILLED,
+    RESET_PENDING,
+    RESET_REJECTED, 
+    RESET_MESSAGE_ALERT,
     SIGNUP_REJECTED, 
     SIGNUP_PENDING,
     SIGNUP_ERROR_ALERT,
@@ -68,6 +72,13 @@ export const signupPending = () => {
     }
 }
 
+export const signupRejected = messageId => {
+    return {
+        type: SIGNUP_REJECTED,
+        payload: messageId
+    }
+}
+
 export const loginFulfilled = userInfo => {
     return {
         type: LOGIN_FULFILLED,
@@ -101,9 +112,49 @@ export const loginErrorAlert = messageId => {
     }
 }
 
+export const signupFullfilled = userInfo => {
+    return {
+        type: SIGNUP_FULFILLED,
+        payload: userInfo
+    }
+}
+
+export const signupConfirmed = () => {
+    return {
+        type: SIGNUP_CONFIRMED
+    }
+}
+
 export const signupMessageAlert = messageId => {
     return {
         type: SIGNUP_ERROR_ALERT,
+        payload: messageId
+    }
+}
+
+export const resetPending = () => {
+    return {
+        type: RESET_PENDING
+    }
+}
+
+export const resetFullfilled = messageId => {
+    return {
+        type: RESET_FULLFILLED,
+        payload: messageId
+    }
+}
+
+export const resetRejected = messageId => {
+    return {
+        type: RESET_REJECTED,
+        payload: messageId
+    }
+}
+
+export const resetMessageAlert = messageId => {
+    return {
+        type: RESET_MESSAGE_ALERT,
         payload: messageId
     }
 }
@@ -115,6 +166,7 @@ export const handleEmail = email => {
         }else{
             console.log("wrong format");
             let messageId="error.emailFormat";
+            dispatch(resetMessageAlert(messageId));
             dispatch(signupMessageAlert(messageId));
             dispatch(loginErrorAlert(messageId));
         }
@@ -250,8 +302,10 @@ export const eSignup = (email, password)=>{
             const { additionalUserInfo: { isNewUser }, user } = response;
             const { emailVerified } = user;
             if(isNewUser){
+                dispatch(signupFullfilled(response));
                 dispatch(signupMessageAlert("message.successfulSignup"));
                 !emailVerified? user.sendEmailVerification().then( () => {
+                    dispatch(signupConfirmed());
                     console.log("Confirmation email sent...")
                 }): null;
             }
@@ -264,7 +318,37 @@ export const eSignup = (email, password)=>{
             errorMessage = errorCode === "auth/email-already-in-use"?
             "error.emailAlreadyInUse":
             "error.signupError"
-            dispatch(signupMessageAlert(errorMessage));
+            dispatch(signupRejected(errorMessage));
+        });
+    }
+}
+
+export const handlePasswordReset = email => {
+    return dispatch => {
+        if(email){
+            dispatch(resetPending());
+            dispatch(eReset(email));  
+        }else{
+            dispatch(resetMessageAlert('error.noEmail'));
+        } 
+    }    
+}
+
+export const eReset = email => {
+    return dispatch => {
+        app.auth().sendPasswordResetEmail(email).then(()=>{
+            const messageId = "message.sentResetEmail";
+            dispatch(resetFullfilled(messageId));
+        }).catch( error => {
+            console.log(error)
+            let errorMessage;
+            let errorCode = error.code;
+            errorMessage = errorCode === "auth/user-not-found"?
+            "error.emailNotRegistered":
+            errorCode === "auth/invalid-email"?
+            "error.emailFormat":
+            "error.resetFailure"
+            dispatch(resetRejected(errorMessage));
         });
     }
 }
@@ -278,7 +362,7 @@ export const handleSignup = (email, password)=>{
             dispatch(signupMessageAlert('error.noCredentials'));
         } 
     }    
-  }
+}
 
 export const confirmToken = (tokeId) => {
     return dispatch => {

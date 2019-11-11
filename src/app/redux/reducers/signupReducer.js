@@ -78,12 +78,14 @@ import {
                 messageId: action.payload
               }
             }
+            
             case SIGNUP_CONFIRMED:{
               return {
                 ...state,
                 signedUp: true
               }
             }
+
             case SIGNUP_FULFILLED:{
               return {...state,
                 fetched: true,

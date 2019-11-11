@@ -34,6 +34,7 @@ const LoginForm = props => {
     const { fetching } = loginInfo;
     const intl = useIntl();
 
+    const loginPageTitle = intl.formatMessage({id:"login.pageTitle"});
     const loginLabel = intl.formatMessage({id:"auth.loginLabel"});
     const signupLabel = intl.formatMessage({id:"auth.signupLabel"});
     const forgotPasswordLabel = intl.formatMessage({id:"auth.forgotPasswordLabel"});
@@ -44,7 +45,9 @@ const LoginForm = props => {
 
     return (
         <div className="form">
-            <span><h3>{ loginLabel }</h3></span>
+            <span>
+                <h3>{ loginPageTitle }</h3>
+            </span>
             { 
                 error?
                 <span className={ 'feedBack' }><FormattedMessage id={ messageId } /></span>: 

@@ -31,13 +31,15 @@ const SignupForm = ({
     const { fetching } = signupInfo;
 
     const intl = useIntl();
-
+    const signupPageTitle = intl.formatMessage({id:"signup.pageTitle"});
     const loginLabel = intl.formatMessage({id:"auth.loginLabel"});
     const signupLabel = intl.formatMessage({id:"auth.signupLabel"});
     const forgotPasswordLabel = intl.formatMessage({id:"auth.forgotPasswordLabel"});
     return (
         <div className="form">
-        <span><h3>Sign Up</h3></span>
+        <span>
+            <h3>{ signupPageTitle}</h3>
+        </span>
         { error?
             <span className={ 'feedBack' }><FormattedMessage id={ messageId } /></span>:
         null }
@@ -98,7 +100,17 @@ const SignupForm = ({
 }
 
 SignupForm.propTypes = {
-
+    email: PropTypes.string, 
+    password: PropTypes.string,
+    passwordConfirm: PropTypes.string,
+    error: PropTypes.bool, 
+    messageId: PropTypes.string,
+    dispatchEmail: PropTypes.func.isRequired,
+    dispatchPassword: PropTypes.func.isRequired,
+    confirmPasswordMatch: PropTypes.func.isRequired,
+    tempValStore: PropTypes.func.isRequired,
+    onSignup: PropTypes.func.isRequired,
+    signupInfo: PropTypes.object
 }
 
 export default SignupForm;

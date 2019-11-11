@@ -12,6 +12,7 @@ import '@formatjs/intl-relativetimeformat/dist/locale-data/fr'
 import promise from 'redux-promise-middleware';
 import genInfoReducer from 'reduxFiles/reducers/genInfoReducer';
 import loginReducer from 'reduxFiles/reducers/loginReducer';
+import resetReducer from 'reduxFiles/reducers/resetReducer';
 import signupReducer from 'reduxFiles/reducers/signupReducer'
 
 Moment.globalMoment = moment;
@@ -44,6 +45,7 @@ const allReducers = combineReducers({
     genInfo: genInfoReducer,
     intl: intlReducer,
     loginInfo: loginReducer,
+    resetInfo: resetReducer,
     signupInfo: signupReducer
 });
 

@@ -1,7 +1,7 @@
 export { default as UserDetails } from './UserDetails/UserDetails';
 export { default as Signup } from './Signup';
 export { default as Settings } from './Settings/Settings';
-export { default as Reset } from './Reset/Reset';
+export { default as Reset } from './Reset';
 export { default as ProfileImage } from './ProfileImage/ProfileImage';
 export { default as NotFound } from './NotFound/NotFound';
 export { default as Messaging } from './Messaging/Messaging';
