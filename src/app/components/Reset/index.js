@@ -4,13 +4,19 @@ import PropTypes from 'prop-types';
 import ResetForm from './ResetForm';
 import { 
   handleEmail, 
-  handlePasswordReset
+  handlePasswordReset,
+  clearErrors
 } from 'reduxFiles/dispatchers/authDispatchers';
 import { Redirect } from 'react-router-dom';
 
 class Reset extends Component {
   state = {
     email: ""
+  }
+
+  componentDidMount(){
+    let { clearAllErros } = this.props;
+    clearAllErros();
   }
 
   temporaryValuesStore = event => {
@@ -58,6 +64,9 @@ const mapDispatchToProps = dispatch => {
   return {
     dispatchEmail: email => {
       dispatch(handleEmail(email));
+    },
+    clearAllErros: ()=>{
+      dispatch(clearErrors());
     },
     onReset: email => {
       dispatch(handlePasswordReset(email));

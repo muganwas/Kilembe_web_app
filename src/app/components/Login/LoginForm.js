@@ -28,8 +28,7 @@ const LoginForm = props => {
         loginInfo,
         messageId, 
         thirdPartyAuthentication, 
-        thirdPartyAuthHandler, 
-        fetchIdToken
+        thirdPartyAuthHandler
     } = props;
     const { fetching } = loginInfo;
     const intl = useIntl();
@@ -104,7 +103,7 @@ const LoginForm = props => {
                 <button 
                 id="facebook" 
                 className="icon-facebook-squared" 
-                onClick={ ()=>thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler, fetchIdToken ) }
+                onClick={ ()=>thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler ) }
                 >
                 { facebookLoginLabel }
                 </button>
@@ -113,7 +112,7 @@ const LoginForm = props => {
                 <button 
                 id="google" 
                 className="icon-google" 
-                onClick={ ()=>thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler, fetchIdToken ) }
+                onClick={ ()=>thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler ) }
                 >
                 { googleLoginLabel }
                 </button>
@@ -132,8 +131,7 @@ LoginForm.propTypes = {
     error: PropTypes.bool, 
     messageId: PropTypes.string, 
     thirdPartyAuthentication: PropTypes.func.isRequired, 
-    thirdPartyAuthHandler: PropTypes.func.isRequired, 
-    fetchIdToken: PropTypes.func.isRequired
+    thirdPartyAuthHandler: PropTypes.func.isRequired
 }
 
 export default LoginForm;

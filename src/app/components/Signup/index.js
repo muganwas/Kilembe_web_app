@@ -5,10 +5,10 @@ import SignupForm from './SignupForm';
 import { 
   handleEmail, 
   handlePassword, 
-  fetchToken,
   handleConfirmPassword,
   authHandler,
-  handleSignup
+  handleSignup,
+  clearErrors
 } from 'reduxFiles/dispatchers/authDispatchers';
 import { Redirect } from 'react-router-dom';
 
@@ -17,6 +17,11 @@ class Signup extends Component {
     email: "",
     password: "",
     passwordConfirm: ""
+  }
+
+  componentDidMount(){
+    let { clearAllErrors } = this.props;
+    clearAllErrors();
   }
 
   temporaryValuesStore = event => {
@@ -64,8 +69,8 @@ const mapStateToProps = state => {
 }
 const mapDispatchToProps = dispatch => {
   return {
-    fetchIdToken: (currentUser, userInfo) => {
-      dispatch(fetchToken(currentUser, userInfo));
+    clearAllErrors: () => {
+      dispatch(clearErrors());
     },
     dispatchEmail: email => {
       dispatch(handleEmail(email));
@@ -79,8 +84,8 @@ const mapDispatchToProps = dispatch => {
     confirmPasswordMatch: (password, confirmPassword) => {
       dispatch(handleConfirmPassword(password, confirmPassword));
     },
-    thirdPartyAuthHandler: (authData, fetchToken) => {
-      dispatch(authHandler(authData, fetchToken));
+    thirdPartyAuthHandler: (authData) => {
+      dispatch(authHandler(authData));
     }
   }
 }

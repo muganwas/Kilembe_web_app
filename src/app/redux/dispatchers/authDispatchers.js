@@ -1,5 +1,3 @@
-import Firebase from 'firebase/app';
-import Rebase from 're-base';
 import axios from 'axios';
 import app from '../../base';
 import { emailregex } from 'misc/constants';
@@ -23,14 +21,11 @@ import {
     SIGNUP_ERROR_ALERT,
     SIGNUP_CONFIRMED,
     PASSWORDS_MATCH,
-    PASSWORDS_MATCH_ERROR
+    PASSWORDS_MATCH_ERROR,
+    CLEAR_ERRORS
 } from '../types';
 
 const confirmTokenURL = process.env.CONFIRM_FIREBASE_TOKEN;
-const base = Rebase.createClass(app.database());
-const storage = Firebase.storage();
-const storageRef = storage.ref();
-
 
 export const storeEmail = email =>{
     return {
@@ -76,6 +71,12 @@ export const signupRejected = messageId => {
     return {
         type: SIGNUP_REJECTED,
         payload: messageId
+    }
+}
+
+export const clearErrors = () => {
+    return {
+        type: CLEAR_ERRORS
     }
 }
 
@@ -210,19 +211,18 @@ export const handleLogin = loginInfo => {
     }    
 }
 
-export const authHandler = (authData, fetchToken) => {
+export const authHandler = (authData) => {
     return dispatch => {
         let currentUser = app.auth().currentUser;
         const uid= authData.user.uid;
-        //console.log(currentUser)
+        console.log(currentUser)
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        
         getUserAvatar(uid).then(url=>{
             const displayName= authData.user.displayName;
             const email= authData.user.email;
             const avURL = url || authData.user.photoURL;
-            const userLoginInfo = {uid,email,displayName,avURL,chatkitUser: {}};
-            const states = [uid,email,displayName];
+            const userLoginInfo = { uid, email, displayName, avURL, chatkitUser: {} };
+            const states = [ uid, email, displayName ];
             const statesS = ['uid','email','displayName'];
             const len = states.length;
             dispatch(dispatchedGenInfo(userLoginInfo));
@@ -235,10 +235,10 @@ export const authHandler = (authData, fetchToken) => {
     }
 }
 
-export const authenticate = (provider, callback, fetchToken) => {
+export const authenticate = (provider, callback) => {
     return dispatch => {
         app.auth().signInWithPopup(provider).then((data)=>callback(data, fetchToken)).catch((error)=>{
-            console.log(error);
+            //console.log(error);
             let errorMessage; 
             error.code === "auth/network-request-failed"?
             errorMessage = "error.networkError":

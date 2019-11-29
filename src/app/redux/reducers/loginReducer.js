@@ -6,7 +6,8 @@ import {
   STORE_PASSWORD, 
   LOGIN_ERROR_ALERT,
   LOGIN_CONFIRMED,
-  LOGOUT_CONFIRMED
+  LOGOUT_CONFIRMED,
+  CLEAR_ERRORS
 } from "../types";
 
 const defaultState = {
@@ -78,6 +79,15 @@ const defaultState = {
               loggedIn: true
             }
           }
+
+          case CLEAR_ERRORS:{
+            return {
+              ...state,
+              error: false,
+              messageId: null
+            }
+          }
+          
           case LOGIN_FULFILLED:{
             return {...state,
               fetched: true,

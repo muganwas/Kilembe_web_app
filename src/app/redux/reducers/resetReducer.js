@@ -3,7 +3,8 @@ import {
     RESET_FULLFILLED,
     RESET_REJECTED,
     STORE_EMAIL,
-    RESET_MESSAGE_ALERT
+    RESET_MESSAGE_ALERT,
+    CLEAR_ERRORS
   } from "../types";
   
   const defaultState = {
@@ -40,6 +41,15 @@ import {
                     feedback: true,
                     messageId: action.payload
                 }
+            }
+
+            case CLEAR_ERRORS:{
+              return {
+                ...state,
+                error: false,
+                messageId: null,
+                feedback: false
+              }
             }
 
             case RESET_REJECTED:{

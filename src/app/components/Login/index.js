@@ -5,10 +5,10 @@ import LoginForm from './LoginForm';
 import { 
   handleEmail, 
   handlePassword, 
-  fetchToken,
   handleLogin, 
   authenticate, 
   authHandler,
+  clearErrors
 } from 'reduxFiles/dispatchers/authDispatchers';
 import { Redirect } from 'react-router-dom';
 
@@ -16,6 +16,11 @@ class Login extends Component {
   state = {
     email: "",
     password: ""
+  }
+
+  componentDidMount(){
+    let { clearAllErrors } = this.props;
+    clearAllErrors();
   }
 
   temporaryValuesStore = event => {
@@ -69,8 +74,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchIdToken: (currentUser, userInfo) => {
-      dispatch(fetchToken(currentUser, userInfo));
+    clearAllErrors: () => {
+      dispatch(clearErrors());
     },
     dispatchEmail: event => {
       dispatch(handleEmail(event));
@@ -81,11 +86,11 @@ const mapDispatchToProps = dispatch => {
     onSubmit: loginProps => {
       dispatch(handleLogin(loginProps));
     },
-    thirdPartyAuthentication: (auth, authHandler, fetchToken) => {
-      dispatch(authenticate(auth, authHandler, fetchToken));
+    thirdPartyAuthentication: (auth, authHandler) => {
+      dispatch(authenticate(auth, authHandler));
     },
-    thirdPartyAuthHandler: (authData, fetchToken) => {
-      dispatch(authHandler(authData, fetchToken));
+    thirdPartyAuthHandler: (authData) => {
+      dispatch(authHandler(authData));
     }
   }
 }

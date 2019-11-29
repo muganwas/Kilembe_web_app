@@ -7,7 +7,8 @@ import {
     SIGNUP_ERROR_ALERT,
     SIGNUP_CONFIRMED,
     PASSWORDS_MATCH,
-    PASSWORDS_MATCH_ERROR
+    PASSWORDS_MATCH_ERROR,
+    CLEAR_ERRORS
   } from "../types";
   
   const defaultState = {
@@ -83,6 +84,14 @@ import {
               return {
                 ...state,
                 signedUp: true
+              }
+            }
+
+            case CLEAR_ERRORS:{
+              return {
+                ...state,
+                error: false,
+                messageId: null
               }
             }
 
