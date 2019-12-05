@@ -1,7 +1,7 @@
 import axios from 'axios';
 import app from '../../base';
 import { emailregex } from 'misc/constants';
-import { dispatchedGenInfo, dispatchChatkitTokenId } from 'reduxFiles/dispatchers/genDispatchers';
+import { dispatchedGenInfo, dispatchChatkitTokenId, fetchGenInfoFromSessionStorage } from 'reduxFiles/dispatchers/genDispatchers';
 import { getUserAvatar } from 'misc/functions';
 import { 
     LOGIN_FULFILLED,
@@ -395,6 +395,19 @@ export const fetchToken = (currUser, userInfo)=>{
             console.log(error);
         });
     } 
+}
+
+export const checkLoginStatus = (confirmLoggedIn, loginInfo, genInfo)=>{
+    return dispatch => {
+        let { loggedIn } = loginInfo;
+        if(!loggedIn){
+            fetchGenInfoFromSessionStorage(confirmLoggedIn, loginInfo).then(res=>{
+                if(res === "not dispatched"){
+                    dispatch(logout(genInfo));
+                }  
+            });
+        } 
+    }
 }
 
 export const logout = genInfo =>{

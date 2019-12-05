@@ -10,6 +10,7 @@ import '@formatjs/intl-relativetimeformat/polyfill';
 import '@formatjs/intl-relativetimeformat/dist/locale-data/en';
 import '@formatjs/intl-relativetimeformat/dist/locale-data/fr'
 import promise from 'redux-promise-middleware';
+import friendsReducer from 'reduxFiles/reducers/friendsReducer';
 import genInfoReducer from 'reduxFiles/reducers/genInfoReducer';
 import loginReducer from 'reduxFiles/reducers/loginReducer';
 import resetReducer from 'reduxFiles/reducers/resetReducer';
@@ -43,6 +44,7 @@ const initialState = {
 
 const allReducers = combineReducers({
     genInfo: genInfoReducer,
+    friendsInfo: friendsReducer,
     intl: intlReducer,
     loginInfo: loginReducer,
     resetInfo: resetReducer,

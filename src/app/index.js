@@ -15,7 +15,8 @@ import {
     Messaging,
     Login,
     Home,
-    Friends
+	Friends,
+	UserDetails
 } from 'components';
 import registerServiceWorker from './registerServiceWorker';
 
@@ -28,6 +29,7 @@ let MainComponent = ()=>{
 		</Provider>
 	)
 }
+
 let FriendsComponent = ()=>{
 	return(
 		<Provider store={store}>
@@ -35,6 +37,15 @@ let FriendsComponent = ()=>{
 		</Provider>
 	)
 }
+
+let FriendDetailsComponent = ()=>{
+	return(
+		<Provider store={store}>
+			<UserDetails />
+		</Provider>
+	)
+}
+
 let HomeComponent = ()=>{
 	return(
 		<Provider store={store}>
@@ -97,6 +108,7 @@ var Root = ()=>{
 				<Route exact path="/messaging" component={ MessagingComponent } />
 				<Route exact path="/settings" component={ SettingsComponent } />
 				<Route exact path="/friends" component={ FriendsComponent } />
+				<Route exact path="/friends/:id" component={ FriendDetailsComponent } />
 				<Route component={ NotFoundComponent } />
 			</Switch>
         </BrowserRouter>

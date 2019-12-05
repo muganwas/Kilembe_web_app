@@ -4,7 +4,7 @@ export const dispatchedGenInfo = info => {
     if(info !== undefined && info !== null){   
       return {
             type: FETCH_GEN_FULFILLED,
-            payload: { info }
+            payload: info
         }
     }else{
         return {
@@ -21,4 +21,21 @@ export const dispatchChatkitTokenId = token => {
         type: FETCH_ID_TOKEN,
         payload: token
     }
+}
+
+export const fetchGenInfoFromSessionStorage = (confirmLoggedIn, loginInfo) => {
+    return new Promise(resolve=> {
+        let { loggedIn } = loginInfo;
+        let storedInfo = sessionStorage.getItem('genInfo');
+        storedInfo = storedInfo?JSON.parse(storedInfo):null;
+        //console.log(storedInfo)
+        if(storedInfo){
+            if(!loggedIn)
+                confirmLoggedIn();
+            dispatchedGenInfo(storedInfo);
+            resolve("dispatched")
+        }else{
+            resolve("not dispatched");
+        }
+    });
 }

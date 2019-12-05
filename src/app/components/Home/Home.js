@@ -5,7 +5,7 @@ import { FormattedMessage } from "react-intl";
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import app from '../../base';
-import { confirmToken, loginConfirmed, logout } from 'reduxFiles/dispatchers/authDispatchers';
+import { confirmToken, loginConfirmed, logout, checkLoginStatus } from 'reduxFiles/dispatchers/authDispatchers';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { 
     Courses,
@@ -27,16 +27,9 @@ class Home extends Component {
     }
     
     componentDidMount(){
+        const { confirmLoggedIn, genInfo, loginInfo, logingStatusConfirmation } = this.props
         this.fetchCourses();
-        let { loginInfo, signOut, genInfo } = this.props;
-        let { loggedIn } = loginInfo;
-        if(!loggedIn){
-            this.fetchGenInfoFromSessionStorage().then(res=>{
-                if(res === "not dispatched"){
-                    signOut(genInfo);
-                }  
-            });
-        }  
+        logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
     }
 
     componentDidUpdate(){
@@ -52,8 +45,9 @@ class Home extends Component {
                 }).then((data)=>{
                     let length = data.length;
                     if(length === 0 || length === null || length === undefined) {
-                        let userRef = usersRef.child(uid);
-                        userRef.set({
+                        console.log(uid)
+                        let ref = usersRef.child(uid);
+                        ref.set({
                             email: localStorage.getItem('email'),
                             dname: localStorage.getItem('dname'),
                             uid: localStorage.getItem('uid'),
@@ -68,22 +62,6 @@ class Home extends Component {
                 //setTimeout(()=>{this.updateInfo()}, 2000);
             }
         }
-    }
-
-    fetchGenInfoFromSessionStorage = () => {
-        return new Promise(resolve=> {
-            let { updateGenInfo, confirmLoggedIn, loginInfo: { loggedIn } } = this.props;
-            let storedInfo = sessionStorage.getItem('genInfo');
-            storedInfo = storedInfo?JSON.parse(storedInfo):null;
-            if(storedInfo){
-                if(!loggedIn)
-                    confirmLoggedIn();
-                updateGenInfo(storedInfo);
-                resolve("dispatched")
-            }else{
-                resolve("not dispatched");
-            }
-        });
     }
 
     updateInfo = () => {
@@ -163,6 +141,9 @@ const mapDispatchToProps = dispatch => {
     return {
         confirmUserToken: userToken => {
             dispatch(confirmToken(userToken));
+        },
+        logingStatusConfirmation: (confirmLoggedIn, loginInfo, genInfo) => {
+            dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, genInfo));
         },
         confirmLoggedIn: () => {
             dispatch(loginConfirmed());
