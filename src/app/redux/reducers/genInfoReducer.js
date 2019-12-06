@@ -38,7 +38,7 @@ const defaultState = {
               fetched: true,
               fetching: false,
               error: false,
-              info: action.payload.info
+              info: action.payload
             }
           }
           default:

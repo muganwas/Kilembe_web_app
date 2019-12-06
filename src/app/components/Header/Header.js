@@ -44,11 +44,9 @@ class Header extends Component {
             storedInfo = storedInfo?
             JSON.parse(storedInfo):
             null;
-            let newGenInfo = { ...genInfo };
-            newGenInfo.info = { ...storedInfo };
             if(!avURL && storedInfo){
                 confirmLoggedIn();
-                updateGenInfo(newGenInfo);
+                updateGenInfo(storedInfo);
             }
         }else{
             this.createChatKitUser();

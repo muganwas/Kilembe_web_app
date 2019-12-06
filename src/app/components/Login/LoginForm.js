@@ -49,7 +49,9 @@ const LoginForm = props => {
             </span>
             { 
                 error?
-                <span className={ 'feedBack' }><FormattedMessage id={ messageId } /></span>: 
+                <span className={ 'feedBack' }>
+                    <FormattedMessage id={ messageId } />
+                </span>: 
                 null 
             }
             <div>

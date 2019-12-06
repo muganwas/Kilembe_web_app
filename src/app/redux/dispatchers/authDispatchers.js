@@ -162,10 +162,12 @@ export const resetMessageAlert = messageId => {
 
 export const handleEmail = email => {
     return dispatch => {
-        if(email.match(emailregex)){
+
+        if(email && email.match(emailregex)){
             dispatch(storeEmail(email));
+        }else if(!email){
+            dispatch(loginErrorAlert("error.noEmail"));
         }else{
-            console.log("wrong format");
             let messageId="error.emailFormat";
             dispatch(resetMessageAlert(messageId));
             dispatch(signupMessageAlert(messageId));
@@ -177,8 +179,10 @@ export const handleEmail = email => {
 export const handlePassword = pass => {
     return dispatch => {
         let passLen = pass.length;
-        if(passLen >= 8){
+        if(pass && passLen >= 8){
             dispatch(storePassword(pass));
+        }else if(!pass){
+            dispatch(loginErrorAlert("error.noPassword"));
         }else{
             let messageId = "error.passwordLength";
             dispatch(signupMessageAlert(messageId));
@@ -215,7 +219,7 @@ export const authHandler = (authData) => {
     return dispatch => {
         let currentUser = app.auth().currentUser;
         const uid= authData.user.uid;
-        console.log(currentUser)
+        //console.log(currentUser)
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
         getUserAvatar(uid).then(url=>{
             const displayName= authData.user.displayName;

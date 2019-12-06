@@ -5,14 +5,26 @@ import { FormattedMessage } from "react-intl";
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import app from '../../base';
-import { confirmToken, loginConfirmed, logout, checkLoginStatus } from 'reduxFiles/dispatchers/authDispatchers';
-import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
+import { 
+    confirmToken, 
+    loginConfirmed, 
+    logout, 
+    checkLoginStatus 
+} from 'reduxFiles/dispatchers/authDispatchers';
+import {
+    fetchUsers
+} from 'reduxFiles/dispatchers/userDispatchers';
+import { 
+    dispatchedGenInfo 
+} from 'reduxFiles/dispatchers/genDispatchers';
 import { 
     Courses,
     Header,
     Footer
 } from 'components';
-import { getUserAvatar } from 'misc/functions';
+import { 
+    getUserAvatar 
+} from 'misc/functions';
 
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
@@ -27,14 +39,26 @@ class Home extends Component {
     }
     
     componentDidMount(){
-        const { confirmLoggedIn, genInfo, loginInfo, logingStatusConfirmation } = this.props
+        const { 
+            confirmLoggedIn, 
+            genInfo, 
+            loginInfo,
+            logingStatusConfirmation 
+        } = this.props
         this.fetchCourses();
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
     }
 
     componentDidUpdate(){
-        let { genInfo: { info: { uid, avURL } }, loginInfo: { loggedIn }  } = this.props;
+        let { 
+            genInfo, 
+            friendsInfo: { users }, 
+            loginInfo: { loggedIn },
+            getUsers 
+        } = this.props;
+        let { info: { uid, avURL } } = genInfo;
         let avatar = avURL;
+        const usersLength = Object.keys(users).length;
         if(!loggedIn)
             this.goTo("/");
         else{
@@ -60,6 +84,9 @@ class Home extends Component {
             }else{
                 getUserAvatar(uid);
                 //setTimeout(()=>{this.updateInfo()}, 2000);
+            }
+            if(genInfo && usersLength === 0){
+                getUsers();
             }
         }
     }
@@ -109,7 +136,8 @@ class Home extends Component {
 
     render(){  
         let { urls, courses } = this.state;
-        let { genInfo: { info: { uid } } } = this.props;
+        let { genInfo: { info } } = this.props;
+        let uid = info?info.uid:null;
         return (
             <div className="container Home">
                 <Header />
@@ -133,12 +161,16 @@ Home.propTypes = {
 const mapStateToProps = state => {
     return {
         genInfo: state.genInfo,
-        loginInfo: state.loginInfo
+        loginInfo: state.loginInfo,
+        friendsInfo: state.friendsInfo
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
+        getUsers: ()=>{
+            dispatch(fetchUsers());
+        },
         confirmUserToken: userToken => {
             dispatch(confirmToken(userToken));
         },
