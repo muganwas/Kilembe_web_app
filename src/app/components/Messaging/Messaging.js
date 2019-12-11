@@ -1,8 +1,25 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { dispatchedGenInfo } from '../../redux/dispatchers/genDispatchers';
-import { ChatManager, TokenProvider } from '@pusher/chatkit';
-import Footer from '../Footer/Footer';
+import PropTypes from 'prop-types';
+import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
+import { 
+    confirmToken, 
+    loginConfirmed, 
+    logout, 
+    checkLoginStatus 
+} from 'reduxFiles/dispatchers/authDispatchers';
+import {
+    fetchUsers,
+    fetchFriends
+} from 'reduxFiles/dispatchers/userDispatchers';
+import { 
+    ChatManager, 
+    TokenProvider 
+} from '@pusher/chatkit';
+import { 
+    Header,
+    Footer 
+} from 'components';
 import Rebase from 're-base';
 import app from '../../base';
 import './css/main.css';
@@ -15,43 +32,67 @@ const usersRef = app.database().ref('users');
 const base = Rebase.createClass(app.database());
 var chatManager;
 
-@connect((store)=>{
-    return{
-        chatkitUser: store.genInfo.info.chatkitUser,
-        genInfo: store.genInfo,
-        allUsers: store.genInfo.info.allUsers
-    }  
-})
 class Messaging extends Component {
-    constructor(props){
-        super(props)
-        this.state = {}
+    componentDidMount(){
+        const { 
+            confirmLoggedIn, 
+            genInfo, 
+            loginInfo,
+            logingStatusConfirmation 
+        } = this.props
+        const { info: { fetched } } = genInfo;
+        logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
+        //console.log(friendsInfo);
+        if(fetched)
+            this.setupChatKit();        
     }
 
-    componentWillMount(){
-        let uid = this.props.userId;
+    componentDidUpdate(){
+        const { 
+            genInfo: { 
+                info, 
+                fetched 
+            }, 
+            getUsers, 
+            getFriends, 
+            friendsInfo 
+        } = this.props;
+        const friendsFetched = friendsInfo.fetched;
+        /**Fetch users and frineds if they're not fetched yet */
+        if(!friendsFetched && fetched){
+            getUsers();
+            getFriends(info);
+            this.setupChatKit();
+        }
+    }
+
+    setupChatKit = () => {
+        const { 
+            genInfo: { 
+                info
+            }
+        } = this.props;
+        //const friendsFetched = friendsInfo.fetched;
+        const { dname, uid } = info;
         base.fetch(`users/${ uid }/chatkit_uid`, {
             context: this,
             asArray: false
         }).then((data)=>{
+            console.log(data)
             let len = Object.keys(data).length;
             if(len === 0){
-                let url = process.env.CHATKIT_CREATE_USER + this.props.userId + "&name="+ this.props.dname;
+                let url = process.env.CHATKIT_CREATE_USER + uid + "&name="+ dname;
                 axios(url)
                 .then((res)=>{
                     let chatkit_id = res.data.id;
-                    usersRef.child(this.props.userId).update({
+                    usersRef.child(uid).update({
                         chatkit_uid: chatkit_id
                     });
                 })
                 .catch((err)=>{
-                    console.log(err)
+                    console.log(err.message);
                 });
             }else{
-                this.fetchAllUsers();
-                this.fetchFriends(uid).then((rez)=>{
-                    this.getAvatar();
-                });
                 let url = process.env.CHATKIT_TOKEN_PROVIDER + data;
                 chatManager = new ChatManager({
                     instanceLocator: process.env.CHATKIT_INSTANCE_LOCATOR,
@@ -67,73 +108,6 @@ class Messaging extends Component {
                 });
             }
         });
-    }
-
-    componentWillReceiveProps(nextProps){
-        this.props = {...nextProps}
-    }
-
-    confirmToken = (token)=>{
-        let url = process.env.CONFIRM_FIREBASE_TOKEN + token;
-        axios(url)
-        .then(response=>{
-            console.log(response);
-        })
-        .catch(err=>{
-            console.log(err.message)
-        })
-    }
-
-    fetchFriends = (uid)=>{
-        return new Promise((resolve, reject)=>{
-            base.fetch(`users/${ uid }/friends`, {
-                context: this,
-                asArray: true
-            }).then((data)=>{
-                let info = {...this.props.genInfo.info};
-                info.friends = data;
-                this.props.dispatch(dispatchedGenInfo(info));
-                resolve("done");
-            }).catch(err=>{
-                console.log(err)
-                reject("there was an error");
-            })
-        })        
-    }
-
-    fetchAllUsers = ()=>{
-        base.fetch(`users`, {
-            context: this,
-            asArray: false
-        }).then((dataB)=>{
-            let info = { ...this.props.genInfo.info }
-            info.allUsers = dataB;
-            this.props.dispatch(dispatchedGenInfo(info));
-        });
-    }
-
-    getAvatar = ()=>{
-        base.fetch(`users`, {
-            context: this,
-            asArray: true
-        }).then((dataB)=>{
-            dataB.forEach((elB)=>{
-                let uid = elB.key;
-                let avatar = elB.avatar;
-                let info = { ...this.props.genInfo.info }
-                let currUsers = [...info.friends];
-                currUsers.forEach((el)=>{
-                    //checking whether key and uid are the same
-                    if(el.key === uid){
-                        el.avatar = avatar;
-                        info.friends = currUsers;
-                        this.props.dispatch(dispatchedGenInfo(info));
-                    }                
-                });
-            });
-        }).catch(err=>{
-            console.log(err)
-        })
     }
 
     displayFriends = (key)=>{
@@ -159,8 +133,9 @@ class Messaging extends Component {
     render(){
         let friends = { ...this.props.genInfo.info.friends };
         return(
-            <div className="Home">
-                <div className="container">
+            <div className="container Home">
+                <Header />
+                <div className="content">
                     { this.props.header }
                     <div className="messaging">
                         <div className="friends">
@@ -168,12 +143,57 @@ class Messaging extends Component {
                             { friends?Object.keys(friends).map(this.displayFriends):null }
                         </div>
                     </div>
-                    <Footer />
                 </div>
+                <Footer />
             </div>
         )
     }
 
 }
 
-export default Messaging;
+Messaging.propTypes = {
+    genInfo: PropTypes.object.isRequired,
+    loginInfo: PropTypes.object.isRequired,
+    friendsInfo: PropTypes.object.isRequired,
+    confirmUserToken: PropTypes.func.isRequired,
+    updateGenInfo: PropTypes.func.isRequired,
+    getUsers: PropTypes.func.isRequired,
+    signOut: PropTypes.func.isRequired,
+    getFriends: PropTypes.func.isRequired
+}
+
+const mapStateToProps = state => {
+    return {
+        genInfo: state.genInfo,
+        loginInfo: state.loginInfo,
+        friendsInfo: state.friendsInfo
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        getUsers: ()=>{
+            dispatch(fetchUsers());
+        },
+        getFriends: info=>{
+            dispatch(fetchFriends(info));
+        },
+        confirmUserToken: userToken => {
+            dispatch(confirmToken(userToken));
+        },
+        logingStatusConfirmation: (confirmLoggedIn, loginInfo, genInfo) => {
+            dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, genInfo));
+        },
+        confirmLoggedIn: () => {
+            dispatch(loginConfirmed());
+        },
+        signOut: genInfo => {
+            dispatch(logout(genInfo));
+        },
+        updateGenInfo: genInfo => {
+            dispatch(dispatchedGenInfo(genInfo));
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Messaging);

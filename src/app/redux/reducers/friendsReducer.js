@@ -27,6 +27,7 @@ const defaultState = {
   outGoingRequests: [],
   inComingRequests: [],
   selectedUser: {},
+  friends: {},
   fetching: false,
   fetched: false,
   error: null

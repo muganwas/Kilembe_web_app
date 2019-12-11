@@ -155,7 +155,9 @@ Home.propTypes = {
     genInfo: PropTypes.object.isRequired,
     loginInfo: PropTypes.object.isRequired,
     confirmUserToken: PropTypes.func.isRequired,
-    updateGenInfo: PropTypes.func.isRequired
+    updateGenInfo: PropTypes.func.isRequired,
+    getUsers: PropTypes.func.isRequired,
+    signOut: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => {

@@ -7,7 +7,10 @@ import axios from 'axios';
 import Rebase from 're-base';
 import app from '../../base';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
-import { logout, loginConfirmed, } from 'reduxFiles/dispatchers/authDispatchers';
+import { 
+    logout, 
+    loginConfirmed, 
+} from 'reduxFiles/dispatchers/authDispatchers';
 
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
@@ -64,6 +67,14 @@ class Header extends Component {
                 });
             });
         }
+    }
+
+    componentDidUpdate(){
+        const {
+            loginInfo: { loggedIn },
+        } =this.props;
+        if(!loggedIn)
+            this.goTo("/");
     }
 
     createChatKitUser = () => {
@@ -167,6 +178,9 @@ class Header extends Component {
 Header.propTypes = {
     genInfo: PropTypes.object,
     info: PropTypes.object,
+    loginInfo: PropTypes.object,
+    confirmLoggedIn: PropTypes.func.isRequired,
+    updateGenInfo: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired
 }
 

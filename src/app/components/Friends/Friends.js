@@ -61,8 +61,8 @@ class Friends extends Component {
     }
 
     getUsers = (key) => {
-        let { friendsInfo: { userId, users, peopleListStyle, defaultAvatar } } = this.props;
-        let loggedInUser = userId;
+        let { friendsInfo: { users, peopleListStyle, defaultAvatar }, genInfo: { info: { uid } } } = this.props;
+        let loggedInUser = uid;
         let uCount = users.length;
         let userImg = users[key].avatar || defaultAvatar;
         let dname = users[key].dname;
