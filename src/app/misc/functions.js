@@ -31,9 +31,18 @@ export const getUserAvatar = (userId)=>{
     }); 
 }
 
-export const setGenericAvatar = () => 
+export const setGenericAvatar = () => {
     storageRef.child('general/avatar.jpg').getDownloadURL().then((url)=>{
         console.log("generic avatar set");
         localStorage.setItem('avatar', url);
         return url;
     });
+}
+
+export const setChatId = uid => {
+    try{
+        if (uid) usersRef.child(uid).update({chatkit_uid: uid});
+    }catch(e){
+        console.log(e.message);
+    }
+}

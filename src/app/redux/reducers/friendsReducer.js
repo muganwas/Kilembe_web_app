@@ -13,11 +13,12 @@ import {
   FETCH_OUT_GOING_REQUEST_PENDING,
   SELECT_USER_ERROR,
   SELECT_USER_FULFILLED,
-  RESPONSE_CLASS_CHANGED
+  RESPONSE_CLASS_CHANGED,
+  LOGOUT_CONFIRMED
 } from "../types";
 
 const defaultState = {
-  users: {},
+  users: [],
   defaultAvatar:
     "https://firebasestorage.googleapis.com/v0/b/kilembe-school.appspot.com/o/general%2Favatar.jpg?alt=media&token=82a7c51f-b798-4ad3-a3f6-1b84572173ca",
   peopleListStyle: "people",
@@ -27,9 +28,11 @@ const defaultState = {
   outGoingRequests: [],
   inComingRequests: [],
   selectedUser: {},
-  friends: {},
+  friends: [],
+  friendsFull: {},
   fetching: false,
   fetched: false,
+  fetchedFriends: false,
   error: null
 };
 const friendsReducer = (state = defaultState, action) => {
@@ -62,7 +65,7 @@ const friendsReducer = (state = defaultState, action) => {
     case FETCH_FRIENDS_PENDING: {
       return {
         ...state,
-        fetched: false,
+        fetchedFriends: false,
         error: null,
         fetching: true
       };
@@ -71,23 +74,23 @@ const friendsReducer = (state = defaultState, action) => {
       return {
         ...state,
         fetching: false,
-        fetched: false,
+        fetchedFriends: false,
         error: action.payload
       };
     }
     case FETCH_FRIENDS_FULFILLED: {
       return {
         ...state,
-        fetched: true,
+        fetchedFriends: true,
         fetching: false,
         error: false,
-        friends: action.payload
+        friends: action.payload.friends,
+        friendsFull: action.payload.friendsFull
       };
     }
     case FETCH_IN_COMING_REQUEST_PENDING: {
       return {
         ...state,
-        fetched: false,
         error: null,
         fetching: true
       };
@@ -95,16 +98,12 @@ const friendsReducer = (state = defaultState, action) => {
     case FETCH_IN_COMING_REQUEST_ERROR: {
       return {
         ...state,
-        fetching: false,
-        fetched: false,
         error: action.payload
       };
     }
     case FETCH_IN_COMING_REQUEST_FULFILLED: {
       return {
         ...state,
-        fetched: true,
-        fetching: false,
         error: false,
         inComingRequests: action.payload
       };
@@ -112,24 +111,18 @@ const friendsReducer = (state = defaultState, action) => {
     case FETCH_OUT_GOING_REQUEST_PENDING: {
       return {
         ...state,
-        fetched: false,
-        error: null,
-        fetching: true
+        error: null
       };
     }
     case FETCH_OUT_GOING_REQUEST_ERROR: {
       return {
         ...state,
-        fetching: false,
-        fetched: false,
         error: action.payload
       };
     }
     case FETCH_OUT_GOING_REQUEST_FULFILLED: {
       return {
         ...state,
-        fetched: true,
-        fetching: false,
         error: false,
         outGoingRequests: action.payload
       };
@@ -137,16 +130,12 @@ const friendsReducer = (state = defaultState, action) => {
     case SELECT_USER_ERROR: {
       return {
         ...state,
-        fetching: false,
-        fetched: false,
         error: action.payload
       };
     }
     case SELECT_USER_FULFILLED: {
       return {
         ...state,
-        fetched: true,
-        fetching: false,
         error: false,
         selectedUser: action.payload
       };
@@ -154,11 +143,14 @@ const friendsReducer = (state = defaultState, action) => {
     case RESPONSE_CLASS_CHANGED: {
       return {
         ...state,
-        fetched: true,
-        fetching: false,
         error: false,
         responseRequired: action.payload
       };
+    }
+    case LOGOUT_CONFIRMED: {
+      return {
+        ...defaultState
+      }
     }
     default:
       return state;

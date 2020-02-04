@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { 
     Header,
-    Footer
+    Footer,
+    KLoader
 } from 'components';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -13,22 +14,24 @@ import {
     fetchUsers,
     fetchFriends,
     fetchFriendsRequests,
+    changeResponseClass,
     pushSelectedUser
 } from 'reduxFiles/dispatchers/userDispatchers';
 import { 
     loginConfirmed, 
     checkLoginStatus 
 } from 'reduxFiles/dispatchers/authDispatchers';
-import { Promise } from 'q';
-let base = Rebase.createClass(app.database());
-let usersRef = app.database().ref('users');
+
+const base = Rebase.createClass(app.database());
+const usersRef = app.database().ref('users');
 
 class UserDetails extends Component {
 
     state = {
         addFriendState: "users.friendRequest",
         fetched: false,
-        selectedUserDispatched: false
+        selectedUserDispatched: false,
+        direction: null
     }
 
     componentDidMount(){        
@@ -44,75 +47,64 @@ class UserDetails extends Component {
             getFriends
         } = this.props;
         const { info } = genInfo;
-        const { uid } = info;
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
         const pathnameArr = pathname.split('/');
         const id = pathnameArr.pop();
-        //console.log(users[id]) 
         const usersLength = Object.keys(users).length;
         if(usersLength === 0){
             getUsers();
-            getFriends(info);
         }else{
-            const selectedUser = users[id];
-            const selectedUserId = selectedUser.uid;
-            this.fetchFriends(selectedUserId, uid);
+            getFriends(info);
             dispatchSelectedUser(users, id);
             this.setState({selectedUserDispatched:true});
         }
     }
 
     componentDidUpdate(){
-        const { direction, fetched, selectedUserDispatched } = this.state;
+        const { 
+            direction, 
+            selectedUserDispatched 
+        } = this.state;
         const { 
             history: { location: { pathname } },
-            friendsInfo: { users },
-            genInfo: { info: { uid } },
+            friendsInfo: { users, fetchedFriends, friendsFull },
+            genInfo: { info },
+            getFriends,
             dispatchSelectedUser
         } = this.props;
+        const requestInfoFetched = this.state.fetched;
+        const { uid } = info;
         const usersLength = Object.keys(users).length;
         const pathnameArr = pathname.split('/');
         const id = pathnameArr.pop();
-        if(!direction && !fetched && usersLength > 0 && uid){
-            const selectedUser = users[id];
-            const selectedUserId = selectedUser.uid;
-            this.fetchFriends(selectedUserId, uid);
+        if(!direction && !fetchedFriends && usersLength > 0 && uid){
+            getFriends(info);
         }
         if(!selectedUserDispatched && id && usersLength > 0){
             dispatchSelectedUser(users, id);
             this.setState({selectedUserDispatched:true});
         }
+        if(!requestInfoFetched && fetchedFriends && friendsFull){
+            this.fetchCurrentUsersFriendsInfo()
+            this.fetchSelectedUsersFriendsInfo();
+        }
     }
 
-    fetchFriends = (selectedUsersId, uid) => {
-        this.fetchCurrentUsersFriendsInfo(selectedUsersId, uid)
-        .then(res => {
-            if(res === "fetched friends")
-                this.fetchSelectedUsersFriendsInfo(selectedUsersId, uid);          
-        })
-    }
-
-    fetchSelectedUsersFriendsInfo = (currUserId, userId) => {
+    fetchCurrentUsersFriendsInfo = () => {
         return new Promise((resolve, reject)=>{
+            const { friendsInfo: { friendsFull, selectedUser: { currUserId } } } = this.props;
             try{
-                let userRef = usersRef.child(`${userId}/friends`);
-                userRef.once('value').then((snapshot)=>{
-                    if(snapshot.val() !== null ){
-                        let requestStatus = snapshot.val()[currUserId];
-                        if(requestStatus !== undefined){
-                            let preciseStatus = requestStatus["accepted"];
-                            let direction = requestStatus["direction"];
-                            this.setState({
-                                friendRequestStatus: preciseStatus,
-                                direction: direction
-                            });
-                        }
-                    }
-                    resolve('fetched frineds');
-                }, error=>{
-                    console.log(error);
-                    reject();
-                });
+                const friendRequest = friendsFull[currUserId]
+                if(friendRequest){
+                    let preciseStatus = friendRequest.accepted;
+                    let direction = friendRequest.direction;
+                    // console.log(direction)
+                    this.setState({
+                        friendRequestStatus: preciseStatus,
+                        direction
+                    });
+                }
+                resolve('CUF fetched');
             }catch(error){
                 console.log(error);
                 reject();
@@ -120,33 +112,30 @@ class UserDetails extends Component {
         });
     }
 
-    fetchCurrentUsersFriendsInfo(currUserId, userId){
+    fetchSelectedUsersFriendsInfo(){
         return new Promise((resolve, reject) => {
+            const { genInfo: { info: { uid } }, friendsInfo: { selectedUser: { currUsersFriends } } } = this.props;
             try{
-                let userRef = usersRef.child(`${currUserId}/friends`);
-                userRef.once('value').then((snapshot)=>{
-                    if(snapshot.val() !== null ){
-                        let requestStatus = snapshot.val()[userId];
-                        if(requestStatus !== undefined){
-                            let preciseStatus = requestStatus["accepted"];
-                            this.setState({
-                                addFriendState: preciseStatus===true?
-                                "users.unfriendUser":
-                                "users.revokeFriendRequest",
-                                fetched: true
-                            });
-                        }
+                const currentUserFriendship = currUsersFriends?
+                currUsersFriends[uid]:
+                null;
+                if(currentUserFriendship){
+                    let requestStatus = currentUserFriendship.accepted;
+                    if(requestStatus !== undefined && requestStatus !== null){
+                        this.setState({
+                            addFriendState: requestStatus===true?
+                            "users.unfriendUser":
+                            "users.revokeFriendRequest",
+                            fetched: true
+                        });
                     }
-                    resolve('friends fetched');
-                }, error=>{
-                    console.log(error);
-                    reject();
-                });
+                }
+                resolve('SUF fetched');
             }catch(error){
                 console.log(error);
                 reject();
             }
-        })
+        });
     }
 
     syncCurrentUsersFriends = (userId) => {
@@ -156,36 +145,46 @@ class UserDetails extends Component {
         });
     }
 
-    respondToIncoming = (e)=>{
+    respondToIncoming = e => {
         let clicked = e.target.id;
+        const { 
+            genInfo: { info }, 
+            friendsInfo: { selectedUser: { currUserId } },
+            changeResponse,
+            getFriendsRequests,
+            getFriends
+        } = this.props;
+        let { uid } = info;
         if(clicked === "accept"){
-            let userRef = usersRef.child(`${this.props.userId}/friends`);
-            userRef.child(`${this.props.currUserId}`).update({
+            let userRef = usersRef.child(`${ uid }/friends`);
+            userRef.child(`${currUserId}`).update({
                 "direction": "incoming",
                 "accepted" : true
             });
-            let userRef1 = usersRef.child(`${this.props.currUserId}/friends`);
-            userRef1.child(`${this.props.userId}`).update({
+            let userRef1 = usersRef.child(`${currUserId}/friends`);
+            userRef1.child(`${uid}`).update({
                 "direction": "outgoing",
                 "accepted" : true
             });
-            (this.props.changeResponseClass)();
+            changeResponse();
             this.setState({
                 friendRequestStatus: true,
                 addFriendState: "users.unfriendUser"
             })
         }else if(clicked === "reject"){
-            let userRef1 = usersRef.child(`${this.props.currUserId}/friends/${this.props.userId}`);
-            let userRef2 = usersRef.child(`${this.props.userId}/friends/${this.props.currUserId}`);
+            let userRef1 = usersRef.child(`${currUserId}/friends/${uid}`);
+            let userRef2 = usersRef.child(`${uid}/friends/${currUserId}`);
             userRef1.remove();
             userRef2.remove();
-            (this.props.changeResponseClass)();
+            changeResponse();
             this.setState({
                 direction: null,
                 friendRequestStatus: null,
                 addFriendState: "user.requestRejected"
-            })
+            });
         }
+        getFriendsRequests(info);
+        getFriends(info);
     }
     respondOrRequest = ()=>{
         const { 
@@ -194,10 +193,15 @@ class UserDetails extends Component {
             addFriendState 
         } = this.state;
         const { 
-            genInfo: { info: { uid } }
+            friendsInfo: { 
+                selectedUser 
+            }
         } = this.props;
+        const { currUserId } = selectedUser;
+        //console.log(uid)
+        //console.log(currUsersFriends)
         if(direction === "incoming" && friendRequestStatus === false){
-            return <div id={ uid } className="ficon icon-user-add">
+            return <div id={ currUserId } className="ficon icon-user-add">
                 <span id="accept" className="respondB" onClick={ this.respondToIncoming }>
                     <FormattedMessage id={"users.acceptFriendRequest"} />
                 </span>
@@ -206,55 +210,67 @@ class UserDetails extends Component {
                 </span>
             </div> 
         }else if( direction === "outgoing" && friendRequestStatus === false){
-            return <div id={ uid } className="ficon nav-button-container icon-user-add" onClick={ this.sendFriendReq }>
-                <span id={ uid }>
+            return <div id={ currUserId } className="ficon nav-button-container icon-user-add" onClick={ this.sendFriendReq }>
+                <span id={ currUserId }>
                     <FormattedMessage id={"users.pendingRequest"} />
                 </span>
             </div>
         }else{
-            return <div id={ uid } className="ficon nav-button-container icon-user-add" onClick={ this.sendFriendReq }>
-                <span id={ uid }>
+            return <div id={ currUserId } className="ficon nav-button-container icon-user-add" onClick={ this.sendFriendReq }>
+                <span id={ currUserId }>
                     <FormattedMessage id={ addFriendState } />
                 </span>
             </div> 
         }
     }
-    sendFriendReq = (e)=>{
-        const { genInfo: { info: {uid} }, friendsInfo: { selectedUser: { currUserId }, friends }  } = this.props;
+
+    sendFriendReq = e => {
+        const { 
+            genInfo: { info }, 
+            friendsInfo: { selectedUser: { currUserId }, friendsFull },
+            getFriendsRequests,
+            getFriends
+        } = this.props;
+        let {uid} = info;
         let newFriend = e.target.id;
-        let friendsCopy = {...friends};
-        friendsCopy[newFriend] = { "direction" : "outgoing", "accepted": false };
-        let userRef = usersRef.child(`${uid}/friends`);
-        userRef.once('value').then((snapshot)=>{
-            if(snapshot.val() !== null ){
+        let friendsCopy = {...friendsFull};
+        const currentUsersFrinedsRef = usersRef.child(`${uid}/friends`);
+        currentUsersFrinedsRef.once('value').then(snapshot => {
+            if (snapshot.val() !== null ) {
                 let requestStatus = snapshot.val()[currUserId];
-                if(requestStatus !== undefined){
+                // console.log(requestStatus)
+                if (requestStatus) {
                     let userRef1 = usersRef.child(`${currUserId}/friends/${uid}`);
                     let userRef2 = usersRef.child(`${uid}/friends/${currUserId}`);
+                    delete friendsCopy[newFriend];
                     userRef1.remove();
                     userRef2.remove();
                     this.setState({
+                        friends: friendsCopy,
                         addFriendState: "users.requestRevoked"
                     });
-                }else{
+                }
+                else {
+                    friendsCopy[newFriend] = { "direction" : "outgoing", "accepted": false };
                     this.setState({
                         friends: friendsCopy,
                         addFriendState: "users.requestSent"
                     });
-                    let userRef = usersRef.child(`${currUserId}/friends`);
-                    userRef.once('value').then((snapshot)=>{
+                    let selectedUsersFriendsRef = usersRef.child(`${currUserId}/friends`);
+                    selectedUsersFriendsRef.once('value').then(snapshot => {
                         if(snapshot.val() === null ){
-                            usersRef.child(`${currUserId}/friends`).set({
+                            selectedUsersFriendsRef.set({
                                 [uid]: {"direction" : "incoming", "accepted": false }
                             });
                         }else{
-                            usersRef.child(`${currUserId}/friends`).update({
+                            selectedUsersFriendsRef.update({
                                 [uid]: {"direction" : "incoming", "accepted": false }
                             });
                         }
                     });
                 }
             }else{
+                friendsCopy[newFriend] = { "direction" : "outgoing", "accepted": false };
                 this.setState({
                     friends: friendsCopy,
                     addFriendState: "users.requestSent"
@@ -262,16 +278,18 @@ class UserDetails extends Component {
                 let userRef = usersRef.child(`${currUserId}/friends`);
                 userRef.once('value').then((snapshot)=>{
                     if(snapshot.val() === null ){
-                        usersRef.child(`${currUserId}/friends`).set({
+                        usersRef.set({
                             [uid]: {"direction" : "incoming", "accepted": false }
                         });
                     }else{
-                        usersRef.child(`${currUserId}/friends`).update({
+                        usersRef.update({
                             [uid]: {"direction" : "incoming", "accepted": false }
                         });
                     }
                 });
             }
+            getFriendsRequests(info);
+            getFriends(info)
         });
         this.syncCurrentUsersFriends(uid);
     }
@@ -299,26 +317,41 @@ class UserDetails extends Component {
                     <div className="ficon icon-left-open-mini nav-button-container" onClick={ ()=>{ this.backToUsers()} }>
                         <span className="nav-button">Back</span>
                     </div>
-                    <div className="currUserDits">
-                        <div id="left">
-                            <div className="roundPic membersAv"><img alt={ this.props.currUserDname } className="members" src={ currUserAvUrl } /></div>
-                        </div>
-                        <div id="center">
-                            <div id="displayName">
-                                <div className="ficon nav-button-container icon-megaphone"><span>{ currUserDname }</span></div>  
+                    { 
+                        currUserDname?
+                        <div className="currUserDits">
+                            <div id="left">
+                                <div className="roundPic membersAv">
+                                    <img alt={ currUserDname } className="members" src={ currUserAvUrl } />
+                                </div>
                             </div>
-                            <div id={ this.props.currUserEmail }>
-                                <div className="ficon nav-button-container icon-mail"><span>{ currUserEmail }</span></div> 
+                            <div id="center">
+                                <div id="displayName">
+                                    <div className="ficon nav-button-container icon-megaphone">
+                                        <span>{ currUserDname }</span>
+                                    </div>  
+                                </div>
+                                <div id={ currUserEmail }>
+                                    <div className="ficon nav-button-container icon-mail">
+                                        <span>{ currUserEmail }</span>
+                                    </div> 
+                                </div>
+                                <div id="add-user">
+                                    { this.respondOrRequest() }
+                                </div>
                             </div>
-                            <div id="add-user">
-                                { this.respondOrRequest() }
+                            <div id="right">
+                                <span className="icon-quote"></span>
+                                <div id="about-me">{ currUserAbout }</div>
                             </div>
-                        </div>
-                        <div id="right">
-                            <span className="icon-quote"></span>
-                            <div id="about-me">{ currUserAbout }</div>
-                        </div>
-                    </div>
+                        </div>:
+                        <KLoader 
+                            type="TailSpin"
+                            color="#757575"
+                            height={50}
+                            width={50}
+                        />
+                    }
                 </div>
                 <Footer />
             </div>
@@ -346,11 +379,14 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        getUsers: ()=>{
+        getUsers: () => {
             dispatch(fetchUsers());
         },
-        getFriends: info=>{
+        getFriends: info => {
             dispatch(fetchFriends(info));
+        },
+        changeResponse: () => {
+            dispatch(changeResponseClass());
         },
         dispatchSelectedUser: (users, id) => {
             dispatch(pushSelectedUser(users, id));

@@ -40,7 +40,7 @@ export const fetchingUsersError = () => {
     }
 }
 
-export const fetchingFrineds = () => { 
+export const fetchingFriends = () => { 
     return {
         type: FETCH_FRIENDS_PENDING
     }
@@ -124,9 +124,7 @@ export const fetchUsers = () => {
             asArray: true
         }).then(data=>{
             let length = data.length;
-            if(length!==0 && length!==null) {
-                dispatch(usersSuccessfullyFetched(data));
-            }
+            if(length!==0 && length!==null) dispatch(usersSuccessfullyFetched(data));
         }, error=>{
             dispatch(fetchingUsersError(error));
         });
@@ -136,12 +134,18 @@ export const fetchUsers = () => {
 export const fetchFriends = info => {
     return dispatch => {
         let { uid } = info;
+        let friends = [];
+        let friendsFull = {};
         let ref = usersRef.child(`${ uid }/friends`);
-        ref.once('value').then(snapshot=>{
-            let uFriends = snapshot.val();
-            if(uFriends !== null && uFriends !== undefined){
-                dispatch(friendsSuccessfullyFetched(uFriends));
+        ref.once('value').then(snapshot => {
+            let uFriends = friendsFull = snapshot.val();
+            if (uFriends !== null && uFriends !== undefined) {
+                Object.keys(uFriends).map(value => {
+                    //console.log(value)
+                    friends.push(value);
+                });
             }
+            dispatch(friendsSuccessfullyFetched({friends, friendsFull}));
         }, error=>{
             dispatch(fetchingFriendsError(error));
         })
@@ -152,16 +156,15 @@ export const pushSelectedUser = (users, key)=>{
     return dispatch => {
         const info = {
             currUserId: users[key].uid,
+            currUsersFriends: users[key].friends,
             currUserDname: users[key].dname,
             currUserAvUrl: users[key].avatar,
             currUserEmail: users[key].shareEmailAddress === true?users[key].email:"Email Address is hidden",
             currUserAbout: users[key].about,
             currUserSharePref: users[key].shareEmailAddress
         };
-        if(users && key)
-            dispatch(selectUserFulfilled(info));
-        else 
-            dispatch(selectUserError({message: "No data"}));
+        if (users && key) dispatch(selectUserFulfilled(info));
+        else dispatch(selectUserError({message: "No data"}));
     }
 }
 
@@ -179,11 +182,8 @@ export const fetchFriendsRequests = info => {
             let outGoingRequests = [];
             let inComingRequests = [];
             snapshot.forEach((pFriend)=>{
-                if(pFriend.val().direction === "outgoing" && pFriend.val().accepted === false){
-                    outGoingRequests.push(pFriend.key);
-                }else if(pFriend.val().direction === "incoming" && pFriend.val().accepted === false){
-                    inComingRequests.push(pFriend.key);
-                }
+                if (pFriend.val().direction === "outgoing" && pFriend.val().accepted === false) outGoingRequests.push(pFriend.key);
+                else if (pFriend.val().direction === "incoming" && pFriend.val().accepted === false) inComingRequests.push(pFriend.key);
             });
             dispatch(fetchIncomingRequestsFulfilled(inComingRequests));
             dispatch(fetchOutGoingRequestsFulfilled(outGoingRequests));

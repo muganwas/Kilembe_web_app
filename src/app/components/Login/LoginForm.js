@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { css } from '@emotion/core';
 import PropTypes from 'prop-types';
 import Firebase from 'firebase/app';
@@ -17,12 +17,12 @@ const override = css`
 
 const LoginForm = props => {
 
+    const [email = '', changeEmail] = useState();
+    const [password = '', changePassword] = useState();
+
     let { 
-        email,
-        password,
         dispatchEmail, 
         dispatchPassword,
-        tempValStore,
         onSubmit,
         error,
         loginInfo,
@@ -42,8 +42,17 @@ const LoginForm = props => {
     const fbAuth = new Firebase.auth.FacebookAuthProvider();
     const googleAuth = new Firebase.auth.GoogleAuthProvider();
 
+    const localSubmit = e => { 
+        e.preventDefault();
+        //dispatchEmail(email);
+        dispatchPassword(password);
+        setTimeout(() => {
+            if(!error) onSubmit(loginInfo);
+        }, 1000);
+    }
+
     return (
-        <div className="form">
+        <form id="login-form" onSubmit={localSubmit} className="form">
             <span>
                 <h3>{ loginPageTitle }</h3>
             </span>
@@ -61,8 +70,8 @@ const LoginForm = props => {
                         placeholder="Email address" 
                         type="text" 
                         value = { email }
-                        onBlur = { ()=>dispatchEmail(email) }
-                        onChange = { tempValStore }
+                        onBlur = { () => dispatchEmail(email) }
+                        onChange = { e => changeEmail(e.target.value) }
                     />
                 </span>
                 <span>
@@ -71,16 +80,12 @@ const LoginForm = props => {
                         placeholder="Password" 
                         type="password"
                         value = { password }
-                        onBlur = { ()=>dispatchPassword(password) }
-                        onChange = { tempValStore }
+                        onBlur = { () => dispatchPassword(password) }
+                        onChange = { e => changePassword(e.target.value) }
                     />
                 </span>
                 <span>
                     <button 
-                        onClick={ () => {
-                            if(!error)
-                                onSubmit(loginInfo) 
-                        } } 
                         type="submit" 
                     >
                         { 
@@ -105,7 +110,7 @@ const LoginForm = props => {
                 <button 
                 id="facebook" 
                 className="icon-facebook-squared" 
-                onClick={ ()=>thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler ) }
+                onClick={ () => thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler ) }
                 >
                 { facebookLoginLabel }
                 </button>
@@ -114,12 +119,12 @@ const LoginForm = props => {
                 <button 
                 id="google" 
                 className="icon-google" 
-                onClick={ ()=>thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler ) }
+                onClick={ () => thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler ) }
                 >
                 { googleLoginLabel }
                 </button>
             </span>
-        </div>
+        </form>
     )
 }
 

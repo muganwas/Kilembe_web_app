@@ -45,16 +45,9 @@ const defaultState = {
             }
           }
 
-          case LOGOUT_CONFIRMED:{
+          case LOGOUT_CONFIRMED: {
             return {
-              email: null,
-              password: null,
-              info: null,
-              messageId: null,
-              loggedIn: false,
-              fetching: false,
-              fetched: false,
-              error: false
+              ...defaultState
             }
           }
 

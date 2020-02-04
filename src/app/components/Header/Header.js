@@ -3,17 +3,18 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { ProfileImage } from 'components';
-import axios from 'axios';
-import Rebase from 're-base';
-import app from '../../base';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
+import {
+    fetchUsers,
+    fetchFriends,
+    fetchFriendsRequests
+} from 'reduxFiles/dispatchers/userDispatchers';
 import { 
     logout, 
-    loginConfirmed, 
+    loginConfirmed,
+    setupUserInFirebase
 } from 'reduxFiles/dispatchers/authDispatchers';
-
-let base = Rebase.createClass(app.database());
-let usersRef = app.database().ref('users');
+// import { setChatId } from '../../misc/functions';
 
 class Header extends Component {
     constructor(){
@@ -35,87 +36,80 @@ class Header extends Component {
 
     componentDidMount(){
         const { 
-            info: { uid, loggedIn }, 
+            info: { loggedIn }, 
             genInfo, 
             updateGenInfo,
-            confirmLoggedIn
+            confirmLoggedIn,
+            friendsInfo: { inComingRequests, fetchedFriends }
         } = this.props;
-        let { info: { avURL } } = genInfo;
+        let { info: { avURL }, fetched } = genInfo;
+        let { notificationClass } = this.state;
         //dispatch local storage genInfo to props
-        if(!loggedIn){
+        if (!loggedIn) {
             let storedInfo = sessionStorage.getItem('genInfo');
             storedInfo = storedInfo?
             JSON.parse(storedInfo):
             null;
-            if(!avURL && storedInfo){
+            if (!avURL && storedInfo) {
                 confirmLoggedIn();
                 updateGenInfo(storedInfo);
             }
-        }else{
-            this.createChatKitUser();
-            let userRef = usersRef.child(`${uid}/friends`);
-            userRef.once('value').then((snapshot)=>{
-                snapshot.forEach((itemSnapshot)=>{
-                    //let itemKey= itemSnapshot.key;
-                    let itemVal= itemSnapshot.val();
-                    if(itemVal.direction === "incoming" && itemVal.accepted === false){
-                        this.setState({
-                            friendAction: true,
-                            notificationClass: "fas fa-circle alert"
-                        });
-                    }
-                });
-            });
+        } 
+        else {
+            // console.log(friendsFetched + ' ' + fetched)
+            if (fetched) this.setUpFriendsInfo();
         }
+        if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
+    }
+
+    setUpFriendsInfo = () =>  {
+        const { 
+            genInfo: { 
+                info,
+                userInDatabase
+            }, 
+            friendsInfo: { fetched, fetchedFriends },
+            getUsers, 
+            getFriends,
+            getFriendsRequests,
+            uploadUsersInfoToFB 
+        } = this.props;
+        let { uid, avURL } = info;
+        if (!fetched) getUsers();
+        if (!fetchedFriends) {
+            getFriends(info);
+            getFriendsRequests(info);
+        }
+        !userInDatabase ? uploadUsersInfoToFB(avURL, uid) : null ;
     }
 
     componentDidUpdate(){
         const {
             loginInfo: { loggedIn },
+            genInfo: { fetched },
+            friendsInfo: { fetchedFriends, inComingRequests }
         } =this.props;
-        if(!loggedIn)
-            this.goTo("/");
-    }
-
-    createChatKitUser = () => {
-        let { genInfo: { fetched }, userId, dname } = this.props;
-        let uid = userId;
-        if(fetched === true){
-            base.fetch(`users/${ uid }/chatkit_uid`, {
-                context: this,
-                asArray: false
-            }).then((data)=>{
-                let len = Object.keys(data).length;
-                if(len === 0){
-                    let url = process.env.CHATKIT_CREATE_USER + userId + "&name="+ dname;
-                    axios(url)
-                    .then((res)=>{
-                        let chatkit_id = res.data.id;
-                        usersRef.child(uid).update({
-                            chatkit_uid: chatkit_id
-                        });
-                    })
-                    .catch((err)=>{
-                        console.log(err)
-                    });
-                }
-            });
-        }
+        const { notificationClass } = this.state;
+        if (!loggedIn) this.goTo("/");
+        else if (fetched) this.setUpFriendsInfo();
+        // show nofication icon if there are incoming requests
+        if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
+        else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
     }
 
     showMenu = ()=>{
         var menu = this.state.dropDownStyle;
-        if( menu !== "visible"){
+        if ( menu !== "visible"){
             this.setState({
                 dropDownStyle: "visible",
                 arrStyle: "visible"
             });
-        }else{
+        }
+        else {
             this.setState({
                 dropDownStyle: null,
                 arrStyle: null
             });
-            
         }
     }
 
@@ -149,26 +143,26 @@ class Header extends Component {
                 null }    
                 { loggedIn?
                 <div className="nav">    
-                    <span className={ homeStyle } onClick={ ()=>this.goTo("/home") }></span>
-                    <span className={ friendsStyle } onClick={ ()=>this.goTo("/friends") }>
+                    <span className={ homeStyle } onClick={ () => this.goTo("/home") }></span>
+                    <span className={ friendsStyle } onClick={ () => this.goTo("/friends") }>
                         <span className={ notificationClass }></span>
                     </span>
-                    <span className={ chatStyle } onClick={ ()=>this.goTo("/messaging") }></span> 
+                    <span className={ chatStyle } onClick={ () => this.goTo("/messaging") }></span> 
                     <span className={ menuStyle } onClick={ this.showMenu }>
                         <div id="arr" className={ arrStyle }>
                             <ul id="menu" className={ dropDownStyle }>
                                 <li className={ settingsIconStyle }>
-                                    <span className="link" onClick={ ()=>this.goTo("/settings") } >Settings</span>
+                                    <span className="link" onClick={ () => this.goTo("/settings") } >Settings</span>
                                 </li>
                                 <li className={ logoutIconStyle }>
-                                    <span className="logout" onClick={ ()=>signOut(genInfo, this.goTo) } >Logout</span>
+                                    <span className="logout" onClick={ () => signOut(genInfo, this.goTo) } >Logout</span>
                                 </li>
                             </ul>
                         </div>
                     </span> 
                 </div>:
                 <div>
-                    <span className={ loginStyle } onClick={ ()=>this.goTo(notFoundPath) }></span>
+                    <span className={ loginStyle } onClick={ () => this.goTo(notFoundPath) }></span>
                 </div> }
             </div>
         )
@@ -188,12 +182,25 @@ const mapStateToProps = state => {
     return {
         genInfo: state.genInfo,
         info: state.genInfo.info,
-        loginInfo: state.loginInfo
+        loginInfo: state.loginInfo,
+        friendsInfo: state.friendsInfo
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
+        getUsers: ()=>{
+            dispatch(fetchUsers());
+        },
+        getFriends: info=>{
+            dispatch(fetchFriends(info));
+        },
+        getFriendsRequests: info => {
+            dispatch(fetchFriendsRequests(info));
+        },
+        uploadUsersInfoToFB: (avatar, uid) => {
+            dispatch(setupUserInFirebase(avatar, uid));
+        },
         updateGenInfo: genInfo => {
             dispatch(dispatchedGenInfo(genInfo));
         },

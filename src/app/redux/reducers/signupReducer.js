@@ -7,6 +7,7 @@ import {
     SIGNUP_ERROR_ALERT,
     SIGNUP_CONFIRMED,
     PASSWORDS_MATCH,
+    LOGOUT_CONFIRMED,
     PASSWORDS_MATCH_ERROR,
     CLEAR_ERRORS
   } from "../types";
@@ -92,6 +93,12 @@ import {
                 ...state,
                 error: false,
                 messageId: null
+              }
+            }
+
+            case LOGOUT_CONFIRMED: {
+              return {
+                ...defaultState
               }
             }
 

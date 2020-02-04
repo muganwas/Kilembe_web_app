@@ -1,8 +1,16 @@
-import { FETCH_GEN_PENDING, FETCH_GEN_REJECTED, FETCH_GEN_FULFILLED, FETCH_ID_TOKEN } from '../types';
+import { 
+  FETCH_GEN_PENDING, 
+  FETCH_GEN_REJECTED, 
+  FETCH_GEN_FULFILLED, 
+  FETCH_ID_TOKEN,
+  LOGOUT_CONFIRMED,
+  USER_SAVED_IN_DATABASE 
+} from '../types';
 const defaultState = {
     info: {
       chatkitUser: {}
     },
+    userInDatabase: false,
     menu: "Main-Menu",
     fetching: false,
     fetched: false,
@@ -26,10 +34,21 @@ const defaultState = {
               error: action.payload
             }
           }
+          case USER_SAVED_IN_DATABASE:{
+            return {
+              ...state,
+              userInDatabase: true
+            }
+          }
           case FETCH_ID_TOKEN:{
             return {
               ...state,
               info: { ...state.info, chatkitUser: { id: action.payload } } 
+            }
+          }
+          case LOGOUT_CONFIRMED: {
+            return {
+              ...defaultState
             }
           }
           case FETCH_GEN_FULFILLED:{

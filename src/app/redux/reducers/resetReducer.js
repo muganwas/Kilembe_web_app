@@ -3,6 +3,7 @@ import {
     RESET_FULLFILLED,
     RESET_REJECTED,
     STORE_EMAIL,
+    LOGOUT_CONFIRMED,
     RESET_MESSAGE_ALERT,
     CLEAR_ERRORS
   } from "../types";
@@ -59,6 +60,12 @@ import {
                   messageId: action.payload,
                   fetching: false
                 }
+            }
+
+            case LOGOUT_CONFIRMED: {
+              return {
+                ...defaultState
+              }
             }
 
             case RESET_FULLFILLED:{

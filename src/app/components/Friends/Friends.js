@@ -4,7 +4,8 @@ import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { 
     Header,
-    Footer
+    Footer,
+    KLoader
 } from 'components';
 import {
     fetchUsers,
@@ -26,23 +27,6 @@ class Friends extends Component {
             logingStatusConfirmation
         } = this.props
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
-    }
-
-    componentDidUpdate(){
-        const { 
-            genInfo,
-            friendsInfo: { users },
-            getUsers,
-            getFriends,
-            getFriendsRequests
-        } = this.props;
-        const usersLength = Object.keys(users).length;
-        if(genInfo && usersLength === 0){
-            const { info } = genInfo;
-            getUsers();
-            getFriends(info);
-            getFriendsRequests(info);
-        }
     }
 
     userDetail = (key)=>{
@@ -89,6 +73,7 @@ class Friends extends Component {
 
     render(){
         let { friendsInfo: { users } } = this.props;
+        let usersLength = users.length;
         return (
             <div className="container Home">
                 <Header />
@@ -96,7 +81,16 @@ class Friends extends Component {
                     <div id="general">
                         <h4>Kilembe Users</h4>
                         <div className="sub-container">
-                            { Object.keys(users).map(this.getUsers) }
+                            { 
+                                usersLength?
+                                Object.keys(users).map(this.getUsers):
+                                <KLoader 
+                                    type="TailSpin"
+                                    color="#757575"
+                                    height={50}
+                                    width={50}
+                                />
+                            }
                         </div>
                     </div>
                 </div>

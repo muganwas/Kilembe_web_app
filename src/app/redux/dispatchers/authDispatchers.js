@@ -1,5 +1,6 @@
 import axios from 'axios';
 import app from '../../base';
+import Rebase from 're-base';
 import { emailregex } from 'misc/constants';
 import { dispatchedGenInfo, dispatchChatkitTokenId, fetchGenInfoFromSessionStorage } from 'reduxFiles/dispatchers/genDispatchers';
 import { getUserAvatar } from 'misc/functions';
@@ -7,7 +8,8 @@ import {
     LOGIN_FULFILLED,
     LOGIN_PENDING, 
     LOGIN_REJECTED, 
-    STORE_EMAIL, STORE_PASSWORD, 
+    STORE_EMAIL, 
+    STORE_PASSWORD, 
     LOGIN_ERROR_ALERT, 
     LOGIN_CONFIRMED,
     LOGOUT_CONFIRMED,
@@ -22,10 +24,13 @@ import {
     SIGNUP_CONFIRMED,
     PASSWORDS_MATCH,
     PASSWORDS_MATCH_ERROR,
-    CLEAR_ERRORS
+    CLEAR_ERRORS,
+    USER_SAVED_IN_DATABASE
 } from '../types';
 
 const confirmTokenURL = process.env.CONFIRM_FIREBASE_TOKEN;
+let base = Rebase.createClass(app.database());
+let usersRef = app.database().ref('users');
 
 export const storeEmail = email =>{
     return {
@@ -71,6 +76,12 @@ export const signupRejected = messageId => {
     return {
         type: SIGNUP_REJECTED,
         payload: messageId
+    }
+}
+
+export const userSaveIntoDB = () => {
+    return {
+        type: USER_SAVED_IN_DATABASE
     }
 }
 
@@ -162,7 +173,6 @@ export const resetMessageAlert = messageId => {
 
 export const handleEmail = email => {
     return dispatch => {
-
         if(email && email.match(emailregex)){
             dispatch(storeEmail(email));
         }else if(!email){
@@ -215,7 +225,7 @@ export const handleLogin = loginInfo => {
     }    
 }
 
-export const authHandler = (authData) => {
+export const authHandler = authData => {
     return dispatch => {
         let currentUser = app.auth().currentUser;
         const uid= authData.user.uid;
@@ -241,7 +251,10 @@ export const authHandler = (authData) => {
 
 export const authenticate = (provider, callback) => {
     return dispatch => {
-        app.auth().signInWithPopup(provider).then((data)=>callback(data, fetchToken)).catch((error)=>{
+        app.auth().
+        signInWithPopup(provider).
+        then(data => callback(data, fetchToken)).
+        catch(error => {
             //console.log(error);
             let errorMessage; 
             error.code === "auth/network-request-failed"?
@@ -357,6 +370,38 @@ export const eReset = email => {
     }
 }
 
+export const setupUserInFirebase = (avatar, uid) => {
+    return dispatch => {
+        if ( avatar || localStorage.getItem("avatar")) {
+            base.fetch(`users/${ uid }`, {
+                context: this,
+                asArray: true
+            }).then(data => {
+                // console.log(data)
+                let length = data.length;
+                if(length === 0 || length === null || length === undefined) {
+                    // console.log(uid)
+                    let ref = usersRef.child(uid);
+                    let derivedDnameArr = localStorage.getItem('email').split('@');
+                    let derivedDname = derivedDnameArr[0];
+                    ref.set({
+                        email: localStorage.getItem('email'),
+                        dname: localStorage.getItem('dname') || derivedDname,
+                        uid: localStorage.getItem('uid'),
+                        chatkit_uid: uid,
+                        about: " ",
+                        shareEmailAddress: false,
+                        avatar: localStorage.getItem("avatar") || avatar
+                    });
+                    dispatch(userSaveIntoDB());
+                }
+                else dispatch(userSaveIntoDB());
+            });
+        }
+        else getUserAvatar(uid);      
+    }
+}
+
 export const handleSignup = (email, password)=>{
     return dispatch => {
         if(email && password){
@@ -407,20 +452,18 @@ export const checkLoginStatus = (confirmLoggedIn, loginInfo, genInfo)=>{
         if(!loggedIn){
             fetchGenInfoFromSessionStorage(confirmLoggedIn, loginInfo).then(res=>{
                 if(res === "not dispatched"){
-                    dispatch(logout(genInfo));
+                    dispatch(logout());
                 }  
             });
         } 
     }
 }
 
-export const logout = genInfo =>{
+export const logout = () =>{
     return dispatch => {
-        genInfo.info = {};
         app.auth().signOut().then(()=>{
             sessionStorage.removeItem('genInfo');
             localStorage.clear();
-            dispatch(dispatchedGenInfo(genInfo));
             dispatch(logoutConfirmed());
             console.log("user signed out!");
         });

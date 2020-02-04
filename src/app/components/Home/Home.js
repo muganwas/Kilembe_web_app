@@ -9,7 +9,7 @@ import {
     confirmToken, 
     loginConfirmed, 
     logout, 
-    checkLoginStatus 
+    checkLoginStatus
 } from 'reduxFiles/dispatchers/authDispatchers';
 import {
     fetchUsers
@@ -22,9 +22,6 @@ import {
     Header,
     Footer
 } from 'components';
-import { 
-    getUserAvatar 
-} from 'misc/functions';
 
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
@@ -51,44 +48,11 @@ class Home extends Component {
 
     componentDidUpdate(){
         let { 
-            genInfo, 
-            friendsInfo: { users }, 
-            loginInfo: { loggedIn },
-            getUsers 
+            loginInfo: { loggedIn }
         } = this.props;
-        let { info: { uid, avURL } } = genInfo;
-        let avatar = avURL;
-        const usersLength = Object.keys(users).length;
+        // const usersLength = Object.keys(users).length;
         if(!loggedIn)
             this.goTo("/");
-        else{
-            if( avatar || (localStorage.getItem("avatar") && localStorage.getItem("avatar"))){
-                base.fetch(`users/${ uid }`, {
-                    context: this,
-                    asArray: true
-                }).then((data)=>{
-                    let length = data.length;
-                    if(length === 0 || length === null || length === undefined) {
-                        console.log(uid)
-                        let ref = usersRef.child(uid);
-                        ref.set({
-                            email: localStorage.getItem('email'),
-                            dname: localStorage.getItem('dname'),
-                            uid: localStorage.getItem('uid'),
-                            about: " ",
-                            shareEmailAddress: false,
-                            avatar: localStorage.getItem("avatar") || avatar
-                        });
-                    }
-                });
-            }else{
-                getUserAvatar(uid);
-                //setTimeout(()=>{this.updateInfo()}, 2000);
-            }
-            if(genInfo && usersLength === 0){
-                getUsers();
-            }
-        }
     }
 
     updateInfo = () => {

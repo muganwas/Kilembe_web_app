@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+import { ScaleLoader } from 'react-spinners';
+import { css } from '@emotion/core';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { 
     confirmToken, 
@@ -13,134 +16,92 @@ import {
     fetchFriends
 } from 'reduxFiles/dispatchers/userDispatchers';
 import { 
-    ChatManager, 
-    TokenProvider 
-} from '@pusher/chatkit';
-import { 
     Header,
     Footer 
 } from 'components';
-import Rebase from 're-base';
-import app from '../../base';
-import './css/main.css';
-import axios from 'axios';
+import './localStyles/main.css';
 
 //components
 import MessagingNav from './MessagingNav';
 
-const usersRef = app.database().ref('users');
-const base = Rebase.createClass(app.database());
-var chatManager;
+const override = css`
+    display: block;
+    margin: 0 auto;
+    border-color: #757575;
+`;
 
 class Messaging extends Component {
+    state = {
+        messaging: false
+    }
     componentDidMount(){
         const { 
             confirmLoggedIn, 
             genInfo, 
             loginInfo,
-            logingStatusConfirmation 
-        } = this.props
-        const { info: { fetched } } = genInfo;
-        logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
-        //console.log(friendsInfo);
-        if(fetched)
-            this.setupChatKit();        
-    }
-
-    componentDidUpdate(){
-        const { 
-            genInfo: { 
-                info, 
-                fetched 
-            }, 
-            getUsers, 
-            getFriends, 
-            friendsInfo 
+            logingStatusConfirmation,
         } = this.props;
-        const friendsFetched = friendsInfo.fetched;
-        /**Fetch users and frineds if they're not fetched yet */
-        if(!friendsFetched && fetched){
-            getUsers();
-            getFriends(info);
-            this.setupChatKit();
-        }
+        logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo); 
     }
 
-    setupChatKit = () => {
-        const { 
-            genInfo: { 
-                info
-            }
-        } = this.props;
-        //const friendsFetched = friendsInfo.fetched;
-        const { dname, uid } = info;
-        base.fetch(`users/${ uid }/chatkit_uid`, {
-            context: this,
-            asArray: false
-        }).then((data)=>{
-            console.log(data)
-            let len = Object.keys(data).length;
-            if(len === 0){
-                let url = process.env.CHATKIT_CREATE_USER + uid + "&name="+ dname;
-                axios(url)
-                .then((res)=>{
-                    let chatkit_id = res.data.id;
-                    usersRef.child(uid).update({
-                        chatkit_uid: chatkit_id
-                    });
-                })
-                .catch((err)=>{
-                    console.log(err.message);
-                });
-            }else{
-                let url = process.env.CHATKIT_TOKEN_PROVIDER + data;
-                chatManager = new ChatManager({
-                    instanceLocator: process.env.CHATKIT_INSTANCE_LOCATOR,
-                    userId: data,
-                    tokenProvider: new TokenProvider({ url })
-                });
-                chatManager.connect()
-                .then(currentUser => {
-                    console.log('Successful connection', currentUser)
-                })
-                .catch(err => {
-                    console.log('Error on connection', err)
-                });
-            }
-        });
-    }
-
-    displayFriends = (key)=>{
-        let friends = this.props.genInfo.info.friends;
-        let uid = friends[key].key;
-        let avatar = friends[key].avatar;
-        let allUsers= this.props.allUsers;
-        let dname;
-        allUsers? dname = allUsers[uid].dname: dname = null;
-        return (
-            <div key={key} className="friend">
-                <div className="left">
-                    <div className="roundPic membersAv">
-                        <img alt={ uid } className="members" src = { avatar } />
-                    </div>
-                    <div className="name">{ dname?dname:null }</div>
-                    <div className="clear"></div>
-                </div>
+    displayFriends = key => {
+        let { friendsInfo: { users } } = this.props;
+        if ( users.length > 0 ) {
+            return <div key={key}> {
+                users.map( obj => {
+                    if (obj.uid === key) {
+                        let { uid, avatar, dname, email } = obj;
+                        // console.log(dname + ' ' + email)
+                        return (
+                            <div key={key} className="friend">
+                                <div className="left">
+                                    <div className="roundPic membersAv-small">
+                                        <img alt={ uid } className="members" src = { avatar } />
+                                        <span className='fas fa-circle alert'></span>
+                                    </div>
+                                    <div className="name">{ dname ? dname : email }</div>
+                                    <div className="clear"></div>
+                                </div>
+                            </div>
+                        )
+                    }
+                    return;
+            }) }
             </div>
-        )
+        }
+        return;
     }
 
     render(){
-        let friends = { ...this.props.genInfo.info.friends };
-        return(
+        let { friendsInfo: { friends, fetchedFriends } } = this.props;
+        let { messaging } = this.state;
+        return (
             <div className="container Home">
                 <Header />
                 <div className="content">
-                    { this.props.header }
                     <div className="messaging">
-                        <div className="friends">
-                            <h3>Friends</h3>
-                            { friends?Object.keys(friends).map(this.displayFriends):null }
+                        <div id='friends-list' className="friends">
+                            <h3><FormattedMessage  id='friends.listTitle' /></h3>
+                            { fetchedFriends ? 
+                            friends && friends.length > 0 ? 
+                            friends.map(val => this.displayFriends(val)) : 
+                            <div className='messages'>
+                                <FormattedMessage id='message.noFriendsYet' />
+                            </div> :
+                            <ScaleLoader
+                                css={override}
+                                sizeUnit={"px"}
+                                height={10}
+                                width={3}
+                                radius={3}
+                                color={'#757575'}
+                                loading={!fetchedFriends} 
+                            /> }
+                        </div>
+                        <div id='conversation-container'>
+                            { !messaging ? 
+                            <span id='messaging-call-to-action'><FormattedMessage id='friends.startConvo' /></span> :
+                            <div></div> }
                         </div>
                     </div>
                 </div>
