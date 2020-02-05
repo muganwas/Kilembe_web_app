@@ -152,7 +152,7 @@ export const fetchFriends = info => {
     }
 }
 
-export const pushSelectedUser = (users, key)=>{
+export const pushSelectedUser = (users, key) => {
     return dispatch => {
         const info = {
             currUserId: users[key].uid,
@@ -168,7 +168,7 @@ export const pushSelectedUser = (users, key)=>{
     }
 }
 
-export const changeResponseClass = responseClass=>{
+export const changeResponseClass = responseClass => {
     return dispatch => {
         dispatch(responseClassChanged(responseClass));
     }
@@ -178,7 +178,7 @@ export const fetchFriendsRequests = info => {
     return dispatch => {
         let { uid } = info;
         let ref = usersRef.child(`${uid}/friends`);
-        ref.once('value').then((snapshot)=>{
+        ref.once('value').then(snapshot => {
             let outGoingRequests = [];
             let inComingRequests = [];
             snapshot.forEach((pFriend)=>{

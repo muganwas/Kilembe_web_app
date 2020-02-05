@@ -20,9 +20,10 @@ import {
     Footer 
 } from 'components';
 import './localStyles/main.css';
+import io from 'socket.io-client';
 
-//components
-import MessagingNav from './MessagingNav';
+const chatServerUrl = process.env.CHAT_SERVER;
+const socket = io(chatServerUrl, { autoConnect: false });
 
 const override = css`
     display: block;
@@ -32,7 +33,12 @@ const override = css`
 
 class Messaging extends Component {
     state = {
-        messaging: false
+        messaging: false,
+        conncetionStatus: '',
+        chatMessage: null,
+        socketError: null,
+        loginValid: false,
+        socketOpen: false
     }
     componentDidMount(){
         const { 
@@ -41,7 +47,60 @@ class Messaging extends Component {
             loginInfo,
             logingStatusConfirmation,
         } = this.props;
-        logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo); 
+        logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
+
+        socket.on('connect', () => {
+            const { genInfo: { info: { chatkitUser: { token } } } } = this.props;
+            socket.emit('authentication', {
+                token
+            });
+            console.log('Connected');
+            this.setState({connectionStatus: 'Connected', socketOpen: true});
+        });
+        
+        socket.on('unauthorized', reason => {
+            const { genInfo: { info: { chatkitUser: { token } } }, confirmUserToken } = this.props;
+            console.log('Unauthorized:', reason);
+            this.setState({socketError: reason.message, socketOpen: false});
+            socket.disconnect();
+            confirmUserToken(token);
+        });
+        
+        socket.on('disconnect', reason => {
+            let { socketError } = this.state;
+            console.log(`Disconnected: ${ socketError || reason}`);
+        });
+        
+        socket.on("join-alert", data => {
+            this.setState({connectioStatus: data});
+        });
+    
+        socket.on("chat-message", data =>{
+            const { name, message } = data;
+            //do something when message recieved
+        });
+    
+        socket.on("user-disconnected", data => {
+            //do something when user disconnects
+        });
+    
+        socket.on("user-connected", data => {
+            //do something when user connects
+        });
+        this.openSocket();
+    }
+
+    componentDidUpdate(){
+        this.openSocket();
+    }
+
+    openSocket = () => {
+        const { genInfo: { info: { dname, chatkitUser: { token } } } } = this.props;
+        const { socketOpen } = this.state;
+        if (token && !socketOpen) {
+            socket.open();
+            socket.emit("user-joined", dname);
+        }
     }
 
     displayFriends = key => {
@@ -74,7 +133,7 @@ class Messaging extends Component {
 
     render(){
         let { friendsInfo: { friends, fetchedFriends } } = this.props;
-        let { messaging } = this.state;
+        let { messaging, socketOpen } = this.state;
         return (
             <div className="container Home">
                 <Header />
@@ -100,7 +159,7 @@ class Messaging extends Component {
                         </div>
                         <div id='conversation-container'>
                             { !messaging ? 
-                            <span id='messaging-call-to-action'><FormattedMessage id='friends.startConvo' /></span> :
+                            <span id='messaging-call-to-action'><FormattedMessage id={socketOpen ? 'friends.startConvo' : 'chat.noConnection'} /></span> :
                             <div></div> }
                         </div>
                     </div>

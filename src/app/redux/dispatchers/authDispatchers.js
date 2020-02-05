@@ -273,7 +273,7 @@ export const eAuthenticate = (email, password)=>{
             const { user } = response;
             const { emailVerified } = user;
             let currUser = user;
-            if(emailVerified){
+            if (emailVerified) {
                 let uid = currUser.uid;
                 localStorage.setItem('currentUser', JSON.stringify(currUser));
                 getUserAvatar(uid).then(url=>{
@@ -413,21 +413,22 @@ export const handleSignup = (email, password)=>{
     }    
 }
 
-export const confirmToken = (tokeId) => {
+export const confirmToken = tokeId => {
     return dispatch => {
         const url = confirmTokenURL + tokeId;
         axios.post(url).then(result => {
             let { data } = result;
             let { error } = data;
-
-            if( error.code && code === "auth/argument-error"){
+            if( error && error.code === "auth/argument-error"){
                 dispatch(loginErrorAlert("error.sessionExpired"));
+                dispatch(logout());
             }else{
                 dispatch(loginConfirmed());
             }
         }).catch(error=>{
             console.log(error.message)
             dispatch(loginErrorAlert("error.loginFailure"));
+            dispatch(logout());
         });
     }
 }
@@ -446,7 +447,7 @@ export const fetchToken = (currUser, userInfo)=>{
     } 
 }
 
-export const checkLoginStatus = (confirmLoggedIn, loginInfo, genInfo)=>{
+export const checkLoginStatus = (confirmLoggedIn, loginInfo)=>{
     return dispatch => {
         let { loggedIn } = loginInfo;
         if(!loggedIn){
