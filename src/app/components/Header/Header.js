@@ -12,8 +12,15 @@ import {
 import { 
     logout, 
     loginConfirmed,
-    setupUserInFirebase
+    setupUserInFirebase,
+    connectToChatServer,
+    disconnectFromChatServer,
+    alertSocketError,
+    socketConnected,
+    socket,
+    confirmToken
 } from 'reduxFiles/dispatchers/authDispatchers';
+import io from 'socket.io-client';
 // import { setChatId } from '../../misc/functions';
 
 class Header extends Component {
@@ -40,7 +47,9 @@ class Header extends Component {
             genInfo, 
             updateGenInfo,
             confirmLoggedIn,
-            friendsInfo: { inComingRequests, fetchedFriends }
+            friendsInfo: { inComingRequests, fetchedFriends },
+            openSocket,
+            dispatchSocketConnected
         } = this.props;
         let { info: { avURL }, fetched } = genInfo;
         let { notificationClass } = this.state;
@@ -60,6 +69,43 @@ class Header extends Component {
             if (fetched) this.setUpFriendsInfo();
         }
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
+
+        socket.on('connect', () => {
+            const { genInfo: { info: { chatkitUser: { token } } } } = this.props;
+            socket.emit('authentication', {
+                token
+            });
+            dispatchSocketConnected();
+        });
+        
+        socket.on('unauthorized', reason => {
+            const { dispatchSocketError } = this.props;
+            console.log('Unauthorized:', reason);
+            dispatchSocketError(reason);
+        });
+        
+        socket.on('disconnect', reason => {
+            let { dispatchSocketError } = this.props;
+            dispatchSocketError(reason);
+        });
+        
+        socket.on("join-alert", data => {
+            //this.setState({connectioStatus: data});
+        });
+    
+        socket.on("chat-message", data =>{
+            const { name, message } = data;
+            //do something when message recieved
+        });
+    
+        socket.on("user-disconnected", data => {
+            //do something when user disconnects
+        });
+    
+        socket.on("user-connected", data => {
+            //do something when user connects
+        });
+        openSocket(this.props);
     }
 
     setUpFriendsInfo = () =>  {
@@ -85,9 +131,10 @@ class Header extends Component {
 
     componentDidUpdate(){
         const {
-            loginInfo: { loggedIn },
+            loginInfo: { loggedIn, socketOpen, unAuthorizedConnection },
             genInfo: { fetched },
-            friendsInfo: { fetchedFriends, inComingRequests }
+            friendsInfo: { fetchedFriends, inComingRequests },
+            openSocket
         } =this.props;
         const { notificationClass } = this.state;
         if (!loggedIn) this.goTo("/");
@@ -95,6 +142,7 @@ class Header extends Component {
         // show nofication icon if there are incoming requests
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
         else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
+        if (!socketOpen && !unAuthorizedConnection) openSocket(this.props);
     }
 
     showMenu = ()=>{
@@ -192,7 +240,22 @@ const mapDispatchToProps = dispatch => {
         getUsers: ()=>{
             dispatch(fetchUsers());
         },
-        getFriends: info=>{
+        openSocket: props => {
+            dispatch(connectToChatServer(props));
+        },
+        closeSocket: () => {
+            dispatch(disconnectFromChatServer());
+        },
+        confirmUserToken: userToken => {
+            dispatch(confirmToken(userToken));
+        },
+        dispatchSocketConnected: () => {
+            dispatch(socketConnected());
+        },
+        dispatchSocketError: error => {
+            dispatch(alertSocketError(error))
+        },
+        getFriends: info => {
             dispatch(fetchFriends(info));
         },
         getFriendsRequests: info => {

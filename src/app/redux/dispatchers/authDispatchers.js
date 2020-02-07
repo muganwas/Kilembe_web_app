@@ -25,8 +25,17 @@ import {
     PASSWORDS_MATCH,
     PASSWORDS_MATCH_ERROR,
     CLEAR_ERRORS,
-    USER_SAVED_IN_DATABASE
+    USER_SAVED_IN_DATABASE,
+    SOCKET_CONNECTED,
+    SOCKET_DISCONNECTED,
+    SOCKET_ERROR,
+    UNAUTHORIZED_AUTHENTICATION
 } from '../types';
+
+import io from 'socket.io-client';
+// import { setChatId } from '../../misc/functions';
+const chatServerUrl = process.env.CHAT_SERVER;
+export const socket = io(chatServerUrl, { autoConnect: false });
 
 const confirmTokenURL = process.env.CONFIRM_FIREBASE_TOKEN;
 let base = Rebase.createClass(app.database());
@@ -168,6 +177,31 @@ export const resetMessageAlert = messageId => {
     return {
         type: RESET_MESSAGE_ALERT,
         payload: messageId
+    }
+}
+
+export const socketConnected = () => {
+    return {
+        type: SOCKET_CONNECTED
+    }
+}
+
+export const socketDisconnected = () => {
+    return {
+        type: SOCKET_DISCONNECTED
+    }
+}
+
+export const socketError = error => {
+    return {
+        type: SOCKET_ERROR,
+        payload: error
+    }
+}
+
+export const unAuthorizedAuthentication = () => {
+    return {
+        type: UNAUTHORIZED_AUTHENTICATION
     }
 }
 
@@ -468,5 +502,34 @@ export const logout = () =>{
             dispatch(logoutConfirmed());
             console.log("user signed out!");
         });
+    }
+}
+
+export const connectToChatServer = props => {
+    return dispatch => {
+        const { genInfo: { info: { dname, chatkitUser: { token } } }, loginInfo: { socketOpen } } = props;
+        //console.log(token)
+        // console.log(socketOpen)
+        if (token && !socketOpen) {
+            console.log('...opening socket')
+            socket.open();
+            socket.emit("user-joined", dname);
+            dispatch(socketConnected());
+        }
+    }
+}
+
+export const disconnectFromChatServer = () => {
+    return dispatch => {
+        socket.disconnect();
+        dispatch(socketDisconnected());
+    }
+}
+
+export const alertSocketError = error => {
+    return dispatch => {
+        //socket.disconnect();
+        if (error.message && error.message === 'UNAUTHORIZED') dispatch(unAuthorizedAuthentication());
+        dispatch(socketError(error));
     }
 }

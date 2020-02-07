@@ -7,7 +7,11 @@ import {
   LOGIN_ERROR_ALERT,
   LOGIN_CONFIRMED,
   LOGOUT_CONFIRMED,
-  CLEAR_ERRORS
+  CLEAR_ERRORS,
+  SOCKET_CONNECTED,
+  SOCKET_DISCONNECTED,
+  SOCKET_ERROR,
+  UNAUTHORIZED_AUTHENTICATION
 } from "../types";
 
 const defaultState = {
@@ -18,7 +22,13 @@ const defaultState = {
   loggedIn: false,
   fetching: false,
   fetched: false,
-  error: false
+  error: false,
+  conncetionStatus: '',
+  chatMessage: null,
+  socketError: null,
+  loginValid: false,
+  socketOpen: false,
+  unAuthorizedConnection: false
 }
   const loginReducer = (state = defaultState, action)=>{
       switch(action.type){
@@ -78,6 +88,40 @@ const defaultState = {
               ...state,
               error: false,
               messageId: null
+            }
+          }
+
+          case SOCKET_CONNECTED: {
+            return {
+              ...state,
+              conncetionStatus: 'connected',
+              socketOpen: true,
+              socketError: null
+            }
+          }
+
+          case SOCKET_DISCONNECTED: {
+            return {
+              ...state,
+              conncetionStatus: 'disconnected',
+              socketOpen: false,
+              socketError: null
+            }
+          }
+
+          case SOCKET_ERROR: { 
+            return {
+              ...state,
+              conncetionStatus: 'disconnected',
+              socketOpen: false,
+              socketError: action.payload
+            }
+          }
+
+          case UNAUTHORIZED_AUTHENTICATION: {
+            return {
+              ...state,
+              unAuthorizedConnection: true
             }
           }
           

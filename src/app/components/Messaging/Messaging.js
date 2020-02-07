@@ -6,7 +6,6 @@ import { ScaleLoader } from 'react-spinners';
 import { css } from '@emotion/core';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { 
-    confirmToken, 
     loginConfirmed, 
     logout, 
     checkLoginStatus 
@@ -20,10 +19,6 @@ import {
     Footer 
 } from 'components';
 import './localStyles/main.css';
-import io from 'socket.io-client';
-
-const chatServerUrl = process.env.CHAT_SERVER;
-const socket = io(chatServerUrl, { autoConnect: false });
 
 const override = css`
     display: block;
@@ -33,12 +28,7 @@ const override = css`
 
 class Messaging extends Component {
     state = {
-        messaging: false,
-        conncetionStatus: '',
-        chatMessage: null,
-        socketError: null,
-        loginValid: false,
-        socketOpen: false
+        messaging: false
     }
     componentDidMount(){
         const { 
@@ -48,59 +38,6 @@ class Messaging extends Component {
             logingStatusConfirmation,
         } = this.props;
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
-
-        socket.on('connect', () => {
-            const { genInfo: { info: { chatkitUser: { token } } } } = this.props;
-            socket.emit('authentication', {
-                token
-            });
-            console.log('Connected');
-            this.setState({connectionStatus: 'Connected', socketOpen: true});
-        });
-        
-        socket.on('unauthorized', reason => {
-            const { genInfo: { info: { chatkitUser: { token } } }, confirmUserToken } = this.props;
-            console.log('Unauthorized:', reason);
-            this.setState({socketError: reason.message, socketOpen: false});
-            socket.disconnect();
-            confirmUserToken(token);
-        });
-        
-        socket.on('disconnect', reason => {
-            let { socketError } = this.state;
-            console.log(`Disconnected: ${ socketError || reason}`);
-        });
-        
-        socket.on("join-alert", data => {
-            this.setState({connectioStatus: data});
-        });
-    
-        socket.on("chat-message", data =>{
-            const { name, message } = data;
-            //do something when message recieved
-        });
-    
-        socket.on("user-disconnected", data => {
-            //do something when user disconnects
-        });
-    
-        socket.on("user-connected", data => {
-            //do something when user connects
-        });
-        this.openSocket();
-    }
-
-    componentDidUpdate(){
-        this.openSocket();
-    }
-
-    openSocket = () => {
-        const { genInfo: { info: { dname, chatkitUser: { token } } } } = this.props;
-        const { socketOpen } = this.state;
-        if (token && !socketOpen) {
-            socket.open();
-            socket.emit("user-joined", dname);
-        }
     }
 
     displayFriends = key => {
@@ -132,8 +69,8 @@ class Messaging extends Component {
     }
 
     render(){
-        let { friendsInfo: { friends, fetchedFriends } } = this.props;
-        let { messaging, socketOpen } = this.state;
+        let { friendsInfo: { friends, fetchedFriends }, loginInfo: { socketError, socketOpen } } = this.props;
+        let { messaging } = this.state;
         return (
             <div className="container Home">
                 <Header />
@@ -175,7 +112,6 @@ Messaging.propTypes = {
     genInfo: PropTypes.object.isRequired,
     loginInfo: PropTypes.object.isRequired,
     friendsInfo: PropTypes.object.isRequired,
-    confirmUserToken: PropTypes.func.isRequired,
     updateGenInfo: PropTypes.func.isRequired,
     getUsers: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired,
@@ -197,9 +133,6 @@ const mapDispatchToProps = dispatch => {
         },
         getFriends: info=>{
             dispatch(fetchFriends(info));
-        },
-        confirmUserToken: userToken => {
-            dispatch(confirmToken(userToken));
         },
         logingStatusConfirmation: (confirmLoggedIn, loginInfo, genInfo) => {
             dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, genInfo));
