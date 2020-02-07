@@ -35,7 +35,7 @@ import {
 import io from 'socket.io-client';
 // import { setChatId } from '../../misc/functions';
 const chatServerUrl = process.env.CHAT_SERVER;
-export const socket = io(chatServerUrl, { autoConnect: false });
+export const socket = io(chatServerUrl, { autoConnect: false, transports: ['websocket'] });
 
 const confirmTokenURL = process.env.CONFIRM_FIREBASE_TOKEN;
 let base = Rebase.createClass(app.database());
@@ -496,7 +496,7 @@ export const checkLoginStatus = (confirmLoggedIn, loginInfo)=>{
 
 export const logout = () =>{
     return dispatch => {
-        app.auth().signOut().then(()=>{
+        app.auth().signOut().then(() => {
             sessionStorage.removeItem('genInfo');
             localStorage.clear();
             dispatch(logoutConfirmed());
