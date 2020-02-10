@@ -24,7 +24,6 @@ const defaultState = {
   fetched: false,
   error: false,
   conncetionStatus: '',
-  chatMessage: null,
   socketError: null,
   loginValid: false,
   socketOpen: false,

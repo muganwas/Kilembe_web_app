@@ -9,6 +9,9 @@ import {
     fetchFriends,
     fetchFriendsRequests
 } from 'reduxFiles/dispatchers/userDispatchers';
+import {
+    fetchedUsersOnline
+} from 'reduxFiles/dispatchers/chatDispatchers';
 import { 
     logout, 
     loginConfirmed,
@@ -20,7 +23,6 @@ import {
     socket,
     confirmToken
 } from 'reduxFiles/dispatchers/authDispatchers';
-import io from 'socket.io-client';
 // import { setChatId } from '../../misc/functions';
 
 class Header extends Component {
@@ -37,7 +39,8 @@ class Header extends Component {
             settingsIconStyle: "small icon-settings",
             logoutIconStyle: "small icon-logout",
             notificationClass: "fas fa-circle alert hidden",
-            friendAction: false
+            friendAction: false,
+            onlineUsers: null
         }
     }
 
@@ -47,11 +50,11 @@ class Header extends Component {
             genInfo, 
             updateGenInfo,
             confirmLoggedIn,
+            loginInfo: { socketOpen, unAuthorizedConnection },
             friendsInfo: { inComingRequests, fetchedFriends },
-            openSocket,
             dispatchSocketConnected
         } = this.props;
-        let { info: { avURL }, fetched } = genInfo;
+        let { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
         let { notificationClass } = this.state;
         //dispatch local storage genInfo to props
         if (!loggedIn) {
@@ -71,11 +74,14 @@ class Header extends Component {
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
 
         socket.on('connect', () => {
-            const { genInfo: { info: { chatkitUser: { token } } } } = this.props;
-            socket.emit('authentication', {
-                token
-            });
-            dispatchSocketConnected();
+            const { genInfo: { info: { uid, chatkitUser: { token } } } } = this.props;
+            if ( token && uid ) {
+                socket.emit('authentication', {
+                    token,
+                    uid
+                });
+                dispatchSocketConnected();
+            }
         });
         
         socket.on('unauthorized', reason => {
@@ -85,12 +91,16 @@ class Header extends Component {
         });
         
         socket.on('disconnect', reason => {
-            let { dispatchSocketError } = this.props;
+            let { dispatchSocketError, genInfo: { info: { uid, chatkitUser: { token }  } } } = this.props;
+            if ( reason === 'io server disconnect' && token && uid ) {
+                console.log('useless server')
+            }
             dispatchSocketError(reason);
         });
         
         socket.on("join-alert", data => {
-            //this.setState({connectioStatus: data});
+            const { dispatchUsersOnline } = this.props;
+            dispatchUsersOnline(data);
         });
     
         socket.on("chat-message", data =>{
@@ -105,7 +115,7 @@ class Header extends Component {
         socket.on("user-connected", data => {
             //do something when user connects
         });
-        openSocket(this.props);
+        if (!socketOpen && !unAuthorizedConnection && token && uid) openSocket(this.props);
     }
 
     setUpFriendsInfo = () =>  {
@@ -132,7 +142,7 @@ class Header extends Component {
     componentDidUpdate(){
         const {
             loginInfo: { loggedIn, socketOpen, unAuthorizedConnection },
-            genInfo: { fetched },
+            genInfo: { fetched, info: { uid, chatkitUser: { token } } },
             friendsInfo: { fetchedFriends, inComingRequests },
             openSocket
         } =this.props;
@@ -142,7 +152,8 @@ class Header extends Component {
         // show nofication icon if there are incoming requests
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
         else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
-        if (!socketOpen && !unAuthorizedConnection) openSocket(this.props);
+        
+        if (!socketOpen && !unAuthorizedConnection && token && uid) openSocket(this.props);
     }
 
     showMenu = ()=>{
@@ -223,7 +234,8 @@ Header.propTypes = {
     loginInfo: PropTypes.object,
     confirmLoggedIn: PropTypes.func.isRequired,
     updateGenInfo: PropTypes.func.isRequired,
-    signOut: PropTypes.func.isRequired
+    signOut: PropTypes.func.isRequired,
+    dispatchUsersOnline: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => {
@@ -272,6 +284,9 @@ const mapDispatchToProps = dispatch => {
         },
         signOut: genInfo => {
             dispatch(logout(genInfo));
+        },
+        dispatchUsersOnline: users => {
+            dispatch(fetchedUsersOnline(users));
         }
     }
 }

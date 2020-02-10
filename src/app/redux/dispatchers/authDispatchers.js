@@ -31,7 +31,6 @@ import {
     SOCKET_ERROR,
     UNAUTHORIZED_AUTHENTICATION
 } from '../types';
-
 import io from 'socket.io-client';
 // import { setChatId } from '../../misc/functions';
 const chatServerUrl = process.env.CHAT_SERVER;
@@ -500,6 +499,7 @@ export const logout = () =>{
             sessionStorage.removeItem('genInfo');
             localStorage.clear();
             dispatch(logoutConfirmed());
+            socket.disconnect();
             console.log("user signed out!");
         });
     }

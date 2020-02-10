@@ -8,7 +8,8 @@ import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { 
     loginConfirmed, 
     logout, 
-    checkLoginStatus 
+    checkLoginStatus,
+    connectToChatServer
 } from 'reduxFiles/dispatchers/authDispatchers';
 import {
     fetchUsers,
@@ -36,12 +37,33 @@ class Messaging extends Component {
             genInfo, 
             loginInfo,
             logingStatusConfirmation,
+            openSocket
         } = this.props;
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
+        const { socketOpen, unAuthorizedConnection } = loginInfo;
+        if (!socketOpen && !unAuthorizedConnection) openSocket(this.props);
     }
 
+    componentDidUpdate(){
+        const { chatInfo: { onlineUsers }, friendsInfo: { friends, friendsFull } } = this.props
+        let newFriendsFull = {...friendsFull};
+        if ( onlineUsers && friends.length > 0 ) {
+            Object.keys(onlineUsers).map( userOnline => {
+                Object.keys(friendsFull).map( friend => {
+                    if (userOnline === friend) {
+                        newFriendsFull[friend].online = true;
+                    }
+                })
+            })
+            // console.log(newFriendsFull)
+        }
+    }
+
+
     displayFriends = key => {
-        let { friendsInfo: { users } } = this.props;
+        let { friendsInfo: { users, friendsFull } } = this.props;
+        let online = friendsFull[key].online;
+        let badgeClass = online ? 'fas fa-circle online' : 'fas fa-circle offline';
         if ( users.length > 0 ) {
             return <div key={key}> {
                 users.map( obj => {
@@ -53,8 +75,8 @@ class Messaging extends Component {
                                 <div className="left">
                                     <div className="roundPic membersAv-small">
                                         <img alt={ uid } className="members" src = { avatar } />
-                                        <span className='fas fa-circle alert'></span>
                                     </div>
+                                    <i className={badgeClass}></i>
                                     <div className="name">{ dname ? dname : email }</div>
                                     <div className="clear"></div>
                                 </div>
@@ -115,14 +137,16 @@ Messaging.propTypes = {
     updateGenInfo: PropTypes.func.isRequired,
     getUsers: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired,
-    getFriends: PropTypes.func.isRequired
+    getFriends: PropTypes.func.isRequired,
+    chatInfo: PropTypes.object.isRequired
 }
 
 const mapStateToProps = state => {
     return {
         genInfo: state.genInfo,
         loginInfo: state.loginInfo,
-        friendsInfo: state.friendsInfo
+        friendsInfo: state.friendsInfo,
+        chatInfo: state.chatInfo
     }
 }
 
@@ -136,6 +160,9 @@ const mapDispatchToProps = dispatch => {
         },
         logingStatusConfirmation: (confirmLoggedIn, loginInfo, genInfo) => {
             dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, genInfo));
+        },
+        openSocket: props => {
+            dispatch(connectToChatServer(props));
         },
         confirmLoggedIn: () => {
             dispatch(loginConfirmed());

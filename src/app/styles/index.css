@@ -14,6 +14,13 @@
   background-color: #dd4b39;
   color: #fff;
 }
+.notification {
+  height: 5px;
+  width: 5px;
+  position: absolute;
+  right: 0;
+  top: 0
+}
 /*app style*/
 body {
   margin: 0;
@@ -643,6 +650,20 @@ li{
 }
 .alert-main:hover::before{
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+}
+.online{
+  position: absolute;
+  margin: -5px 0 0 -6px;
+  color: #0ed43f;
+  font-size: 10px;
+  z-index: 10000;
+}
+.offline{
+  position: absolute;
+  margin: -5px 0 0 -6px;
+  color: #a5a5a5;
+  font-size: 10px;
+  z-index: 10000;
 }
 .respondB{
   position: absolute;

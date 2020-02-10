@@ -47,12 +47,9 @@ class Home extends Component {
     }
 
     componentDidUpdate(){
-        let { 
-            loginInfo: { loggedIn }
-        } = this.props;
+        let { loginInfo: { loggedIn } } = this.props;
         // const usersLength = Object.keys(users).length;
-        if(!loggedIn)
-            this.goTo("/");
+        if (!loggedIn) this.goTo("/");
     }
 
     updateInfo = () => {

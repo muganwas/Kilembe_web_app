@@ -14,7 +14,8 @@ import friendsReducer from 'reduxFiles/reducers/friendsReducer';
 import genInfoReducer from 'reduxFiles/reducers/genInfoReducer';
 import loginReducer from 'reduxFiles/reducers/loginReducer';
 import resetReducer from 'reduxFiles/reducers/resetReducer';
-import signupReducer from 'reduxFiles/reducers/signupReducer'
+import signupReducer from 'reduxFiles/reducers/signupReducer';
+import chatReducer from 'reduxFiles/reducers/chatReducer';
 
 Moment.globalMoment = moment;
 
@@ -48,7 +49,8 @@ const allReducers = combineReducers({
     intl: intlReducer,
     loginInfo: loginReducer,
     resetInfo: resetReducer,
-    signupInfo: signupReducer
+    signupInfo: signupReducer,
+    chatInfo: chatReducer
 });
 
 const store = createStore(
