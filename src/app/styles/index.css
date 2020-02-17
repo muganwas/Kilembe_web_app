@@ -47,9 +47,14 @@ li{
 }
 .main{
   display: block;
+  align-items: center;
   text-align: center;
 }
-.form{
+.main>div>div {
+  display: inline-block;
+}
+
+.form {
   margin: 0 50px;
 }
 .App{

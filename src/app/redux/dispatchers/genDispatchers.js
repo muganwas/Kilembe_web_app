@@ -23,10 +23,10 @@ export const dispatchChatkitTokenId = token => {
     }
 }
 
-export const fetchGenInfoFromSessionStorage = (confirmLoggedIn, loginInfo) => {
+export const fetchGenInfoFromlocalStorage = (confirmLoggedIn, loginInfo) => {
     return new Promise(resolve=> {
         let { loggedIn } = loginInfo;
-        let storedInfo = sessionStorage.getItem('genInfo');
+        let storedInfo = localStorage.getItem('genInfo');
         storedInfo = storedInfo?JSON.parse(storedInfo):null;
         //console.log(storedInfo)
         if(storedInfo){

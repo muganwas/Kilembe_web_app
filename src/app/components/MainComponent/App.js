@@ -1,59 +1,52 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-//import axios from 'axios';
-//redux
+import { ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { confirmToken } from 'reduxFiles/dispatchers/authDispatchers';
-
-import './styles/App.css';
+import '../../styles/App.css';
+import { REDIRECT_TIMER } from 'misc/constants';
 import { withRouter } from 'react-router-dom';
 
 
 class App extends Component {
 
   componentDidMount(){
-    let storedInfo = sessionStorage.getItem("genInfo");
+    let storedInfo = localStorage.getItem("genInfo");
     //if stored info is present pickout session token
-    let sessionToken = storedInfo?JSON.parse(storedInfo).chatkitUser.token:null;
-    let { checkSessionValidity, chatkitUser } = this.props;
+    let genInfo = JSON.parse(storedInfo);
+    let sessionToken = storedInfo ? genInfo.chatkitUser.token : null;
+    let { checkSessionValidity } = this.props;
 
-    let uid = localStorage.getItem("uid")==="null"?
-    null:
-    localStorage.getItem("uid");
+    let uid = localStorage.getItem("uid") === "null" ?
+      null : localStorage.getItem("uid");
 
-    let exists = localStorage.getItem("exists")==="null"?
-    null:
-    localStorage.getItem("exists")==="false"?
-    false:
-    localStorage.getItem("exists");
+    let exists = localStorage.getItem("exists") === "null" ?
+      null : localStorage.getItem("exists") === "false" ?
+        false : localStorage.getItem("exists");
     
     /**Determine page to redirect to */
-    if(uid !== null) {
-      //check if user session is still valid
-      checkSessionValidity(sessionToken);
-      this.goTo("/home");
-    }else if(uid === null && exists === null){
-      this.goTo("/login");
-    }else if(uid === null && exists === false ){
-      this.goTo("/signup");
-    }
 
-    let len = chatkitUser?Object.keys(chatkitUser).length:0;
-    if(len === 0){
-      /**Fetch chatkit info from local storage */
-      let genInfo = JSON.parse(sessionStorage.getItem('genInfo'));
-      this.props.sendGenInfo(genInfo);
-    }
+    if (uid) {
+      console.log(genInfo)
+      if (genInfo) this.props.sendGenInfo(genInfo);
+      //check if user session is still valid
+      if (sessionToken) checkSessionValidity(sessionToken);
+      //go home if not logged out
+      setTimeout(() => {
+        this.goTo("/home");
+      }, REDIRECT_TIMER);
+    }else if (uid === null && exists === null) this.goTo("/login")
+    else if (uid === null && exists === false ) this.goTo("/signup")
   }
 
-  goTo = (location) => {
+  goTo = location => {
     const { history } = this.props;
     history.push(location);
   } 
  
   render() {
-    return false;
+    return <ActivityIndicator />;
   }
 }
 

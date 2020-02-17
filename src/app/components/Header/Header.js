@@ -21,7 +21,6 @@ import {
     alertSocketError,
     socketConnected,
     socket,
-    confirmToken
 } from 'reduxFiles/dispatchers/authDispatchers';
 // import { setChatId } from '../../misc/functions';
 
@@ -52,13 +51,14 @@ class Header extends Component {
             confirmLoggedIn,
             loginInfo: { socketOpen, unAuthorizedConnection },
             friendsInfo: { inComingRequests, fetchedFriends },
-            dispatchSocketConnected
+            dispatchSocketConnected,
+            openSocket
         } = this.props;
         let { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
         let { notificationClass } = this.state;
         //dispatch local storage genInfo to props
         if (!loggedIn) {
-            let storedInfo = sessionStorage.getItem('genInfo');
+            let storedInfo = localStorage.getItem('genInfo');
             storedInfo = storedInfo?
             JSON.parse(storedInfo):
             null;

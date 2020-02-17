@@ -72,7 +72,9 @@ module.exports = {
 			components: path.resolve(__dirname, 'src/app/components'),
 			views: path.resolve(__dirname, 'src/app/views'),
 			actions: path.resolve(__dirname, 'src/app/actions'),
-			assets: path.resolve(__dirname, 'src/app/assets')
+			assets: path.resolve(__dirname, 'src/app/assets'),
+			sytles: path.resolve(__dirname, 'src/app/styles'),
+			'react-native$': 'react-native-web',
 		}
 	},
 	devServer: {

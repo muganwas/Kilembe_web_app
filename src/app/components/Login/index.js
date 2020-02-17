@@ -38,9 +38,7 @@ class Login extends Component {
       password
     } = this.state;
     //go home if logged in
-    if(loggedIn){
-      return <Redirect to={"/home"} />;
-    }
+    if (loggedIn) return <Redirect to={"/home"} />
 
     return(
       <div className="App">

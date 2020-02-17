@@ -25,7 +25,7 @@ class ProfileImage extends Component {
         let { info: { avURL, displayName, uid } } = genInfo;
         //console.log(dname)
         if(!avURL){
-            let storedInfo = sessionStorage.getItem('genInfo');
+            let storedInfo = localStorage.getItem('genInfo');
             storedInfo = storedInfo?JSON.parse(storedInfo):null;
             if( storedInfo ){
                 let { avURL, displayName  } = storedInfo;

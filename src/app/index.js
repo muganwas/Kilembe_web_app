@@ -1,28 +1,29 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { AppRegistry } from 'react-native';
 import store from './store';
 import { Provider } from 'react-intl-redux';
 import './styles/index.css';
 import './styles/styles.css';
 import './styles/animations.css';
-import App from './App';
 import { 
-    Signup,
-    Settings,
-    Reset,
-    NotFound,
-    Messaging,
-    Login,
-    Home,
+	App,
+	Signup,
+	Settings,
+	Reset,
+	NotFound,
+	Messaging,
+	Login,
+	Home,
 	Friends,
 	UserDetails
 } from 'components';
-import registerServiceWorker from './registerServiceWorker';
+//import registerServiceWorker from './registerServiceWorker';
 
 let mPoint = document.getElementById('root');
 
-let MainComponent = ()=>{
+let MainComponent = () => {
 	return(
 		<Provider store={store}>
 			<App/>
@@ -98,25 +99,31 @@ let NotFoundComponent = ()=>{
 }
 var Root = ()=>{
     return(
-        <BrowserRouter basename = "/" >
-			<Switch>
-				<Route exact path="/" component={ MainComponent } />
-				<Route exact path="/login" component={ LoginComponent } />
-				<Route exact path="/signup" component={ SignupComponent } />
-				<Route exact path="/reset" component={ ResetComponent } />
-				<Route exact path="/home" component={ HomeComponent } />
-				<Route exact path="/messaging" component={ MessagingComponent } />
-				<Route exact path="/settings" component={ SettingsComponent } />
-				<Route exact path="/friends" component={ FriendsComponent } />
-				<Route exact path="/friends/:id" component={ FriendDetailsComponent } />
-				<Route component={ NotFoundComponent } />
-			</Switch>
-        </BrowserRouter>
+			<BrowserRouter basename = "/" >
+				<Switch>
+					<Route exact path="/" component={ MainComponent } />
+					<Route exact path="/login" component={ LoginComponent } />
+					<Route exact path="/signup" component={ SignupComponent } />
+					<Route exact path="/reset" component={ ResetComponent } />
+					<Route exact path="/home" component={ HomeComponent } />
+					<Route exact path="/messaging" component={ MessagingComponent } />
+					<Route exact path="/settings" component={ SettingsComponent } />
+					<Route exact path="/friends" component={ FriendsComponent } />
+					<Route exact path="/friends/:id" component={ FriendDetailsComponent } />
+					<Route component={ NotFoundComponent } />
+				</Switch>
+			</BrowserRouter>
     )
 }
 
-render(
+/*render(
     <Root/>, mPoint
     );
 
-registerServiceWorker();
+registerServiceWorker();*/
+AppRegistry.registerComponent('App', () => Root);
+
+AppRegistry.runApplication('App', {
+  initialProps: {},
+  rootTag: mPoint
+});

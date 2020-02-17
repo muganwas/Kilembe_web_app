@@ -1,4 +1,5 @@
 export { default as UserDetails } from './UserDetails/UserDetails';
+export { default as App } from './MainComponent/App';
 export { default as Signup } from './Signup';
 export { default as Settings } from './Settings/Settings';
 export { default as Reset } from './Reset';

@@ -2,7 +2,7 @@ import axios from 'axios';
 import app from '../../base';
 import Rebase from 're-base';
 import { emailregex } from 'misc/constants';
-import { dispatchedGenInfo, dispatchChatkitTokenId, fetchGenInfoFromSessionStorage } from 'reduxFiles/dispatchers/genDispatchers';
+import { dispatchedGenInfo, dispatchChatkitTokenId, fetchGenInfoFromlocalStorage } from 'reduxFiles/dispatchers/genDispatchers';
 import { getUserAvatar } from 'misc/functions';
 import { 
     LOGIN_FULFILLED,
@@ -452,12 +452,13 @@ export const confirmToken = tokeId => {
         axios.post(url).then(result => {
             let { data } = result;
             let { error } = data;
-            if( error && error.code === "auth/argument-error"){
+            console.log(result)
+            if ( error && error.code === "auth/argument-error") {
                 dispatch(loginErrorAlert("error.sessionExpired"));
                 dispatch(logout());
-            }else{
-                dispatch(loginConfirmed());
             }
+            else dispatch(loginConfirmed());
+            
         }).catch(error=>{
             console.log(error.message)
             dispatch(loginErrorAlert("error.loginFailure"));
@@ -471,7 +472,7 @@ export const fetchToken = (currUser, userInfo)=>{
         currUser.getIdToken(true).then( idToken=>{
             let genInfo = { ...userInfo };
             genInfo.chatkitUser.token = idToken;
-            sessionStorage.setItem('genInfo', JSON.stringify(genInfo));
+            localStorage.setItem('genInfo', JSON.stringify(genInfo));
             dispatch(dispatchedGenInfo(genInfo));
             dispatch(dispatchChatkitTokenId(idToken));
         }).catch(error => {
@@ -484,7 +485,7 @@ export const checkLoginStatus = (confirmLoggedIn, loginInfo)=>{
     return dispatch => {
         let { loggedIn } = loginInfo;
         if(!loggedIn){
-            fetchGenInfoFromSessionStorage(confirmLoggedIn, loginInfo).then(res=>{
+            fetchGenInfoFromlocalStorage(confirmLoggedIn, loginInfo).then(res=>{
                 if(res === "not dispatched"){
                     dispatch(logout());
                 }  
@@ -496,7 +497,7 @@ export const checkLoginStatus = (confirmLoggedIn, loginInfo)=>{
 export const logout = () =>{
     return dispatch => {
         app.auth().signOut().then(() => {
-            sessionStorage.removeItem('genInfo');
+            localStorage.removeItem('genInfo');
             localStorage.clear();
             dispatch(logoutConfirmed());
             socket.disconnect();
