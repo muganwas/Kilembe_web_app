@@ -45,13 +45,13 @@ class Messaging extends Component {
     }
 
     displayFriends = key => {
-        let { friendsInfo: { users }, chatInfo: { onlineUsers } } = this.props;
+        let { friendsInfo: { users, friendsFull }, chatInfo: { onlineUsers } } = this.props;
         let online = onlineUsers[key] || false;
         let badgeClass = online ? 'fas fa-circle online' : 'fas fa-circle offline';
         if ( users.length > 0 ) {
             return <div key={key}> {
                 users.map( obj => {
-                    if (obj.uid === key) {
+                    if (obj.uid === key && friendsFull[key].accepted) {
                         let { uid, avatar, dname, email } = obj;
                         // console.log(dname + ' ' + email)
                         return (
