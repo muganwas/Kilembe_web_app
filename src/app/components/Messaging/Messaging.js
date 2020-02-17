@@ -44,25 +44,9 @@ class Messaging extends Component {
         if (!socketOpen && !unAuthorizedConnection) openSocket(this.props);
     }
 
-    componentDidUpdate(){
-        const { chatInfo: { onlineUsers }, friendsInfo: { friends, friendsFull } } = this.props
-        let newFriendsFull = {...friendsFull};
-        if ( onlineUsers && friends.length > 0 ) {
-            Object.keys(onlineUsers).map( userOnline => {
-                Object.keys(friendsFull).map( friend => {
-                    if (userOnline === friend) {
-                        newFriendsFull[friend].online = true;
-                    }
-                })
-            })
-            // console.log(newFriendsFull)
-        }
-    }
-
-
     displayFriends = key => {
-        let { friendsInfo: { users, friendsFull } } = this.props;
-        let online = friendsFull[key].online;
+        let { friendsInfo: { users }, chatInfo: { onlineUsers } } = this.props;
+        let online = onlineUsers[key] || false;
         let badgeClass = online ? 'fas fa-circle online' : 'fas fa-circle offline';
         if ( users.length > 0 ) {
             return <div key={key}> {
@@ -91,7 +75,7 @@ class Messaging extends Component {
     }
 
     render(){
-        let { friendsInfo: { friends, fetchedFriends }, loginInfo: { socketError, socketOpen } } = this.props;
+        let { friendsInfo: { friends, fetchedFriends }, loginInfo: { socketOpen } } = this.props;
         let { messaging } = this.state;
         return (
             <div className="container Home">

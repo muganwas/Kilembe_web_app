@@ -91,10 +91,11 @@ class Header extends Component {
         });
         
         socket.on('disconnect', reason => {
-            let { dispatchSocketError, genInfo: { info: { uid, chatkitUser: { token }  } } } = this.props;
+            let { dispatchSocketError, dispatchUsersOnline, genInfo: { info: { uid, chatkitUser: { token }  } } } = this.props;
             if ( reason === 'io server disconnect' && token && uid ) {
-                console.log('useless server')
+                console.log('useless server');
             }
+            dispatchUsersOnline({});
             dispatchSocketError(reason);
         });
         
@@ -109,7 +110,9 @@ class Header extends Component {
         });
     
         socket.on("user-disconnected", data => {
-            //do something when user disconnects
+            console.log('user disconnected');
+            const { dispatchUsersOnline } = this.props;
+            dispatchUsersOnline(data);
         });
     
         socket.on("user-connected", data => {
