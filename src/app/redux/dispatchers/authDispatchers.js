@@ -206,11 +206,10 @@ export const unAuthorizedAuthentication = () => {
 
 export const handleEmail = email => {
     return dispatch => {
-        if(email && email.match(emailregex)){
+        if (email && email.match(emailregex)) {
             dispatch(storeEmail(email));
-        }else if(!email){
-            dispatch(loginErrorAlert("error.noEmail"));
-        }else{
+        }
+        else if (email && !email.match(emailregex)){
             let messageId="error.emailFormat";
             dispatch(resetMessageAlert(messageId));
             dispatch(signupMessageAlert(messageId));
@@ -222,11 +221,10 @@ export const handleEmail = email => {
 export const handlePassword = pass => {
     return dispatch => {
         let passLen = pass.length;
-        if(pass && passLen >= 8){
+        if (pass && passLen >= 8) {
             dispatch(storePassword(pass));
-        }else if(!pass){
-            dispatch(loginErrorAlert("error.noPassword"));
-        }else{
+        }
+        else if (pass && passLen < 8) {
             let messageId = "error.passwordLength";
             dispatch(signupMessageAlert(messageId));
             dispatch(loginErrorAlert(messageId));
@@ -237,10 +235,15 @@ export const handlePassword = pass => {
 export const handleConfirmPassword = (pass, confirmPass) => {
     return dispatch => {
         let confirmPassLen  = confirmPass.length;
-        if( confirmPassLen >= 8 &&  pass === confirmPass ){
+        if ( confirmPass && confirmPassLen >= 8 && pass === confirmPass ) {
             dispatch(confirmPasswordMatch(pass));
-        }else{
+        }
+        else if (confirmPass && confirmPassLen >= 8 && pass !== confirmPass) {
             let messageId = "error.passwordMatchError";
+            dispatch(signupMessageAlert(messageId));
+        }
+        else if (confirmPass && confirmPassLen < 8) {
+            let messageId = "error.confirmPasswordShort";
             dispatch(signupMessageAlert(messageId));
         }
     }

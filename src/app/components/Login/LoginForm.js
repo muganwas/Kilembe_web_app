@@ -52,7 +52,7 @@ const LoginForm = props => {
     }
 
     return (
-        <form id="login-form" onSubmit={localSubmit} className="form">
+        <div id="login-form" className="form">
             <span>
                 <h3>{ loginPageTitle }</h3>
             </span>
@@ -63,7 +63,7 @@ const LoginForm = props => {
                 </span>: 
                 null 
             }
-            <div>
+            <form onSubmit={localSubmit}>
                 <span>
                     <input 
                         id="email" 
@@ -103,7 +103,7 @@ const LoginForm = props => {
                         }
                     </button>
                 </span>
-            </div>
+            </form>
             <Link className="link span" to = { "/signup" }>{ signupLabel }</Link> 
             <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
             <span>
@@ -124,7 +124,7 @@ const LoginForm = props => {
                 { googleLoginLabel }
                 </button>
             </span>
-        </form>
+        </div>
     )
 }
 

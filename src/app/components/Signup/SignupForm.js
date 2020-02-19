@@ -28,6 +28,11 @@ const SignupForm = ({
     signupInfo
 }) => {
 
+    const localSubmit = e => {
+        e.preventDefault();
+        if (!error) onSignup(email, password); 
+    }
+
     const { fetching } = signupInfo;
 
     const intl = useIntl();
@@ -43,56 +48,55 @@ const SignupForm = ({
         { error?
             <span className={ 'feedBack' }><FormattedMessage id={ messageId } /></span>:
         null }
-            <span>
-                <input 
-                    id="email" 
-                    placeholder="Email address" 
-                    type="text"
-                    value={email}
-                    onChange = { tempValStore }
-                    onBlur = { ()=>dispatchEmail(email) }
-                />
-            </span>
-            <span>
-                <input 
-                    id="password" 
-                    placeholder="Password" 
-                    type="password"
-                    value={password}
-                    onChange = { tempValStore }
-                    onBlur = { ()=>dispatchPassword(password) }
-                />
-            </span>
-            <span>
-                <input 
-                    id="passwordConfirm" 
-                    placeholder="Confirm Password" 
-                    type="password" 
-                    value={passwordConfirm}
-                    onChange = { tempValStore }
-                    onBlur ={ ()=>confirmPasswordMatch(password, passwordConfirm) }
-                />
-            </span>
-            <span>
-                <button onClick={ ()=>{
-                    if(!error)
-                        onSignup(email, password);
-                    } }>
-                    { 
-                        fetching?
-                        <ScaleLoader
-                            css={override}
-                            sizeUnit={"px"}
-                            height={10}
-                            width={3}
-                            radius={3}
-                            color={'#757575'}
-                            loading={fetching} 
-                        />:
-                        signupLabel 
-                    }
-                </button>
-            </span>
+            <form onSubmit={localSubmit}>
+                <span>
+                    <input 
+                        id="email" 
+                        placeholder="Email address" 
+                        type="text"
+                        value={email}
+                        onChange = { tempValStore }
+                        onBlur = { () => dispatchEmail(email) }
+                    />
+                </span>
+                <span>
+                    <input 
+                        id="password" 
+                        placeholder="Password" 
+                        type="password"
+                        value={password}
+                        onChange = { tempValStore }
+                        onBlur = { () => dispatchPassword(password) }
+                    />
+                </span>
+                <span>
+                    <input 
+                        id="passwordConfirm" 
+                        placeholder="Confirm Password" 
+                        type="password" 
+                        value={passwordConfirm}
+                        onChange = { tempValStore }
+                        onBlur ={ () => confirmPasswordMatch(password, passwordConfirm) }
+                    />
+                </span>
+                <span>
+                    <button onClick={localSubmit}>
+                        { 
+                            fetching?
+                            <ScaleLoader
+                                css={override}
+                                sizeUnit={"px"}
+                                height={10}
+                                width={3}
+                                radius={3}
+                                color={'#757575'}
+                                loading={fetching} 
+                            /> :
+                            signupLabel 
+                        }
+                    </button>
+                </span>
+            </form>
             <Link className="link span" to = { "/login" }>{ loginLabel }</Link> 
             <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
         </div>

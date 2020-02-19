@@ -75,11 +75,11 @@ const mapDispatchToProps = dispatch => {
     clearAllErrors: () => {
       dispatch(clearErrors());
     },
-    dispatchEmail: event => {
-      dispatch(handleEmail(event));
+    dispatchEmail: email => {
+      dispatch(handleEmail(email));
     },
-    dispatchPassword: event => {
-      dispatch(handlePassword(event));
+    dispatchPassword: password => {
+      dispatch(handlePassword(password));
     },
     onSubmit: loginProps => {
       dispatch(handleLogin(loginProps));
@@ -87,7 +87,7 @@ const mapDispatchToProps = dispatch => {
     thirdPartyAuthentication: (auth, authHandler) => {
       dispatch(authenticate(auth, authHandler));
     },
-    thirdPartyAuthHandler: (authData) => {
+    thirdPartyAuthHandler: authData => {
       dispatch(authHandler(authData));
     }
   }
