@@ -324,12 +324,13 @@ export const eAuthenticate = (email, password)=>{
                     let len = states.length;
                     dispatch(dispatchedGenInfo(userInfo));
                     dispatch(fetchToken(currUser, userInfo));
-                    for(var count=0;count<len; count++){
+                    for (var count=0;count<len; count++) {
                         localStorage.setItem(statesS[count], states[count]);
                     }
                     dispatch(loginFulfilled(userInfo));
                 });
-            }else{
+            }
+            else {
                 dispatch(loginFailed("error.userEmailNotVerified"));
                 user.sendEmailVerification().then(()=>{
                     console.log("verfication email sent");
@@ -354,7 +355,7 @@ export const eSignup = (email, password)=>{
         app.auth().createUserWithEmailAndPassword(email, password).then( response=>{
             const { additionalUserInfo: { isNewUser }, user } = response;
             const { emailVerified } = user;
-            if(isNewUser){
+            if (isNewUser) {
                 dispatch(signupFullfilled(response));
                 dispatch(signupMessageAlert("message.successfulSignup"));
                 !emailVerified? user.sendEmailVerification().then( () => {
@@ -364,7 +365,7 @@ export const eSignup = (email, password)=>{
             }
             console.log(emailVerified);
             //after signup
-        }).catch((error)=>{
+        }).catch(error => {
             //console.log(error);
             let errorMessage;
             let errorCode = error.code;
@@ -452,10 +453,9 @@ export const handleSignup = (email, password)=>{
 export const confirmToken = tokeId => {
     return dispatch => {
         const url = confirmTokenURL + tokeId;
-        axios.post(url).then(result => {
+        if (tokeId) axios.post(url).then(result => {
             let { data } = result;
             let { error } = data;
-            console.log(result)
             if ( error && error.code === "auth/argument-error") {
                 dispatch(loginErrorAlert("error.sessionExpired"));
                 dispatch(logout());
@@ -484,16 +484,28 @@ export const fetchToken = (currUser, userInfo)=>{
     } 
 }
 
-export const checkLoginStatus = (confirmLoggedIn, loginInfo)=>{
+export const checkLoginStatus = (confirmLoggedIn, loginInfo, info)=>{
     return dispatch => {
-        let { loggedIn } = loginInfo;
-        if(!loggedIn){
-            fetchGenInfoFromlocalStorage(confirmLoggedIn, loginInfo).then(res=>{
-                if(res === "not dispatched"){
-                    dispatch(logout());
-                }  
-            });
-        } 
+        const { loggedIn } = loginInfo;
+        const genInfo = JSON.parse(localStorage.getItem('genInfo'));
+        if (!loggedIn) {
+            if (!info) {
+                alert('no info')
+                fetchGenInfoFromlocalStorage(confirmLoggedIn, loginInfo).then(res=>{
+                    if (res === "not dispatched") {
+                        dispatch(logout());
+                    }
+                    else {
+                        const { chatkitUser: { token } } = genInfo;
+                        dispatch(confirmToken(token));
+                    }
+                });
+            }
+            else {
+                const { info: { chatkitUser: { token } } } = info;
+                dispatch(confirmToken(token));
+            }
+        }
     }
 }
 
@@ -515,7 +527,7 @@ export const connectToChatServer = props => {
         //console.log(token)
         // console.log(socketOpen)
         if (token && !socketOpen) {
-            console.log('...opening socket')
+            console.log('opening socket...')
             socket.open();
             socket.emit("user-joined", dname);
             dispatch(socketConnected());
@@ -534,6 +546,9 @@ export const alertSocketError = error => {
     return dispatch => {
         //socket.disconnect();
         if (error.message && error.message === 'UNAUTHORIZED') dispatch(unAuthorizedAuthentication());
+        if (error.code === 'auth/id-token-expired') {
+            dispatch(logout());
+        }
         dispatch(socketError(error));
     }
 }

@@ -1,15 +1,17 @@
 import {
-  FETCH_ONLINE_USERS_PENDING,
   FETCH_ONLINE_USERS_FULFILLED,
-  FETCH_ONLINE_USERS_ERROR,
-  FETCH_MESSAGES_PENDING,
-  FETCH_MESSAGES_FULFILLED,
-  FETCH_MESSAGES_ERROR
+  SET_USER_TO_CHAT
 } from '../types';
 
 export const fetchedUsersOnline = users => {
   return {
     type: FETCH_ONLINE_USERS_FULFILLED,
     payload: users
+  }
+}
+export const setUserToChat = userId => {
+  return {
+    type: SET_USER_TO_CHAT,
+    payload: userId
   }
 }

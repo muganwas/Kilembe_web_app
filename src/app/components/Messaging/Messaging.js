@@ -15,11 +15,13 @@ import {
     fetchUsers,
     fetchFriends
 } from 'reduxFiles/dispatchers/userDispatchers';
+import { setUserToChat } from 'reduxFiles/dispatchers/chatDispatchers';
 import { 
     Header,
     Footer 
 } from 'components';
 import './localStyles/main.css';
+import ChatComponent from './ChatComponent';
 
 const override = css`
     display: block;
@@ -33,20 +35,28 @@ class Messaging extends Component {
     }
     componentDidMount(){
         const { 
-            confirmLoggedIn, 
-            genInfo, 
+            confirmLoggedIn,
             loginInfo,
             logingStatusConfirmation,
-            openSocket
+            openSocket,
+            genInfo
         } = this.props;
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
         const { socketOpen, unAuthorizedConnection } = loginInfo;
         if (!socketOpen && !unAuthorizedConnection) openSocket(this.props);
     }
 
+    displayChatComponent = e => {
+        e.stopPropagation();
+        const { selectUserToChat } = this.props;
+        const { id } = e.target;
+        selectUserToChat(id);
+        this.setState({messaging:true});
+    }
+
     displayFriends = key => {
         let { friendsInfo: { users, friendsFull }, chatInfo: { onlineUsers } } = this.props;
-        let online = onlineUsers[key] || false;
+        let online = onlineUsers && onlineUsers[key] ? true : false;
         let badgeClass = online ? 'fas fa-circle online' : 'fas fa-circle offline';
         if ( users.length > 0 ) {
             return <div key={key}> {
@@ -55,13 +65,13 @@ class Messaging extends Component {
                         let { uid, avatar, dname, email } = obj;
                         // console.log(dname + ' ' + email)
                         return (
-                            <div key={key} className="friend">
-                                <div className="left">
-                                    <div className="roundPic membersAv-small">
-                                        <img alt={ uid } className="members" src = { avatar } />
+                            <div key={key} id={key} onClick={this.displayChatComponent} className="friend">
+                                <div id={key} className="left">
+                                    <div id={key} className="roundPic membersAv-small">
+                                        <img id={key} alt={ uid } className="members" src = { avatar } />
                                     </div>
                                     <i className={badgeClass}></i>
-                                    <div className="name">{ dname ? dname : email }</div>
+                                    <div id={key} className="name">{ dname ? dname : email }</div>
                                     <div className="clear"></div>
                                 </div>
                             </div>
@@ -86,7 +96,7 @@ class Messaging extends Component {
                             <h3><FormattedMessage  id='friends.listTitle' /></h3>
                             { fetchedFriends ? 
                             friends && friends.length > 0 ? 
-                            friends.map(val => this.displayFriends(val)) : 
+                            friends.map(this.displayFriends) : 
                             <div className='messages'>
                                 <FormattedMessage id='message.noFriendsYet' />
                             </div> :
@@ -103,7 +113,7 @@ class Messaging extends Component {
                         <div id='conversation-container'>
                             { !messaging ? 
                             <span id='messaging-call-to-action'><FormattedMessage id={socketOpen ? 'friends.startConvo' : 'chat.noConnection'} /></span> :
-                            <div></div> }
+                            <ChatComponent /> }
                         </div>
                     </div>
                 </div>
@@ -136,20 +146,23 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        getUsers: ()=>{
+        getUsers: () => {
             dispatch(fetchUsers());
         },
-        getFriends: info=>{
+        getFriends: info => {
             dispatch(fetchFriends(info));
         },
-        logingStatusConfirmation: (confirmLoggedIn, loginInfo, genInfo) => {
-            dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, genInfo));
+        logingStatusConfirmation: (confirmLoggedIn, loginInfo, info) => {
+            dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, info));
         },
         openSocket: props => {
             dispatch(connectToChatServer(props));
         },
         confirmLoggedIn: () => {
             dispatch(loginConfirmed());
+        },
+        selectUserToChat: userId => {
+            dispatch(setUserToChat(userId))
         },
         signOut: genInfo => {
             dispatch(logout(genInfo));

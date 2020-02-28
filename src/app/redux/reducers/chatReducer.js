@@ -5,10 +5,12 @@ import {
   FETCH_MESSAGES_PENDING,
   FETCH_MESSAGES_FULFILLED,
   FETCH_MESSAGES_ERROR,
+  SET_USER_TO_CHAT
 } from "../types";
 
 const defaultState = {
   onlineUsers: null,
+  selectedUser: null,
   messages: null,
   fetching: false,
   fetched: false,
@@ -65,6 +67,12 @@ const chatReducer = (state = defaultState, action) => {
         error: false,
         messages: action.payload
       };
+    }
+    case SET_USER_TO_CHAT: {
+      return {
+        ...state,
+        selectedUser: action.payload
+      }
     }
     default:
       return state;

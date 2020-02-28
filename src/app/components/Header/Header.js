@@ -21,6 +21,7 @@ import {
     alertSocketError,
     socketConnected,
     socket,
+    confirmToken
 } from 'reduxFiles/dispatchers/authDispatchers';
 // import { setChatId } from '../../misc/functions';
 
@@ -81,6 +82,17 @@ class Header extends Component {
                     uid
                 });
                 dispatchSocketConnected();
+            }
+            else {
+                const storedGen = JSON.parse(localStorage.getItem('genInfo'));
+                const { uid, chatkitUser: { token } } = storedGen;
+                if ( token && uid ) {
+                    socket.emit('authentication', {
+                        token,
+                        uid
+                    });
+                    dispatchSocketConnected();
+                }
             }
         });
         
