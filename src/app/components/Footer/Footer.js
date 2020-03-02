@@ -1,14 +1,17 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Link } from 'react-router-dom';
 import { Donate } from 'components';
-import { devProfileURL } from 'misc/constants';
+import { withRouter, Link } from 'react-router-dom';
+//import { devProfileURL } from 'misc/constants';
 
-const Footer = () => {
+const Footer = ({history}) => {
+    const goTo = location => {
+        history.push(location);
+    } 
     return (
         <div className="swagg">
             <FormattedMessage id={"site.copyrightText"} />
-            <Link id="devLink" to={ devProfileURL }>
+            <Link id="devLink" onClick={() => goTo(`/redirect/dev`)}>
                 <span id="devName">
                     <FormattedMessage id={"dev.name"}/>
                 </span>
@@ -18,4 +21,4 @@ const Footer = () => {
     )
 }
 
-export default Footer;
+export default withRouter(Footer);

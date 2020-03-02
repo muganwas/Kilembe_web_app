@@ -2,7 +2,11 @@ import axios from 'axios';
 import app from '../../base';
 import Rebase from 're-base';
 import { emailregex } from 'misc/constants';
-import { dispatchedGenInfo, dispatchChatkitTokenId, fetchGenInfoFromlocalStorage } from 'reduxFiles/dispatchers/genDispatchers';
+import { 
+    dispatchedGenInfo, 
+    dispatchChatkitTokenId, 
+    fetchGenInfoFromlocalStorage 
+} from 'reduxFiles/dispatchers/genDispatchers';
 import { getUserAvatar } from 'misc/functions';
 import { 
     LOGIN_FULFILLED,
@@ -267,7 +271,7 @@ export const authHandler = authData => {
         const uid= authData.user.uid;
         //console.log(currentUser)
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        getUserAvatar(uid).then(url=>{
+        getUserAvatar(uid).then(url => {
             const displayName= authData.user.displayName;
             const email= authData.user.email;
             const avURL = url || authData.user.photoURL;
@@ -277,7 +281,7 @@ export const authHandler = authData => {
             const len = states.length;
             dispatch(dispatchedGenInfo(userLoginInfo));
             dispatch(fetchToken(currentUser, userLoginInfo));
-            for(var count=0;count<len; count++){
+            for(var count = 0; count < len; count++){
                 localStorage.setItem(statesS[count], states[count]);
             }
             dispatch(loginFulfilled(userLoginInfo));
@@ -302,9 +306,9 @@ export const authenticate = (provider, callback) => {
     }
 }
 
-export const eAuthenticate = (email, password)=>{
+export const eAuthenticate = (email, password) => {
     return dispatch => {
-        app.auth().signInWithEmailAndPassword(email, password).then(response=>{
+        app.auth().signInWithEmailAndPassword(email, password).then(response => {
             //console.log(response)
             const { user } = response;
             const { emailVerified } = user;
@@ -312,7 +316,7 @@ export const eAuthenticate = (email, password)=>{
             if (emailVerified) {
                 let uid = currUser.uid;
                 localStorage.setItem('currentUser', JSON.stringify(currUser));
-                getUserAvatar(uid).then(url=>{
+                getUserAvatar(uid).then(url => {
                     console.log(url);
                     let email = currUser.email;
                     let splitEmailAdd = email.split('@');
@@ -324,7 +328,7 @@ export const eAuthenticate = (email, password)=>{
                     let len = states.length;
                     dispatch(dispatchedGenInfo(userInfo));
                     dispatch(fetchToken(currUser, userInfo));
-                    for (var count=0;count<len; count++) {
+                    for (var count = 0; count < len; count++) {
                         localStorage.setItem(statesS[count], states[count]);
                     }
                     dispatch(loginFulfilled(userInfo));
@@ -336,7 +340,7 @@ export const eAuthenticate = (email, password)=>{
                     console.log("verfication email sent");
                 });
             }
-        }).catch((error)=>{
+        }).catch(error => {
             let errorCode = error.code;
             let errorMessage;
             if( errorCode === "auth/wrong-password" )
@@ -352,7 +356,7 @@ export const eAuthenticate = (email, password)=>{
 
 export const eSignup = (email, password)=>{
     return dispatch => {
-        app.auth().createUserWithEmailAndPassword(email, password).then( response=>{
+        app.auth().createUserWithEmailAndPassword(email, password).then( response => {
             const { additionalUserInfo: { isNewUser }, user } = response;
             const { emailVerified } = user;
             if (isNewUser) {
@@ -390,7 +394,7 @@ export const handlePasswordReset = email => {
 
 export const eReset = email => {
     return dispatch => {
-        app.auth().sendPasswordResetEmail(email).then(()=>{
+        app.auth().sendPasswordResetEmail(email).then(() => {
             const messageId = "message.sentResetEmail";
             dispatch(resetFullfilled(messageId));
         }).catch( error => {
@@ -439,7 +443,7 @@ export const setupUserInFirebase = (avatar, uid) => {
     }
 }
 
-export const handleSignup = (email, password)=>{
+export const handleSignup = (email, password) => {
     return dispatch => {
         if(email && password){
             dispatch(signupPending());
@@ -456,14 +460,15 @@ export const confirmToken = tokenId => {
         if (tokenId) axios.post(url).then(result => {
                 let { data } = result;
                 let { error } = data;
-                console.log(error.code)
-                if ( error && error.code === "auth/argument-error") {
-                    dispatch(loginErrorAlert("error.sessionExpired"));
-                    dispatch(logout());
+                if (error) {
+                    if (error.code === "auth/argument-error") {
+                        dispatch(loginErrorAlert("error.sessionExpired"));
+                        dispatch(logout());
+                    }
                 }
                 else dispatch(loginConfirmed());
                 
-            }).catch(error=>{
+            }).catch(error => {
                 console.log(error.message)
                 dispatch(loginErrorAlert("error.loginFailure"));
                 dispatch(logout());

@@ -11,7 +11,7 @@ import {
   // dispatchRecievedMessage,
   dispatchSentMessage
 } from 'reduxFiles/dispatchers/chatDispatchers';
-import { TextInput, TouchableOpacity, Text, View, ScrollView } from 'react-native';
+import { TextInput, TouchableOpacity, Text, View, ScrollView, Image } from 'react-native';
 import styles from './localStyles/mainStyles';
 
 class ChatComponent extends React.Component { 
@@ -43,44 +43,57 @@ class ChatComponent extends React.Component {
     const enabledSend = (this.state.message).length; 
     
     const displayMessages = () => {
-      return <View style={styles.messagesSubContainer}>
-        { 
-          Object.keys(messages).map(key => {
-            const usersMessages = messages[key]
-            if (String(key) === String(selectedUser)) {
-              return <View key={key} style={ styles.messagesSubContainer }>
-                {
-                  Object.keys(usersMessages).map(key => {
-                    const sender = usersMessages[key].sender;
-                    const message = usersMessages[key].message;
-                    if ( sender === selectedUser) {
-                      return <View key={key} style={styles.recievedContainer}>
-                        <Text style={styles.recievedMsg}>{ message }</Text>
-                      </View>
-                    }
-                    else if (String(sender) === String(uid)) {
-                      return <View key={key} style={styles.sentContainer}>
-                        <Text style={styles.sentMsg}>{ message }</Text>
-                      </View>
-                    }
-                    else return;
-                  })
-                }
-              </View>
-            }
-          })
-        }
-      </View>
+      return (
+        <View style={styles.messagesSubContainer}>
+          { 
+            Object.keys(messages).map(key => {
+              const usersMessages = messages[key]
+              if (String(key) === String(selectedUser)) {
+                return <View key={key} style={ styles.messagesSubContainer }>
+                  {
+                    Object.keys(usersMessages).map(key => {
+                      const sender = usersMessages[key].sender;
+                      const message = usersMessages[key].message;
+                      if (String(sender) === String(selectedUser)) {
+                        return (
+                        <View key={key} style={styles.recievedContainer}>
+                          <Text style={styles.recievedMsg}>{ message }</Text>
+                        </View>
+                        )
+                      }
+                      else if (String(sender) === String(uid)) {
+                        return (
+                        <View key={key} style={styles.sentContainer}>
+                          <Text style={styles.sentMsg}>{ message }</Text>
+                        </View>
+                        )
+                      }
+                      else return;
+                    })
+                  }
+                </View>
+              }
+            })
+          }
+        </View>
+      )
     }
 
     return (
       <View style={styles.chatContainer}>
-        <View style={styles.userInfo}>
-          <Text style={styles.userName}>
-            { users.map(user => {
-              if (user.uid === selectedUser ) return user.dname
-            })}
-          </Text>
+        <View style={styles.userInfoContainer}>
+          {
+            users.map(user => {
+              if (user.uid === selectedUser ) return (
+                <View key={user.uid} style={styles.userInfo}>
+                  <Image alt={ uid } style={styles.roundPic} source={user.avatar} />
+                  <Text style={styles.userName}>
+                    { user.dname }
+                  </Text>
+                </View>
+              )
+            })
+          }
         </View>
         <ScrollView 
           ref={ref => this.scrollView = ref}

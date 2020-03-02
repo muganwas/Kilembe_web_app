@@ -15,9 +15,38 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     height: 30,
   },
+  userInfoContainer: {
+  },
+  members: {
+    position: 'relative',
+    width: '100%',
+    height: 'auto',
+  },
+  roundPic: {
+    width: 20,
+    maxHeight: 23,
+    minHeight: 20,
+    margin: 3,
+    borderWidth: 1,
+    borderColor: '#c9c9c9',
+    position: 'relative',
+    display: 'inline-block',
+    overflow: 'hidden',
+    borderRadius: '50%',
+  },
   userInfo: {
+    boxSizing: 'border-box',
+    alignContent: 'center',
+    alignItems: 'center',
+    display: 'block',
+    height: 40
   },
   userName: {
+    margin: 2,
+    alignContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+    display: 'inline-block',
     textTransform: 'capitalize'
   },
   recievedContainer: {
@@ -56,7 +85,8 @@ const styles = StyleSheet.create({
   messagesContainer: {
     display: 'block',
     height: '100%',
-    minHeight: 100
+    minHeight: 100,
+    height: 200
   },
   messagesSubContainer: {
     display: 'block'

@@ -1,5 +1,4 @@
 import React from 'react';
-import { render } from 'react-dom';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { AppRegistry } from 'react-native';
 import store from './store';
@@ -17,7 +16,8 @@ import {
 	Login,
 	Home,
 	Friends,
-	UserDetails
+	UserDetails,
+	Redirect
 } from 'components';
 //import registerServiceWorker from './registerServiceWorker';
 
@@ -31,7 +31,7 @@ let MainComponent = () => {
 	)
 }
 
-let FriendsComponent = ()=>{
+let FriendsComponent = () => {
 	return(
 		<Provider store={store}>
 			<Friends/>
@@ -39,7 +39,7 @@ let FriendsComponent = ()=>{
 	)
 }
 
-let FriendDetailsComponent = ()=>{
+let FriendDetailsComponent = () => {
 	return(
 		<Provider store={store}>
 			<UserDetails />
@@ -47,42 +47,42 @@ let FriendDetailsComponent = ()=>{
 	)
 }
 
-let HomeComponent = ()=>{
+let HomeComponent = () => {
 	return(
 		<Provider store={store}>
 			<Home/>
 		</Provider>
 	)
 }
-let LoginComponent = ()=>{
+let LoginComponent = () => {
 	return(
 		<Provider store={store}>
 			<Login/>
 		</Provider>
 	)
 }
-let SignupComponent = ()=>{
+let SignupComponent = () => {
 	return(
 		<Provider store={store}>
 			<Signup/>
 		</Provider>
 	)
 }
-let ResetComponent = ()=>{
+let ResetComponent = () => {
 	return(
 		<Provider store={store}>
 			<Reset/>
 		</Provider>
 	)
 }
-let SettingsComponent = ()=>{
+let SettingsComponent = () => {
 	return(
 		<Provider store={store}>
 			<Settings/>
 		</Provider>
 	)
 }
-let MessagingComponent = ()=>{
+let MessagingComponent = () => {
 	return(
 		<Provider store={store}>
 			<Messaging/>
@@ -90,10 +90,18 @@ let MessagingComponent = ()=>{
 	)
 }
 
-let NotFoundComponent = ()=>{
+let NotFoundComponent = () => {
 	return(
 		<Provider store={store}>
 			<NotFound/>
+		</Provider>
+	)
+}
+
+let RedirectComponent = () => {
+	return (
+		<Provider store={store}>
+			<Redirect/>
 		</Provider>
 	)
 }
@@ -110,6 +118,7 @@ var Root = ()=>{
 					<Route exact path="/settings" component={ SettingsComponent } />
 					<Route exact path="/friends" component={ FriendsComponent } />
 					<Route exact path="/friends/:id" component={ FriendDetailsComponent } />
+					<Route exact path="/redirect/:route" component={ RedirectComponent } />
 					<Route component={ NotFoundComponent } />
 				</Switch>
 			</BrowserRouter>

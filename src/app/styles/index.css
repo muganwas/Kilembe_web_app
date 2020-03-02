@@ -324,7 +324,7 @@ li{
 }
 .membersAv-small{
   width: 20px;
-  max-height: 30px;
+  max-height: 23px;
   min-height: 20px;
   cursor: pointer;
   float: left;
@@ -354,6 +354,15 @@ li{
   width: 30px;
   max-height: 40px;
   min-height: 30px;
+  border: thin solid #c9c9c9;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.roundPic-users {
+  width: 20px;
+  max-height: 23px;
+  min-height: 20px;
   border: thin solid #c9c9c9;
   position: relative;
   overflow: hidden;
@@ -515,10 +524,10 @@ li{
 }
 .friend{
   box-sizing: border-box;
-  padding: 10px;
+  padding: 5px;
   display: block;
-  height: 60px;
-  margin: 10px 0;
+  height: 40px;
+  margin: 5px 0;
   z-index: 10000;
 }
 .friend:hover{
@@ -529,8 +538,11 @@ li{
 .friend .name{
   text-transform: capitalize;
   display: inline-block;
-  padding: 10px 5px 10px 10px;
-  font-size: 12px;
+  align-items: center;
+  align-content: center;
+  padding: 5px;
+  font-size: 10px;
+  font-weight: bold;
 }
 .friend .membersAv{
   width: 30px;
@@ -659,16 +671,16 @@ li{
 }
 .online{
   position: absolute;
-  margin: 0 0 0 -10px;
+  margin: 0 0 0 -8px;
   color: #0ed43f;
-  font-size: 10px;
+  font-size: 8px;
   z-index: 10000;
 }
 .offline{
   position: absolute;
-  margin: 0 0 0 -10px;
+  margin: 0 0 0 -8px;
   color: #a5a5a5;
-  font-size: 10px;
+  font-size: 8px;
   z-index: 10000;
 }
 .respondB{
