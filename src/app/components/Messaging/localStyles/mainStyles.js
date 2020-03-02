@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+const styles = {
   chatContainer: {
     height: '100%',
     display: 'flex',
@@ -15,9 +15,50 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     height: 30,
   },
-  userInfo: {
+  userInfoContainer: {
   },
-  userName: {
+  members: {
+    position: 'relative',
+    width: '100%',
+    height: 'auto',
+  },
+  roundPic: {
+    width: 20,
+    height: 20,
+    margin: 3,
+    borderWidth: 1,
+    borderColor: '#c9c9c9',
+    position: 'relative',
+    display: 'inline-block',
+    verticalAlign:'top',
+    overflow: 'hidden',
+    borderRadius: '50%',
+  },
+  userInfo: {
+    boxSizing: 'border-box',
+    display: 'block',
+    height: 40
+  },
+  userTextInfoContainer: {
+    margin: 3,
+    height: 20,
+    position: 'relative',
+    alignContent: 'center',
+    alignItems: 'center',
+    display: 'inline-block',
+  },
+  username: {
+    display: 'block',
+    fontWeight: 'bold',
+    textAlign: 'left',
+    fontSize: 10,
+    textTransform: 'capitalize'
+  },
+  availability: {
+    display: 'block',
+    textAlign: 'left',
+    fontSize: 8,
+    fontWeight: 'thin',
     textTransform: 'capitalize'
   },
   recievedContainer: {
@@ -56,7 +97,8 @@ const styles = StyleSheet.create({
   messagesContainer: {
     display: 'block',
     height: '100%',
-    minHeight: 100
+    minHeight: 100,
+    height: 200
   },
   messagesSubContainer: {
     display: 'block'
@@ -87,6 +129,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#fff'
   }
-});
+};
 
 export default styles;

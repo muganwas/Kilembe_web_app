@@ -27,7 +27,7 @@ class App extends Component {
     
     /**Determine page to redirect to */
     if (uid) {
-      //console.log(genInfo)
+      console.log(genInfo)
       if (genInfo) this.props.sendGenInfo(genInfo);
       //check if user session is still valid
       if (sessionToken) checkSessionValidity(sessionToken);
@@ -45,7 +45,7 @@ class App extends Component {
   } 
  
   render() {
-    return <ActivityIndicator />;
+    return null;
   }
 }
 

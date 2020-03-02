@@ -276,7 +276,7 @@ Header.propTypes = {
     getUsers: PropTypes.func,
     openSocket: PropTypes.func,
     closeSocket: PropTypes.func,
-    confirmUserToken: PropTypes,
+    confirmUserToken: PropTypes.func,
     logingStatusConfirmation: PropTypes.func,
     dispatchSocketConnected: PropTypes.func,
     dispatchSocketError: PropTypes.func,
