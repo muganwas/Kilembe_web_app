@@ -1,10 +1,10 @@
-import { FETCH_GEN_FULFILLED, FETCH_GEN_REJECTED } from '../actions';
+import { FETCH_GEN_FULFILLED, FETCH_GEN_REJECTED, FETCH_ID_TOKEN } from '../types';
 
 export const dispatchedGenInfo = info => {
     if(info !== undefined && info !== null){   
       return {
             type: FETCH_GEN_FULFILLED,
-            payload: { info }
+            payload: info
         }
     }else{
         return {
@@ -14,4 +14,27 @@ export const dispatchedGenInfo = info => {
             }
         } 
     }
+}
+
+export const dispatchChatkitTokenId = token => {
+    return {
+        type: FETCH_ID_TOKEN,
+        payload: token
+    }
+}
+
+export const fetchGenInfoFromlocalStorage = (confirmLoggedIn, loginInfo) => {
+    return new Promise(resolve => {
+        let { loggedIn } = loginInfo;
+        let storedInfo = localStorage.getItem('genInfo');
+        storedInfo = storedInfo ? JSON.parse(storedInfo) : null;
+        //console.log(storedInfo)
+        if(storedInfo){
+            if(!loggedIn) confirmLoggedIn();
+            dispatchedGenInfo(storedInfo);
+            resolve("dispatched")
+        }else{
+            resolve("not dispatched");
+        }
+    });
 }

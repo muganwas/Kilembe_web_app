@@ -1,15 +1,15 @@
 const path = require('path');
 //const CleanWebpackPlugin = require('clean-webpack-plugin');
 const webpack = require('webpack');
-var Dotenv = require('dotenv-webpack');
+const Dotenv = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 var DIST_DIR = path.resolve(__dirname, "./public");
 var SRC_DIR = path.resolve(__dirname, "./src");
 
 module.exports = {   
-    entry: SRC_DIR + '/app/index.js'
-    ,
+    entry: SRC_DIR + '/app/index.js',
     module: {
 		rules : [
 			{
@@ -46,7 +46,8 @@ module.exports = {
 		]
 	},
     plugins: [
-        //new CleanWebpackPlugin(['dist/*.*']),
+		//new CleanWebpackPlugin(['dist/*.*']),
+		new CaseSensitivePathsPlugin(),
         new HtmlWebpackPlugin({
             title: 'Production'
 		}),
@@ -71,7 +72,9 @@ module.exports = {
 			components: path.resolve(__dirname, 'src/app/components'),
 			views: path.resolve(__dirname, 'src/app/views'),
 			actions: path.resolve(__dirname, 'src/app/actions'),
-			assets: path.resolve(__dirname, 'src/app/assets')
+			assets: path.resolve(__dirname, 'src/app/assets'),
+			sytles: path.resolve(__dirname, 'src/app/styles'),
+			'react-native$': 'react-native-web',
 		}
 	},
 	devServer: {

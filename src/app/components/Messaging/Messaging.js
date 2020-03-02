@@ -1,179 +1,176 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { dispatchedGenInfo } from '../../redux/dispatchers/genDispatchers';
-import { ChatManager, TokenProvider } from '@pusher/chatkit';
-import Footer from '../Footer/Footer';
-import Rebase from 're-base';
-import app from '../../base';
-import './css/main.css';
-import axios from 'axios';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+import { ScaleLoader } from 'react-spinners';
+import { css } from '@emotion/core';
+import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
+import { 
+    loginConfirmed, 
+    logout, 
+    checkLoginStatus,
+    connectToChatServer
+} from 'reduxFiles/dispatchers/authDispatchers';
+import {
+    fetchUsers,
+    fetchFriends
+} from 'reduxFiles/dispatchers/userDispatchers';
+import { setUserToChat } from 'reduxFiles/dispatchers/chatDispatchers';
+import { 
+    Header,
+    Footer 
+} from 'components';
+import './localStyles/main.css';
+import ChatComponent from './ChatComponent';
 
-//components
-import MessagingNav from './MessagingNav';
+const override = css`
+    display: block;
+    margin: 0 auto;
+    border-color: #757575;
+`;
 
-const usersRef = app.database().ref('users');
-const base = Rebase.createClass(app.database());
-var chatManager;
-
-@connect((store)=>{
-    return{
-        chatkitUser: store.genInfo.info.chatkitUser,
-        genInfo: store.genInfo,
-        allUsers: store.genInfo.info.allUsers
-    }  
-})
 class Messaging extends Component {
-    constructor(props){
-        super(props)
-        this.state = {}
+    state = {
+        messaging: false
+    }
+    componentDidMount(){
+        const { 
+            confirmLoggedIn,
+            loginInfo,
+            logingStatusConfirmation,
+            openSocket,
+            genInfo
+        } = this.props;
+        logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
+        const { socketOpen, unAuthorizedConnection } = loginInfo;
+        if (!socketOpen && !unAuthorizedConnection) openSocket(this.props);
     }
 
-    componentWillMount(){
-        let uid = this.props.userId;
-        base.fetch(`users/${ uid }/chatkit_uid`, {
-            context: this,
-            asArray: false
-        }).then((data)=>{
-            let len = Object.keys(data).length;
-            if(len === 0){
-                let url = process.env.CHATKIT_CREATE_USER + this.props.userId + "&name="+ this.props.dname;
-                axios(url)
-                .then((res)=>{
-                    let chatkit_id = res.data.id;
-                    usersRef.child(this.props.userId).update({
-                        chatkit_uid: chatkit_id
-                    });
-                })
-                .catch((err)=>{
-                    console.log(err)
-                });
-            }else{
-                this.fetchAllUsers();
-                this.fetchFriends(uid).then((rez)=>{
-                    this.getAvatar();
-                });
-                let url = process.env.CHATKIT_TOKEN_PROVIDER + data;
-                chatManager = new ChatManager({
-                    instanceLocator: process.env.CHATKIT_INSTANCE_LOCATOR,
-                    userId: data,
-                    tokenProvider: new TokenProvider({ url })
-                });
-                chatManager.connect()
-                .then(currentUser => {
-                    console.log('Successful connection', currentUser)
-                })
-                .catch(err => {
-                    console.log('Error on connection', err)
-                });
-            }
-        });
+    displayChatComponent = e => {
+        e.stopPropagation();
+        const { selectUserToChat } = this.props;
+        const { id } = e.target;
+        selectUserToChat(id);
+        this.setState({messaging:true});
     }
 
-    componentWillReceiveProps(nextProps){
-        this.props = {...nextProps}
-    }
-
-    confirmToken = (token)=>{
-        let url = process.env.CONFIRM_FIREBASE_TOKEN + token;
-        axios(url)
-        .then(response=>{
-            console.log(response);
-        })
-        .catch(err=>{
-            console.log(err.message)
-        })
-    }
-
-    fetchFriends = (uid)=>{
-        return new Promise((resolve, reject)=>{
-            base.fetch(`users/${ uid }/friends`, {
-                context: this,
-                asArray: true
-            }).then((data)=>{
-                let info = {...this.props.genInfo.info};
-                info.friends = data;
-                this.props.dispatch(dispatchedGenInfo(info));
-                resolve("done");
-            }).catch(err=>{
-                console.log(err)
-                reject("there was an error");
-            })
-        })        
-    }
-
-    fetchAllUsers = ()=>{
-        base.fetch(`users`, {
-            context: this,
-            asArray: false
-        }).then((dataB)=>{
-            let info = { ...this.props.genInfo.info }
-            info.allUsers = dataB;
-            this.props.dispatch(dispatchedGenInfo(info));
-        });
-    }
-
-    getAvatar = ()=>{
-        base.fetch(`users`, {
-            context: this,
-            asArray: true
-        }).then((dataB)=>{
-            dataB.forEach((elB)=>{
-                let uid = elB.key;
-                let avatar = elB.avatar;
-                let info = { ...this.props.genInfo.info }
-                let currUsers = [...info.friends];
-                currUsers.forEach((el)=>{
-                    //checking whether key and uid are the same
-                    if(el.key === uid){
-                        el.avatar = avatar;
-                        info.friends = currUsers;
-                        this.props.dispatch(dispatchedGenInfo(info));
-                    }                
-                });
-            });
-        }).catch(err=>{
-            console.log(err)
-        })
-    }
-
-    displayFriends = (key)=>{
-        let friends = this.props.genInfo.info.friends;
-        let uid = friends[key].key;
-        let avatar = friends[key].avatar;
-        let allUsers= this.props.allUsers;
-        let dname;
-        allUsers? dname = allUsers[uid].dname: dname = null;
-        return (
-            <div key={key} className="friend">
-                <div className="left">
-                    <div className="roundPic membersAv">
-                        <img alt={ uid } className="members" src = { avatar } />
-                    </div>
-                    <div className="name">{ dname?dname:null }</div>
-                    <div className="clear"></div>
-                </div>
+    displayFriends = key => {
+        let { friendsInfo: { users, friendsFull }, chatInfo: { onlineUsers } } = this.props;
+        let online = onlineUsers && onlineUsers[key] ? true : false;
+        let badgeClass = online ? 'fas fa-circle online' : 'fas fa-circle offline';
+        if ( users.length > 0 ) {
+            return <div key={key}> {
+                users.map( obj => {
+                    if (obj.uid === key && friendsFull[key].accepted) {
+                        let { uid, avatar, dname, email } = obj;
+                        // console.log(dname + ' ' + email)
+                        return (
+                            <div key={key} id={key} onClick={this.displayChatComponent} className="friend">
+                                <div id={key} className="left">
+                                    <div id={key} className="roundPic membersAv-small">
+                                        <img id={key} alt={ uid } className="members" src = { avatar } />
+                                    </div>
+                                    <i className={badgeClass}></i>
+                                    <div id={key} className="name">{ dname ? dname : email }</div>
+                                    <div className="clear"></div>
+                                </div>
+                            </div>
+                        )
+                    }
+                    return;
+            }) }
             </div>
-        )
+        }
+        return;
     }
 
     render(){
-        let friends = { ...this.props.genInfo.info.friends };
-        return(
-            <div className="Home">
-                <div className="container">
-                    { this.props.header }
+        let { friendsInfo: { friends, fetchedFriends }, loginInfo: { socketOpen } } = this.props;
+        let { messaging } = this.state;
+        return (
+            <div className="container Home">
+                <Header />
+                <div className="content">
                     <div className="messaging">
-                        <div className="friends">
-                            <h3>Friends</h3>
-                            { friends?Object.keys(friends).map(this.displayFriends):null }
+                        <div id='friends-list' className="friends">
+                            <h3><FormattedMessage  id='friends.listTitle' /></h3>
+                            { fetchedFriends ? 
+                            friends && friends.length > 0 ? 
+                            friends.map(this.displayFriends) : 
+                            <div className='messages'>
+                                <FormattedMessage id='message.noFriendsYet' />
+                            </div> :
+                            <ScaleLoader
+                                css={override}
+                                sizeUnit={"px"}
+                                height={10}
+                                width={3}
+                                radius={3}
+                                color={'#757575'}
+                                loading={!fetchedFriends} 
+                            /> }
+                        </div>
+                        <div id='conversation-container'>
+                            { !messaging ? 
+                            <span id='messaging-call-to-action'><FormattedMessage id={socketOpen ? 'friends.startConvo' : 'chat.noConnection'} /></span> :
+                            <ChatComponent /> }
                         </div>
                     </div>
-                    <Footer />
                 </div>
+                <Footer />
             </div>
         )
     }
 
 }
 
-export default Messaging;
+Messaging.propTypes = {
+    genInfo: PropTypes.object.isRequired,
+    loginInfo: PropTypes.object.isRequired,
+    friendsInfo: PropTypes.object.isRequired,
+    updateGenInfo: PropTypes.func.isRequired,
+    getUsers: PropTypes.func.isRequired,
+    signOut: PropTypes.func.isRequired,
+    getFriends: PropTypes.func.isRequired,
+    chatInfo: PropTypes.object.isRequired
+}
+
+const mapStateToProps = state => {
+    return {
+        genInfo: state.genInfo,
+        loginInfo: state.loginInfo,
+        friendsInfo: state.friendsInfo,
+        chatInfo: state.chatInfo
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        getUsers: () => {
+            dispatch(fetchUsers());
+        },
+        getFriends: info => {
+            dispatch(fetchFriends(info));
+        },
+        logingStatusConfirmation: (confirmLoggedIn, loginInfo, info) => {
+            dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, info));
+        },
+        openSocket: props => {
+            dispatch(connectToChatServer(props));
+        },
+        confirmLoggedIn: () => {
+            dispatch(loginConfirmed());
+        },
+        selectUserToChat: userId => {
+            dispatch(setUserToChat(userId))
+        },
+        signOut: genInfo => {
+            dispatch(logout(genInfo));
+        },
+        updateGenInfo: genInfo => {
+            dispatch(dispatchedGenInfo(genInfo));
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Messaging);

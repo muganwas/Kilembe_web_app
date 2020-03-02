@@ -1,16 +1,21 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
-import Donate from '../Donate/Donate';
+import { Donate } from 'components';
+import { devProfileURL } from 'misc/constants';
 
-class Footer extends Component {
-    render(){
-        return (
-            <div className="swagg">&copy;2018 Kilembe School
-                <Link id="devLink" to="https://www.upwork.com/fl/stevenmuganwa"> Muganwas</Link>   
-                <Donate/>
-            </div>
-        )
-    }
+const Footer = () => {
+    return (
+        <div className="swagg">
+            <FormattedMessage id={"site.copyrightText"} />
+            <Link id="devLink" to={ devProfileURL }>
+                <span id="devName">
+                    <FormattedMessage id={"dev.name"}/>
+                </span>
+            </Link>   
+            <Donate/>
+        </div>
+    )
 }
 
 export default Footer;

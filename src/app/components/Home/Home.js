@@ -1,71 +1,71 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Rebase from 're-base';
-import firebase from 'firebase';
+import { FormattedMessage } from "react-intl";
+import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import app from '../../base';
-import Courses from '../Courses/courses';
-import Footer from '../Footer/Footer';
+import { 
+    confirmToken, 
+    loginConfirmed, 
+    logout, 
+    checkLoginStatus
+} from 'reduxFiles/dispatchers/authDispatchers';
+import {
+    fetchUsers
+} from 'reduxFiles/dispatchers/userDispatchers';
+import { 
+    dispatchedGenInfo 
+} from 'reduxFiles/dispatchers/genDispatchers';
+import { 
+    Courses,
+    Header,
+    Footer
+} from 'components';
+
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
-var storage = firebase.storage();
-var storageRef = storage.ref();
+
 
 class Home extends Component {
-    constructor(props){
-        super(props);
+    constructor(){
+        super();
         this.state = {
-            courses: {}
+            courses: []
         };
     }
-    getImage = ()=>{
-        return new Promise((resolve, reject)=>{
-            let userId = this.props.uid;
-            base.fetch(`users/${ userId }`, {
-                context: this,
-                asArray: true,
-                then(data){
-                    let len = data.length;
-                    if( len !== 0){
-                        let fl = data[1][0];
-                        let avURL = data[1];
-                        //easiest way I could figure out to check for an upload avatar url
-                        if(fl === "h"){
-                            this.setState({
-                            avatar: avURL
-                            });
-                            localStorage.setItem('avatar', avURL);
-                        }else{
-                            storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
-                            this.setState({
-                                avatar: data,
-                            });
-                            localStorage.setItem('avatar', data);
-                            });
-                        }
-                    }else{
-                        storageRef.child('general/avatar.jpg').getDownloadURL().then((data)=>{
-                            this.setState({
-                                avatar: data,
-                            });
-                            localStorage.setItem('avatar', data);
-                        }); 
-                    }
-                }
-            });
-        });
+    
+    componentDidMount(){
+        const { 
+            confirmLoggedIn, 
+            genInfo, 
+            loginInfo,
+            logingStatusConfirmation 
+        } = this.props
+        this.fetchCourses();
+        logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
     }
-    updateInfo = ()=>{
-        let userID = this.props.uid;
-        let userRef = usersRef.child(userID);
+
+    componentDidUpdate(){
+        let { loginInfo: { loggedIn } } = this.props;
+        // const usersLength = Object.keys(users).length;
+        if (!loggedIn) this.goTo("/");
+    }
+
+    updateInfo = () => {
+        let { genInfo: { info: { uid, avatar } } } = this.props;
+        let userRef = usersRef.child(uid);
         userRef.update({
             email: localStorage.getItem('email'),
             dname: localStorage.getItem('dname'),
             uid: localStorage.getItem('uid'),
             about: " ",
             shareEmailAddress: false,
-            avatar: localStorage.getItem("avatar") === undefined?this.props.avatar === undefined?{}: this.props.avatar : localStorage.getItem("avatar")
+            avatar: localStorage.getItem("avatar") === undefined?avatar === undefined?{}:avatar : localStorage.getItem("avatar")
         });
     }
-    componentDidMount(){
+
+    fetchCourses = () => {
         var currUser = app.auth().currentUser;
         var courses = [];
         var videos = [];
@@ -89,41 +89,67 @@ class Home extends Component {
             } 
         });        
     }
-    componentWillMount(){
-        if((this.props.avatar !== null && this.props.avatar !== undefined) || (localStorage.getItem("avatar") !== null && localStorage.getItem("avatar") !== undefined)){
-            base.fetch(`users/${ this.props.uid }`, {
-                context: this,
-                asArray: true
-            }).then((data)=>{
-                let length = data.length;
-                if(length===0 || length===null || length === undefined) {
-                    let userRef = usersRef.child(this.props.uid);
-                    userRef.set({
-                        email: localStorage.getItem('email'),
-                        dname: localStorage.getItem('dname'),
-                        uid: localStorage.getItem('uid'),
-                        about: " ",
-                        shareEmailAddress: false,
-                        avatar: localStorage.getItem("avatar") || this.props.avatar
-                    });
-                }
-            });
-        }else{
-            this.getImage();
-            setTimeout(()=>{this.updateInfo()}, 2000);
-        }
-    }
-    render(){   
+
+    goTo = (location) => {
+        const { history } = this.props;
+        history.push(location);
+    } 
+
+    render(){  
+        let { urls, courses } = this.state;
+        let { genInfo: { info } } = this.props;
+        let uid = info?info.uid:null;
         return (
-            <div className="container">
-                {this.props.header}
+            <div className="container Home">
+                <Header />
                 <div className="content">
-                    <h4>Available Courses</h4>
-                    <Courses userID={this.props.uid} videos={ this.state.urls } courses = { this.state.courses } />
+                    <h4><FormattedMessage id={"home.coursesTitle"} /></h4>
+                    <Courses userID={ uid } videos={ urls } courses = { courses } />
                 </div>
                 <Footer />                               
             </div>
         )
     }
 }
-export default Home;
+
+Home.propTypes = {
+    genInfo: PropTypes.object.isRequired,
+    loginInfo: PropTypes.object.isRequired,
+    confirmUserToken: PropTypes.func.isRequired,
+    updateGenInfo: PropTypes.func.isRequired,
+    getUsers: PropTypes.func.isRequired,
+    signOut: PropTypes.func.isRequired
+}
+
+const mapStateToProps = state => {
+    return {
+        genInfo: state.genInfo,
+        loginInfo: state.loginInfo,
+        friendsInfo: state.friendsInfo
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        getUsers: ()=>{
+            dispatch(fetchUsers());
+        },
+        confirmUserToken: userToken => {
+            dispatch(confirmToken(userToken));
+        },
+        logingStatusConfirmation: (confirmLoggedIn, loginInfo, genInfo) => {
+            dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, genInfo));
+        },
+        confirmLoggedIn: () => {
+            dispatch(loginConfirmed());
+        },
+        signOut: genInfo => {
+            dispatch(logout(genInfo));
+        },
+        updateGenInfo: genInfo => {
+            dispatch(dispatchedGenInfo(genInfo));
+        }
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(withRouter(Home));

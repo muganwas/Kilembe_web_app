@@ -1,118 +1,59 @@
 import React, { Component } from 'react';
-import Footer from '../Footer/Footer';
-import Rebase from 're-base';
-import app from '../../base';
-import UserDetails from '../UserDetails/UserDetails';
-let base = Rebase.createClass(app.database());
-let usersRef = app.database().ref('users');
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { 
+    Header,
+    Footer,
+    KLoader
+} from 'components';
+import {
+    fetchUsers,
+    fetchFriends,
+    fetchFriendsRequests
+} from 'reduxFiles/dispatchers/userDispatchers';
+import { 
+    loginConfirmed, 
+    checkLoginStatus 
+} from 'reduxFiles/dispatchers/authDispatchers';
 
 class Friends extends Component {
-    constructor(props){
-        super(props);
-        this.state={
-            userId: this.props.userId,
-            users: {},
-            peopleListStyle: "people",
-            general: true,
-            specific: false,
-            responseRequired: "fas fa-bell alert-main",
-            outGoingRequests: [],
-            inComingRequests: []
-        }
-    }
-    componentWillMount(){
-        base.fetch(`users`, {
-            context: this,
-            asArray: true
-        }).then((data)=>{
-            let length = data.length;
-            if(length!==0 && length!==null) {
-                this.setState({
-                    users: data
-                });
-            }
-        });
-    }
+    
     componentDidMount(){
-        let userRef = usersRef.child(`${this.props.userId}/friends`);
-        userRef.once('value').then((snapshot)=>{
-            let uFriends = snapshot.val();
-            if(uFriends !== null && uFriends !== undefined){
-                this.setState({
-                    friends: uFriends
-                });
-            }
-        });
-        let userRef1 = usersRef.child(`${this.props.userId}/friends`);
-        userRef1.once('value').then((snapshot)=>{
-            let outGoingRequests = [];
-            let inComingRequests = [];
-            snapshot.forEach((pFriend)=>{
-                if(pFriend.val().direction === "outgoing" && pFriend.val().accepted === false){
-                    outGoingRequests.push(pFriend.key);
-                    this.setState({
-                        outGoingRequests
-                    })
-                }else if(pFriend.val().direction === "incoming" && pFriend.val().accepted === false){
-                    inComingRequests.push(pFriend.key);
-                    this.setState({
-                        inComingRequests
-                    })
-                }
-            });
-        });
+        const { 
+            confirmLoggedIn, 
+            genInfo, 
+            loginInfo, 
+            logingStatusConfirmation
+        } = this.props
+        logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
     }
-    backToUsers = ()=>{
-        this.setState({
-            general: true,
-            specific: false,
-            currUserId: null,
-            currUserDname: null,
-            currUserAvUrl: null,
-            currUserAbout: null,
-            currUserSharePref: null
-        });
-    }
+
     userDetail = (key)=>{
-        let newUsers = {...this.state.users}
-        this.setState({
-            general: false,
-            specific: true,
-            currUserId: newUsers[key].uid,
-            currUserDname: newUsers[key].dname,
-            currUserAvUrl: newUsers[key].avatar,
-            currUserEmail: newUsers[key].shareEmailAddress === true?newUsers[key].email:"Email Address is hidden",
-            currUserAbout: newUsers[key].about,
-            currUserSharePref: newUsers[key].shareEmailAddress
-        });
+        this.goTo(`/friends/${key}`);
     }
-    changeResponseClass = ()=>{
-        this.setState({
-            responseRequired: ""
-        });
-    }
+
     incoming = (key)=>{
-        let incoming = this.state.inComingRequests;
-        let len = incoming.length;
-        let count = 0;
-        for(count; count < len; count++){
-            let users = {...this.state.users};
+        let { friendsInfo: { inComingRequests, responseRequired, users } } = this.props;;
+        let len = inComingRequests.length;
+        for(let count = 0; count < len; count++){
             let currUser = users[key].uid;
-            if(incoming[count] === currUser){
-                return <span className={ this.state.responseRequired }></span>;
+            if(inComingRequests[count] === currUser){
+                return <span className={ responseRequired }></span>;
             }
         } 
     }
+
     getUsers = (key) => {
-        let loggedInUser = this.state.userId;
-        let users = {...this.state.users};
+        let { friendsInfo: { users, peopleListStyle, defaultAvatar }, genInfo: { info: { uid } } } = this.props;
+        let loggedInUser = uid;
         let uCount = users.length;
-        let userImg = users[key].avatar;
+        let userImg = users[key].avatar || defaultAvatar;
         let dname = users[key].dname;
-        let userId = users[key].uid;
-        if(uCount !== 0 && loggedInUser !== userId){
+        let usersId = users[key].uid;
+        if(uCount !== 0 && loggedInUser !== usersId && dname){
             return(
-                <div title={ dname } id={ userId } key={key} className={ this.state.peopleListStyle } onClick={ ()=>{ this.userDetail(key) } }>
+                <div title={ dname } id={ usersId } key={key} className={ peopleListStyle } onClick={ ()=>{ this.userDetail(key) } }>
                     <div className="roundPic membersAv">
                         <img alt={ key } className="members" src={ userImg } />
                     </div>
@@ -124,40 +65,77 @@ class Friends extends Component {
             )
         }
     }
+
+    goTo = (location) => {
+        const { history } = this.props;
+        history.push(location);
+    } 
+
     render(){
-        if(this.state.general === true){
-            return (
-                <div className="Home">
-                    <div className="container">
-                        { this.props.header }
-                        <div className="content">
-                            <h4>Kilembe Users</h4>
-                            <div className="sub-container">
-                                { Object.keys(this.state.users).map(this.getUsers) }
-                            </div>
+        let { friendsInfo: { users } } = this.props;
+        let usersLength = users.length;
+        return (
+            <div className="container Home">
+                <Header />
+                <div className="content">
+                    <div id="general">
+                        <h4>Kilembe Users</h4>
+                        <div className="sub-container">
+                            { 
+                                usersLength?
+                                Object.keys(users).map(this.getUsers):
+                                <KLoader 
+                                    type="TailSpin"
+                                    color="#757575"
+                                    height={50}
+                                    width={50}
+                                />
+                            }
                         </div>
-                        <Footer />
                     </div>
                 </div>
-            )
-        }else{
-            return(
-               <UserDetails
-                 changeResponseClass = { this.changeResponseClass }
-                 header = { this.props.header }
-                 addFriendState = { this.state.addFriendState }
-                 currUserSharePref = { this.state.currUserSharePref } 
-                 currUserAbout = { this.state.currUserAbout } 
-                 currUserEmail = { this.state.currUserEmail } 
-                 currUserDname = { this.state.currUserDname } 
-                 currUserAvUrl = { this.state.currUserAvUrl } 
-                 currUserId={ this.state.currUserId } 
-                 userId={ this.state.userId } 
-                 backToUsers = { this.backToUsers } 
-                 userDetail = { this.userDetail } />
-            )
-        } 
+                <Footer />
+            </div>
+        )
     }
 }
 
-export default Friends;
+Friends.propTypes = {
+    friendsInfo: PropTypes.object.isRequired,
+    loginInfo: PropTypes.object.isRequired,
+    genInfo: PropTypes.object.isRequired,
+    getUsers: PropTypes.func.isRequired,
+    getFriends: PropTypes.func.isRequired,
+    logingStatusConfirmation: PropTypes.func.isRequired,
+    confirmLoggedIn: PropTypes.func.isRequired
+}
+
+const mapStateToProps = state => {
+    return {
+        friendsInfo: state.friendsInfo,
+        loginInfo: state.loginInfo,
+        genInfo: state.genInfo
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        getUsers: ()=>{
+            dispatch(fetchUsers());
+        },
+        getFriends: info=>{
+            dispatch(fetchFriends(info));
+        },
+        logingStatusConfirmation: (confirmLoggedIn, loginInfo, genInfo) => {
+            dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, genInfo));
+        },
+        confirmLoggedIn: () => {
+            dispatch(loginConfirmed());
+        },
+        getFriendsRequests: info => {
+            dispatch(fetchFriendsRequests(info));
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Friends));

@@ -1,4 +1,19 @@
-import { LOGIN_FULFILLED, LOGIN_REJECTED, LOGIN_PENDING, STORE_EMAIL, STORE_PASSWORD, LOGIN_ERROR_ALERT } from "../actions";
+import { 
+  LOGIN_FULFILLED, 
+  LOGIN_REJECTED, 
+  LOGIN_PENDING, 
+  STORE_EMAIL, 
+  STORE_PASSWORD, 
+  LOGIN_ERROR_ALERT,
+  LOGIN_CONFIRMED,
+  LOGOUT_CONFIRMED,
+  CLEAR_ERRORS,
+  SOCKET_CONNECTED,
+  SOCKET_DISCONNECTED,
+  SOCKET_ERROR,
+  UNAUTHORIZED_AUTHENTICATION
+} from "../types";
+
 const defaultState = {
   email: null,
   password: null,
@@ -7,7 +22,12 @@ const defaultState = {
   loggedIn: false,
   fetching: false,
   fetched: false,
-  error: false
+  error: false,
+  conncetionStatus: '',
+  socketError: null,
+  loginValid: false,
+  socketOpen: false,
+  unAuthorizedConnection: false
 }
   const loginReducer = (state = defaultState, action)=>{
       switch(action.type){
@@ -22,6 +42,7 @@ const defaultState = {
             return {...state,
               fetching: false,
               fetched: false,
+              info: null,
               messageId: action.payload,
               error: true
             }
@@ -32,6 +53,13 @@ const defaultState = {
               error: false
             }
           }
+
+          case LOGOUT_CONFIRMED: {
+            return {
+              ...defaultState
+            }
+          }
+
           case STORE_PASSWORD:{
             return {...state,
               password: action.payload,
@@ -41,9 +69,61 @@ const defaultState = {
           case LOGIN_ERROR_ALERT:{
             return {...state,
               error: true,
+              loggedIn: false,
+              fetching: false,
+              fetched: true,
               messageId: action.payload
             }
           }
+          case LOGIN_CONFIRMED:{
+            return {
+              ...state,
+              loggedIn: true
+            }
+          }
+
+          case CLEAR_ERRORS:{
+            return {
+              ...state,
+              error: false,
+              messageId: null
+            }
+          }
+
+          case SOCKET_CONNECTED: {
+            return {
+              ...state,
+              conncetionStatus: 'connected',
+              socketOpen: true,
+              socketError: null
+            }
+          }
+
+          case SOCKET_DISCONNECTED: {
+            return {
+              ...state,
+              conncetionStatus: 'disconnected',
+              socketOpen: false,
+              socketError: null
+            }
+          }
+
+          case SOCKET_ERROR: { 
+            return {
+              ...state,
+              conncetionStatus: 'disconnected',
+              socketOpen: false,
+              socketError: action.payload
+            }
+          }
+
+          case UNAUTHORIZED_AUTHENTICATION: {
+            return {
+              ...state,
+              unAuthorizedConnection: true
+            }
+          }
+          
           case LOGIN_FULFILLED:{
             return {...state,
               fetched: true,

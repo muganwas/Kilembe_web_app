@@ -1,5 +1,6 @@
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import thunk from 'redux-thunk';
+import { apiMiddleware } from 'redux-api-middleware';
 import logger from 'redux-logger';
 import { intlReducer } from 'react-intl-redux';
 import moment from 'moment';
@@ -9,12 +10,16 @@ import '@formatjs/intl-relativetimeformat/polyfill';
 import '@formatjs/intl-relativetimeformat/dist/locale-data/en';
 import '@formatjs/intl-relativetimeformat/dist/locale-data/fr'
 import promise from 'redux-promise-middleware';
-import genInfoReducer from './redux/reducers/genInfoReducer';
-import loginReducer from './redux/reducers/loginReducer';
+import friendsReducer from 'reduxFiles/reducers/friendsReducer';
+import genInfoReducer from 'reduxFiles/reducers/genInfoReducer';
+import loginReducer from 'reduxFiles/reducers/loginReducer';
+import resetReducer from 'reduxFiles/reducers/resetReducer';
+import signupReducer from 'reduxFiles/reducers/signupReducer';
+import chatReducer from 'reduxFiles/reducers/chatReducer';
 
 Moment.globalMoment = moment;
 
-const middleware = applyMiddleware(promise(), thunk, logger);
+const middleware = applyMiddleware(promise(), thunk, apiMiddleware, logger);
 // Define user's language. Different browsers have the user locale defined
 // on different fields on the `navigator` object, so we make sure to account
 // for these different by checking all of them
@@ -40,8 +45,12 @@ const initialState = {
 
 const allReducers = combineReducers({
     genInfo: genInfoReducer,
+    friendsInfo: friendsReducer,
     intl: intlReducer,
-    loginInfo: loginReducer
+    loginInfo: loginReducer,
+    resetInfo: resetReducer,
+    signupInfo: signupReducer,
+    chatInfo: chatReducer
 });
 
 const store = createStore(
