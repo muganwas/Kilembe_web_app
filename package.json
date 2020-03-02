@@ -17,7 +17,6 @@
     "@types/react-responsive": "^3.0.2",
     "@types/react-router-dom": "^4.3.0",
     "@types/redux-api-middleware": "^3.0.7",
-    "@types/redux-logger": "^3.0.7",
     "axios": "^0.18.1",
     "case-sensitive-paths-webpack-plugin": "^2.2.0",
     "dotenv": "^6.2.0",
@@ -60,7 +59,6 @@
     "react-spinners": "^0.6.1",
     "redux": "^4.0.0",
     "redux-api-middleware": "^3.0.1",
-    "redux-logger": "^3.0.6",
     "redux-promise-middleware": "^5.1.1",
     "redux-thunk": "^2.3.0",
     "socket.io-client": "^2.3.0",
@@ -79,6 +77,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "@types/redux-logger": "^3.0.7",
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -95,6 +94,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "babel-runtime": "6.26.0",
     "html-loader": "^0.5.1",
+    "redux-logger": "^3.0.6",
     "svg-inline-loader": "^0.8.0",
     "webpack-cli": "^3.1.0"
   },
