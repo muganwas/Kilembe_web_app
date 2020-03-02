@@ -352,8 +352,7 @@ li{
 }
 .roundPic {
   width: 30px;
-  max-height: 40px;
-  min-height: 30px;
+  height: 30px;
   border: thin solid #c9c9c9;
   position: relative;
   overflow: hidden;
@@ -361,8 +360,7 @@ li{
 }
 .roundPic-users {
   width: 20px;
-  max-height: 23px;
-  min-height: 20px;
+  height: 20px;
   border: thin solid #c9c9c9;
   position: relative;
   overflow: hidden;
@@ -546,8 +544,7 @@ li{
 }
 .friend .membersAv{
   width: 30px;
-  max-height: 40px;
-  min-height: 30px;
+  height: 30px;
   cursor: pointer;
   float: left;
 }

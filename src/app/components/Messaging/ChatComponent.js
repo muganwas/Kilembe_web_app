@@ -7,6 +7,7 @@ import {
   connectToChatServer,
   socket
 } from 'reduxFiles/dispatchers/authDispatchers';
+import { FormattedMessage } from 'react-intl';
 import {
   // dispatchRecievedMessage,
   dispatchSentMessage
@@ -39,7 +40,7 @@ class ChatComponent extends React.Component {
     else console.log('empty message')
   }
   render(){
-    const { chatInfo: { selectedUser, messages }, friendsInfo: { users }, genInfo: { info: { uid } } } = this.props;
+    const { chatInfo: { selectedUser, messages, onlineUsers }, friendsInfo: { users }, genInfo: { info: { uid } } } = this.props;
     const enabledSend = (this.state.message).length; 
     
     const displayMessages = () => {
@@ -86,9 +87,13 @@ class ChatComponent extends React.Component {
             users.map(user => {
               if (user.uid === selectedUser ) return (
                 <View key={user.uid} style={styles.userInfo}>
-                  <Image alt={ uid } style={styles.roundPic} source={user.avatar} />
-                  <Text style={styles.userName}>
-                    { user.dname }
+                  <img alt={ uid } style={styles.roundPic} src={user.avatar} />
+                  <Text style={styles.userTextInfoContainer}>
+                    <Text style={styles.username}>{ user.dname }</Text>
+                    { onlineUsers[selectedUser] ?
+                      <Text style={styles.availability}><FormattedMessage id="user.online" /></Text> :
+                      <Text style={styles.availability}><FormattedMessage id="user.offline" /></Text>  
+                    }
                   </Text>
                 </View>
               )
