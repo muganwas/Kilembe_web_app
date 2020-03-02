@@ -450,23 +450,24 @@ export const handleSignup = (email, password)=>{
     }    
 }
 
-export const confirmToken = tokeId => {
+export const confirmToken = tokenId => {
     return dispatch => {
-        const url = confirmTokenURL + tokeId;
-        if (tokeId) axios.post(url).then(result => {
-            let { data } = result;
-            let { error } = data;
-            if ( error && error.code === "auth/argument-error") {
-                dispatch(loginErrorAlert("error.sessionExpired"));
+        const url = confirmTokenURL + tokenId;
+        if (tokenId) axios.post(url).then(result => {
+                let { data } = result;
+                let { error } = data;
+                console.log(error.code)
+                if ( error && error.code === "auth/argument-error") {
+                    dispatch(loginErrorAlert("error.sessionExpired"));
+                    dispatch(logout());
+                }
+                else dispatch(loginConfirmed());
+                
+            }).catch(error=>{
+                console.log(error.message)
+                dispatch(loginErrorAlert("error.loginFailure"));
                 dispatch(logout());
-            }
-            else dispatch(loginConfirmed());
-            
-        }).catch(error=>{
-            console.log(error.message)
-            dispatch(loginErrorAlert("error.loginFailure"));
-            dispatch(logout());
-        });
+            });
     }
 }
 
@@ -523,13 +524,13 @@ export const logout = () =>{
 
 export const connectToChatServer = props => {
     return dispatch => {
-        const { genInfo: { info: { dname, chatkitUser: { token } } }, loginInfo: { socketOpen } } = props;
-        //console.log(token)
-        // console.log(socketOpen)
-        if (token && !socketOpen) {
+        const { genInfo: { info: { chatkitUser: { token } } }, loginInfo: { socketOpen } } = props;
+        const storedInfo = JSON.parse(localStorage.getItem('genInfo'));
+        const storedToken = storedInfo.chatkitUser.token;
+        if ((token || storedToken) && !socketOpen) {
             console.log('opening socket...')
             socket.open();
-            socket.emit("user-joined", dname);
+            //socket.emit("user-joined", dname);
             dispatch(socketConnected());
         }
     }
@@ -544,6 +545,8 @@ export const disconnectFromChatServer = () => {
 
 export const alertSocketError = error => {
     return dispatch => {
+        // console.log('disconnected with error')
+        console.log(error)
         //socket.disconnect();
         if (error.message && error.message === 'UNAUTHORIZED') dispatch(unAuthorizedAuthentication());
         if (error.code === 'auth/id-token-expired') {

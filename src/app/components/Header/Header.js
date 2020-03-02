@@ -10,7 +10,9 @@ import {
     fetchFriendsRequests
 } from 'reduxFiles/dispatchers/userDispatchers';
 import {
-    fetchedUsersOnline
+    fetchedUsersOnline,
+    dispatchRecievedMessage,
+    //dispatchSentMessage
 } from 'reduxFiles/dispatchers/chatDispatchers';
 import { 
     logout, 
@@ -21,9 +23,10 @@ import {
     alertSocketError,
     socketConnected,
     socket,
+    checkLoginStatus,
     confirmToken
 } from 'reduxFiles/dispatchers/authDispatchers';
-// import { setChatId } from '../../misc/functions';
+import { RECONNECT_TIMER } from 'misc/constants';
 
 class Header extends Component {
     constructor(){
@@ -42,6 +45,7 @@ class Header extends Component {
             friendAction: false,
             onlineUsers: null
         }
+        this.reconnectTimer = null;
     }
 
     componentDidMount(){
@@ -50,13 +54,15 @@ class Header extends Component {
             genInfo, 
             updateGenInfo,
             confirmLoggedIn,
-            loginInfo: { socketOpen, unAuthorizedConnection },
+            loginInfo,
             friendsInfo: { inComingRequests, fetchedFriends },
             dispatchSocketConnected,
             openSocket
         } = this.props;
-        let { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
-        let { notificationClass } = this.state;
+        const { socketOpen, unAuthorizedConnection } = loginInfo;
+        const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
+        const { notificationClass } = this.state;
+        
         //dispatch local storage genInfo to props
         if (!loggedIn) {
             let storedInfo = localStorage.getItem('genInfo');
@@ -97,9 +103,10 @@ class Header extends Component {
         });
         
         socket.on('unauthorized', reason => {
-            const { dispatchSocketError } = this.props;
-            console.log('Unauthorized:', reason);
+            const { dispatchSocketError, signOut } = this.props;
+            // console.log('Unauthorized:', reason);
             dispatchSocketError(reason);
+            signOut();
         });
         
         socket.on('disconnect', reason => {
@@ -114,10 +121,16 @@ class Header extends Component {
         socket.on("join-alert", data => {
             const { dispatchUsersOnline } = this.props;
             dispatchUsersOnline(data);
+            console.log('You connected');
         });
     
-        socket.on("chat-message", data =>{
-            const { name, message } = data;
+        socket.on("chat-message", data => {
+            const { chatInfo: { messages }, storeRecievedMessages } = this.props;
+            const { sender } = data;
+            let newMessages = {...messages};
+            if (newMessages[sender]) newMessages[sender].push(data);
+            else newMessages[sender] = [data];
+            storeRecievedMessages(newMessages);
             //do something when message recieved
         });
     
@@ -128,7 +141,8 @@ class Header extends Component {
         });
     
         socket.on("user-connected", data => {
-            //do something when user connects
+            const { dispatchUsersOnline } = this.props;
+            dispatchUsersOnline(data);
         });
         if (!socketOpen && !unAuthorizedConnection && token && uid) openSocket(this.props);
     }
@@ -143,7 +157,7 @@ class Header extends Component {
             getUsers, 
             getFriends,
             getFriendsRequests,
-            uploadUsersInfoToFB 
+            uploadUsersInfoToFB,
         } = this.props;
         let { uid, avURL } = info;
         if (!fetched) getUsers();
@@ -167,11 +181,17 @@ class Header extends Component {
         // show nofication icon if there are incoming requests
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
         else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
-        
-        if (!socketOpen && !unAuthorizedConnection && token && uid) openSocket(this.props);
+        if (loggedIn && !socketOpen && !unAuthorizedConnection) {
+            clearInterval(this.reconnectTimer);
+            this.reconnectTimer = setInterval(() => {
+                console.log('trying to reconnect...');
+                openSocket(this.props);
+            }, RECONNECT_TIMER);
+        } 
+        else clearInterval(this.reconnectTimer);
     }
 
-    showMenu = ()=>{
+    showMenu = () => {
         var menu = this.state.dropDownStyle;
         if ( menu !== "visible"){
             this.setState({
@@ -212,10 +232,10 @@ class Header extends Component {
         "/";
         return (
             <div className="mainNav">
-                { loggedIn? 
+                { loggedIn ? 
                 <ProfileImage dname={ dname } userId = { uid } />:
                 null }    
-                { loggedIn?
+                { loggedIn ?
                 <div className="nav">    
                     <span className={ homeStyle } onClick={ () => this.goTo("/home") }></span>
                     <span className={ friendsStyle } onClick={ () => this.goTo("/friends") }>
@@ -234,7 +254,7 @@ class Header extends Component {
                             </ul>
                         </div>
                     </span> 
-                </div>:
+                </div> :
                 <div>
                     <span className={ loginStyle } onClick={ () => this.goTo(notFoundPath) }></span>
                 </div> }
@@ -247,10 +267,22 @@ Header.propTypes = {
     genInfo: PropTypes.object,
     info: PropTypes.object,
     loginInfo: PropTypes.object,
+    friendsInfo: PropTypes.object,
+    chatInfo: PropTypes.object,
     confirmLoggedIn: PropTypes.func.isRequired,
     updateGenInfo: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired,
-    dispatchUsersOnline: PropTypes.func.isRequired
+    dispatchUsersOnline: PropTypes.func.isRequired,
+    getUsers: PropTypes.func,
+    openSocket: PropTypes.func,
+    closeSocket: PropTypes.func,
+    confirmUserToken: PropTypes,
+    logingStatusConfirmation: PropTypes.func,
+    dispatchSocketConnected: PropTypes.func,
+    dispatchSocketError: PropTypes.func,
+    getFriends: PropTypes.func,
+    getFriendsRequests: PropTypes.func,
+    uploadUsersInfoToFB: PropTypes.func,
 }
 
 const mapStateToProps = state => {
@@ -258,7 +290,8 @@ const mapStateToProps = state => {
         genInfo: state.genInfo,
         info: state.genInfo.info,
         loginInfo: state.loginInfo,
-        friendsInfo: state.friendsInfo
+        friendsInfo: state.friendsInfo,
+        chatInfo: state.chatInfo
     }
 }
 
@@ -276,11 +309,14 @@ const mapDispatchToProps = dispatch => {
         confirmUserToken: userToken => {
             dispatch(confirmToken(userToken));
         },
+        logingStatusConfirmation: (confirmLoggedIn, loginInfo, genInfo) => {
+            dispatch(checkLoginStatus(confirmLoggedIn, loginInfo, genInfo));
+        },
         dispatchSocketConnected: () => {
             dispatch(socketConnected());
         },
         dispatchSocketError: error => {
-            dispatch(alertSocketError(error))
+            dispatch(alertSocketError(error));
         },
         getFriends: info => {
             dispatch(fetchFriends(info));
@@ -302,6 +338,9 @@ const mapDispatchToProps = dispatch => {
         },
         dispatchUsersOnline: users => {
             dispatch(fetchedUsersOnline(users));
+        },
+        storeRecievedMessages: message => {
+            dispatch(dispatchRecievedMessage(message));
         }
     }
 }

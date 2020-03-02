@@ -5,13 +5,15 @@ import {
   FETCH_MESSAGES_PENDING,
   FETCH_MESSAGES_FULFILLED,
   FETCH_MESSAGES_ERROR,
-  SET_USER_TO_CHAT
+  SET_USER_TO_CHAT,
+  MESSAGE_RECIEVED_DISPATCHED,
+  MESSAGE_SENT_DISPATCHED
 } from "../types";
 
 const defaultState = {
   onlineUsers: null,
   selectedUser: null,
-  messages: null,
+  messages: {},
   fetching: false,
   fetched: false,
   error: null
@@ -42,6 +44,18 @@ const chatReducer = (state = defaultState, action) => {
         error: false,
         onlineUsers: action.payload
       };
+    }
+    case MESSAGE_RECIEVED_DISPATCHED: {
+      return {
+        ...state,
+        messages: action.payload 
+      }
+    }
+    case MESSAGE_SENT_DISPATCHED: {
+      return {
+        ...state,
+        messages: action.payload
+      }
     }
     case FETCH_MESSAGES_PENDING: {
       return {

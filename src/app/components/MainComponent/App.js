@@ -26,9 +26,8 @@ class App extends Component {
         false : localStorage.getItem("exists");
     
     /**Determine page to redirect to */
-
     if (uid) {
-      console.log(genInfo)
+      //console.log(genInfo)
       if (genInfo) this.props.sendGenInfo(genInfo);
       //check if user session is still valid
       if (sessionToken) checkSessionValidity(sessionToken);
