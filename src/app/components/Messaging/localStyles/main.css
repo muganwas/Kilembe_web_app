@@ -1,0 +1,7 @@
+.messages {
+  background-color: #b9b9b9;
+  padding: 3px;
+  text-transform: lowercase;
+  font-style: italic;
+  color: #f0f0f0;
+}

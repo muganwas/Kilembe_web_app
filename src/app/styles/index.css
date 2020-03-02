@@ -1,5 +1,6 @@
 /*icon mods*/
 @import './font-awsome/fontawesome-all.css';
+@import './kloader.css';
 .divider{
   display: block;
   height: 5px;
@@ -13,13 +14,21 @@
   background-color: #dd4b39;
   color: #fff;
 }
+.notification {
+  height: 5px;
+  width: 5px;
+  position: absolute;
+  right: 0;
+  top: 0
+}
 /*app style*/
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
 }
-h3, h4, h5 {
+h3, h4, h5, .page-header-small {
+  display: block;
   font-size: 14px;
   font-weight: bold;
 }
@@ -38,9 +47,14 @@ li{
 }
 .main{
   display: block;
+  align-items: center;
   text-align: center;
 }
-.form{
+.main>div>div {
+  display: inline-block;
+}
+
+.form {
   margin: 0 50px;
 }
 .App{
@@ -56,7 +70,7 @@ li{
   border-radius: 5px;
   width: 350px;
 }
-.App span{
+.App span, .span {
   display: block;
   padding: 2px 5px;
   text-align: left;
@@ -121,6 +135,14 @@ li{
 }
 .avContainer{
   display: inline-block;
+}
+.nav.logged-out{
+  float: none;
+}
+.nav.logged-out::after{
+  clear: both;
+  content: " ";
+  display: block;
 }
 .nav .icon{
   float: left;
@@ -300,6 +322,13 @@ li{
   cursor: pointer;
   float: left;
 }
+.membersAv-small{
+  width: 20px;
+  max-height: 30px;
+  min-height: 20px;
+  cursor: pointer;
+  float: left;
+} 
 .members{
   position: relative;
   width: 100%;
@@ -460,14 +489,29 @@ li{
     margin: 5% 10px;
 }
 .messaging{
+  display: flex;
   box-sizing: border-box;
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
 }
 .friends{
   box-sizing: border-box;
   width: 25%;
-  padding: 10px 0;
+  padding: 10px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.15);
+}
+#friends-list{
+  min-width: 200px;
+  flex: 2
+}
+#conversation-container{
+  padding: 10px;
+  display: block;
+  flex: 7
+}
+#messaging-call-to-action{
+  display: block;
+  color: #bbbbbb;
+  text-align: center;
 }
 .friend{
   box-sizing: border-box;
@@ -475,6 +519,7 @@ li{
   display: block;
   height: 60px;
   margin: 10px 0;
+  z-index: 10000;
 }
 .friend:hover{
   box-sizing: border-box;
@@ -612,6 +657,20 @@ li{
 .alert-main:hover::before{
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
+.online{
+  position: absolute;
+  margin: 0 0 0 -10px;
+  color: #0ed43f;
+  font-size: 10px;
+  z-index: 10000;
+}
+.offline{
+  position: absolute;
+  margin: 0 0 0 -10px;
+  color: #a5a5a5;
+  font-size: 10px;
+  z-index: 10000;
+}
 .respondB{
   position: absolute;
   text-align: center;
@@ -629,12 +688,16 @@ li{
 .respondB:last-child{
   right: -1px;
 }
+#devName {
+  padding: 0px 5px;
+}
 @media only screen and (max-width: 900px){
   .playlist{
     display: none;
   }
   .friends{
     width: 35%;
+
   }
   .content .tutorial{
     box-sizing: border-box;
