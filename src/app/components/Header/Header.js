@@ -114,6 +114,7 @@ class Header extends Component {
             if ( reason === 'io server disconnect' && token && uid ) {
                 console.log('useless server');
             }
+            socket.removeAllListeners();
             dispatchUsersOnline({});
             dispatchSocketError(reason);
         });
@@ -171,7 +172,7 @@ class Header extends Component {
     componentDidUpdate(){
         const {
             loginInfo: { loggedIn, socketOpen, unAuthorizedConnection },
-            genInfo: { fetched, info: { uid, chatkitUser: { token } } },
+            genInfo: { fetched },
             friendsInfo: { fetchedFriends, inComingRequests },
             openSocket
         } =this.props;
