@@ -5,6 +5,14 @@
   "homepage": "https://kilembeschoool.aliendynamic.com",
   "main": "index.js",
   "private": true,
+  "scripts": {
+    "dev": "webpack-dev-server --open --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js",
+    "start": "node server.js",
+    "heroku-postbuild": "npm run build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
     "@pusher/chatkit": "^0.7.17",
     "@types/dotenv-webpack": "^1.5.0",
@@ -67,14 +75,6 @@
     "webpack-dev-server": "^3.9.0",
     "webpack-manifest-plugin": "^2.0.3",
     "webpack-merge": "^4.1.4"
-  },
-  "scripts": {
-    "dev": "webpack-dev-server --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js",
-    "start": "node server.js",
-    "heroku-postbuild": "npm run build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
   },
   "devDependencies": {
     "@types/redux-logger": "^3.0.7",
