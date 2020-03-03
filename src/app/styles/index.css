@@ -524,7 +524,6 @@ li{
   box-sizing: border-box;
   padding: 5px;
   display: block;
-  height: 40px;
   margin: 5px 0;
   z-index: 10000;
 }

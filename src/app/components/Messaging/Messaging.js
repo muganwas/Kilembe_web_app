@@ -66,13 +66,12 @@ class Messaging extends Component {
                         // console.log(dname + ' ' + email)
                         return (
                             <div key={key} id={key} onClick={this.displayChatComponent} className="friend">
-                                <div id={key} className="left">
+                                <div id={key} className="left-col">
                                     <div id={key} className="roundPic-users membersAv-small">
                                         <img id={key} alt={ uid } className="members" src = { avatar } />
                                     </div>
                                     <i className={badgeClass}></i>
                                     <div id={key} className="name">{ dname ? dname : email }</div>
-                                    <div className="clear"></div>
                                 </div>
                             </div>
                         )

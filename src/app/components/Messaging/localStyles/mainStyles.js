@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const styles = {
+const styles = StyleSheet.create({
   chatContainer: {
     height: '100%',
     display: 'flex',
@@ -16,6 +16,7 @@ const styles = {
     height: 30,
   },
   userInfoContainer: {
+    backgroundColor: '#EDEDED',
   },
   members: {
     position: 'relative',
@@ -30,21 +31,20 @@ const styles = {
     borderColor: '#c9c9c9',
     position: 'relative',
     display: 'inline-block',
-    verticalAlign:'top',
     overflow: 'hidden',
     borderRadius: '50%',
   },
   userInfo: {
     boxSizing: 'border-box',
     display: 'block',
-    height: 40
+    margin: 5
   },
   userTextInfoContainer: {
     margin: 3,
-    height: 20,
     position: 'relative',
     alignContent: 'center',
     alignItems: 'center',
+    textAlignVertical:'top',
     display: 'inline-block',
   },
   username: {
@@ -98,6 +98,7 @@ const styles = {
     display: 'block',
     height: '100%',
     minHeight: 100,
+    padding: 10,
     height: 200
   },
   messagesSubContainer: {
@@ -129,6 +130,6 @@ const styles = {
     textAlign: 'center',
     color: '#fff'
   }
-};
+});
 
 export default styles;
