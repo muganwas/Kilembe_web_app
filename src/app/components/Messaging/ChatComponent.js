@@ -9,10 +9,9 @@ import {
 } from 'reduxFiles/dispatchers/authDispatchers';
 import { FormattedMessage } from 'react-intl';
 import {
-  // dispatchRecievedMessage,
   dispatchSentMessage
 } from 'reduxFiles/dispatchers/chatDispatchers';
-import { TextInput, TouchableOpacity, Text, View, ScrollView, Image } from 'react-native';
+import { TextInput, TouchableOpacity, Text, View, ScrollView} from 'react-native';
 import styles from './localStyles/mainStyles';
 
 class ChatComponent extends React.Component { 

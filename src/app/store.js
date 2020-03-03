@@ -18,8 +18,10 @@ import signupReducer from 'reduxFiles/reducers/signupReducer';
 import chatReducer from 'reduxFiles/reducers/chatReducer';
 
 Moment.globalMoment = moment;
-
-const middleware = applyMiddleware(promise(), thunk, apiMiddleware, logger);
+var middleware;
+// apply logger only in development and staging
+if (process.env.NODE_ENV !== 'production') middleware = applyMiddleware(promise(), thunk, apiMiddleware, logger);
+else middleware = applyMiddleware(promise(), thunk, apiMiddleware);
 // Define user's language. Different browsers have the user locale defined
 // on different fields on the `navigator` object, so we make sure to account
 // for these different by checking all of them
