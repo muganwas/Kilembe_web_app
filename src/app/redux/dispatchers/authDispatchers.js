@@ -533,8 +533,8 @@ export const connectToChatServer = props => {
         const storedInfo = JSON.parse(localStorage.getItem('genInfo'));
         const storedToken = storedInfo.chatkitUser.token;
         const remoteConnected = socket.connected;
-        console.log('remote socket connected: ', remoteConnected);
-        if ((token || storedToken) && !socketOpen && !remoteConnected) {
+        console.log('remote socket open: ', remoteConnected);
+        if ((token || storedToken) && !socketOpen) {
             console.log('opening socket...')
             socket.open();
             dispatch(socketConnected());

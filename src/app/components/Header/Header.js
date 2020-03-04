@@ -101,6 +101,10 @@ class Header extends Component {
                 }
             }
         });
+
+        socket.on('authorized', reason => {
+            console.log(reason.message)
+        })
         
         socket.on('unauthorized', reason => {
             const { dispatchSocketError, signOut } = this.props;
@@ -128,8 +132,16 @@ class Header extends Component {
         socket.on("chat-message", data => {
             const { chatInfo: { messages }, storeRecievedMessages } = this.props;
             const { sender } = data;
-            let newMessages = {...messages};
-            if (newMessages[sender]) newMessages[sender].push(data);
+            let newMessages = Object.assign({}, messages);
+            const messagesWithSender = newMessages[sender];
+            const messagesWithSenderLength = messagesWithSender ? messagesWithSender.length : 0;
+            // console.log(data);
+            if (messagesWithSenderLength > 0) {
+                const prevMessages = [...newMessages[sender]];
+                const prevMessage = prevMessages.pop();
+                if (JSON.stringify(prevMessage) === JSON.stringify(data)) console.log('repeated msg')
+                else newMessages[sender].push(data);
+            }
             else newMessages[sender] = [data];
             storeRecievedMessages(newMessages);
             //do something when message recieved
@@ -182,14 +194,15 @@ class Header extends Component {
         // show nofication icon if there are incoming requests
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
         else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
+        
         if (loggedIn && !socketOpen && !unAuthorizedConnection) {
-            clearInterval(this.reconnectTimer);
-            this.reconnectTimer = setInterval(() => {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = setTimeout(() => {
                 console.log('trying to reconnect...');
                 openSocket(this.props);
             }, RECONNECT_TIMER);
         } 
-        else clearInterval(this.reconnectTimer);
+        else clearTimeout(this.reconnectTimer);
     }
 
     showMenu = () => {
