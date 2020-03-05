@@ -14,8 +14,10 @@ const defaultState = {
   onlineUsers: null,
   selectedUser: null,
   messages: {},
-  fetching: false,
-  fetched: false,
+  fetchingOnlineUsers: false,
+  fetchedOnlineUsers: false,
+  fetchingChats: false,
+  fetchedChats: false,
   error: null
 };
 const chatReducer = (state = defaultState, action) => {
@@ -23,25 +25,24 @@ const chatReducer = (state = defaultState, action) => {
     case FETCH_ONLINE_USERS_PENDING: {
       return {
         ...state,
-        fetched: false,
-        error: null,
-        fetching: true
+        fetchedOnlineUsers: false,
+        fetchingOnlineUsers: true,
+        error: null
       };
     }
     case FETCH_ONLINE_USERS_ERROR: {
       return {
         ...state,
-        fetching: false,
-        fetched: false,
+        fetchingOnlineUsers: false,
+        fetchedOnlineUsers: false,
         error: action.payload
       };
     }
     case FETCH_ONLINE_USERS_FULFILLED: {
       return {
         ...state,
-        fetched: true,
-        fetching: false,
-        error: false,
+        fetchedOnlineUsers: true,
+        fetchingOnlineUsers: false,
         onlineUsers: action.payload
       };
     }
@@ -60,25 +61,23 @@ const chatReducer = (state = defaultState, action) => {
     case FETCH_MESSAGES_PENDING: {
       return {
         ...state,
-        fetched: false,
-        error: null,
-        fetching: true
+        fetchedChats: false,
+        fetchingChats: true
       };
     }
     case FETCH_MESSAGES_ERROR: {
       return {
         ...state,
-        fetching: false,
-        fetched: false,
+        fetchingChats: false,
+        fetchedChats: false,
         error: action.payload
       };
     }
     case FETCH_MESSAGES_FULFILLED: {
       return {
         ...state,
-        fetched: true,
-        fetching: false,
-        error: false,
+        fetchedChats: true,
+        fetchingChats: false,
         messages: action.payload
       };
     }

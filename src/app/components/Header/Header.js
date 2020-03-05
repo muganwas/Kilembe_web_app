@@ -104,8 +104,8 @@ class Header extends Component {
         });
 
         socket.on('authorized', reason => {
-            const { genInfo: { info: { uid } }, fetchChats } = this.props;
-            fetchChats(uid);
+            const { genInfo: { info: { uid, chatkitUser: { token } } }, fetchChats } = this.props;
+            fetchChats(uid, token);
             console.log(reason.message)
         })
         
@@ -117,7 +117,7 @@ class Header extends Component {
         });
         
         socket.on('disconnect', reason => {
-            let { dispatchSocketError, dispatchUsersOnline, genInfo: { info: { uid, chatkitUser: { token }  } } } = this.props;
+            let { dispatchSocketError, dispatchUsersOnline } = this.props;
             dispatchUsersOnline({});
             dispatchSocketError(reason);
         });
@@ -356,8 +356,8 @@ const mapDispatchToProps = dispatch => {
         storeRecievedMessages: message => {
             dispatch(dispatchRecievedMessage(message));
         },
-        fetchChats: sender => {
-            dispatch(fetchChatMessages(sender));
+        fetchChats: (sender, token) => {
+            dispatch(fetchChatMessages(sender,token));
         }
     }
 }
