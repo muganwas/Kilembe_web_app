@@ -54,7 +54,7 @@ export const fetchMessagesError = error => {
 export const fetchChatMessages = uid => {
   return dispatch => {
     dispatch(fetchMessagesPending());
-    const url = chatServerUrl + 'api/v1/fetchChats?sender=' + uid;
+    const url = chatServerUrl + '/api/v1/fetchChats?sender=' + uid;
     axios.get(url).then( results => {
       const { data } = results;
       let messages = {};
