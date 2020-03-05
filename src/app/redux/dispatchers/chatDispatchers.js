@@ -58,15 +58,23 @@ export const fetchChatMessages = uid => {
     axios.get(url).then( results => {
       const { data } = results;
       let messages = {};
-      let otherUser;
+      let otherUsers = {};
+      // get uids of other users this user has chatted with
       data.map(msgObj => {
         const { sender, recipient } = msgObj;
-        if (sender !== uid) otherUser = sender;
-        else if (recipient !== uid) otherUser = recipient;
+        if (sender !== uid) otherUsers[sender] = sender;
+        else if (recipient !== uid) otherUsers[recipient] = recipient;
       });
-      if (otherUser) {
-        messages[otherUser] = data;
-        console.log(messages);
+      // if any user, seperate the different groups of messages
+      if (Object.keys(otherUsers).length > 0) {
+        Object.keys(otherUsers).map( otherUser => {
+          const thisUsersMessages = [];
+          data.map(msgObj => {
+            const { sender, recipient } = msgObj;
+            if (otherUser === sender || otherUser === recipient) thisUsersMessages.push(msgObj);
+          });
+          if (thisUsersMessages.length > 0) messages[otherUser] = thisUsersMessages;
+        });
         dispatch(fetchMessagesFulfilled(messages))
       }
     }).catch(e => {
