@@ -12,6 +12,7 @@ import {
 import {
     fetchedUsersOnline,
     dispatchRecievedMessage,
+    fetchChatMessages
     //dispatchSentMessage
 } from 'reduxFiles/dispatchers/chatDispatchers';
 import { 
@@ -57,7 +58,7 @@ class Header extends Component {
             loginInfo,
             friendsInfo: { inComingRequests, fetchedFriends },
             dispatchSocketConnected,
-            openSocket
+            openSocket,
         } = this.props;
         const { socketOpen, unAuthorizedConnection } = loginInfo;
         const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
@@ -103,6 +104,8 @@ class Header extends Component {
         });
 
         socket.on('authorized', reason => {
+            const { genInfo: { info: { uid } }, fetchChats } = this.props;
+            fetchChats(uid);
             console.log(reason.message)
         })
         
@@ -115,10 +118,6 @@ class Header extends Component {
         
         socket.on('disconnect', reason => {
             let { dispatchSocketError, dispatchUsersOnline, genInfo: { info: { uid, chatkitUser: { token }  } } } = this.props;
-            if ( reason === 'io server disconnect' && token && uid ) {
-                console.log('useless server');
-            }
-            socket.removeAllListeners();
             dispatchUsersOnline({});
             dispatchSocketError(reason);
         });
@@ -191,6 +190,7 @@ class Header extends Component {
         const { notificationClass } = this.state;
         if (!loggedIn) this.goTo("/");
         else if (fetched) this.setUpFriendsInfo();
+        
         // show nofication icon if there are incoming requests
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
         else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
@@ -355,6 +355,9 @@ const mapDispatchToProps = dispatch => {
         },
         storeRecievedMessages: message => {
             dispatch(dispatchRecievedMessage(message));
+        },
+        fetchChats: sender => {
+            dispatch(fetchChatMessages(sender));
         }
     }
 }
