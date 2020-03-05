@@ -12,6 +12,7 @@ import {
 import {
     fetchedUsersOnline,
     dispatchRecievedMessage,
+    fetchChatMessages
     //dispatchSentMessage
 } from 'reduxFiles/dispatchers/chatDispatchers';
 import { 
@@ -57,7 +58,7 @@ class Header extends Component {
             loginInfo,
             friendsInfo: { inComingRequests, fetchedFriends },
             dispatchSocketConnected,
-            openSocket
+            openSocket,
         } = this.props;
         const { socketOpen, unAuthorizedConnection } = loginInfo;
         const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
@@ -101,6 +102,12 @@ class Header extends Component {
                 }
             }
         });
+
+        socket.on('authorized', reason => {
+            const { genInfo: { info: { uid } }, fetchChats } = this.props;
+            fetchChats(uid);
+            console.log(reason.message)
+        })
         
         socket.on('unauthorized', reason => {
             const { dispatchSocketError, signOut } = this.props;
@@ -111,9 +118,6 @@ class Header extends Component {
         
         socket.on('disconnect', reason => {
             let { dispatchSocketError, dispatchUsersOnline, genInfo: { info: { uid, chatkitUser: { token }  } } } = this.props;
-            if ( reason === 'io server disconnect' && token && uid ) {
-                console.log('useless server');
-            }
             dispatchUsersOnline({});
             dispatchSocketError(reason);
         });
@@ -127,8 +131,16 @@ class Header extends Component {
         socket.on("chat-message", data => {
             const { chatInfo: { messages }, storeRecievedMessages } = this.props;
             const { sender } = data;
-            let newMessages = {...messages};
-            if (newMessages[sender]) newMessages[sender].push(data);
+            let newMessages = Object.assign({}, messages);
+            const messagesWithSender = newMessages[sender];
+            const messagesWithSenderLength = messagesWithSender ? messagesWithSender.length : 0;
+            // console.log(data);
+            if (messagesWithSenderLength > 0) {
+                const prevMessages = [...newMessages[sender]];
+                const prevMessage = prevMessages.pop();
+                if (JSON.stringify(prevMessage) === JSON.stringify(data)) console.log('repeated msg')
+                else newMessages[sender].push(data);
+            }
             else newMessages[sender] = [data];
             storeRecievedMessages(newMessages);
             //do something when message recieved
@@ -171,24 +183,26 @@ class Header extends Component {
     componentDidUpdate(){
         const {
             loginInfo: { loggedIn, socketOpen, unAuthorizedConnection },
-            genInfo: { fetched, info: { uid, chatkitUser: { token } } },
+            genInfo: { fetched },
             friendsInfo: { fetchedFriends, inComingRequests },
             openSocket
         } =this.props;
         const { notificationClass } = this.state;
         if (!loggedIn) this.goTo("/");
         else if (fetched) this.setUpFriendsInfo();
+        
         // show nofication icon if there are incoming requests
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
         else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
+        
         if (loggedIn && !socketOpen && !unAuthorizedConnection) {
-            clearInterval(this.reconnectTimer);
-            this.reconnectTimer = setInterval(() => {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = setTimeout(() => {
                 console.log('trying to reconnect...');
                 openSocket(this.props);
             }, RECONNECT_TIMER);
         } 
-        else clearInterval(this.reconnectTimer);
+        else clearTimeout(this.reconnectTimer);
     }
 
     showMenu = () => {
@@ -341,6 +355,9 @@ const mapDispatchToProps = dispatch => {
         },
         storeRecievedMessages: message => {
             dispatch(dispatchRecievedMessage(message));
+        },
+        fetchChats: sender => {
+            dispatch(fetchChatMessages(sender));
         }
     }
 }
