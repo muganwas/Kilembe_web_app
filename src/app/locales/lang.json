@@ -47,6 +47,7 @@
         "signup.pageTitle": "Sign Up",
         "reset.pageTitle": "Password Reset",
         "playlist.title":"Your playlist",
+        "users.title": "Kilembe users",
         "site.copyrightText": "©2018 Kilembe School"
     },
     "fr": {
@@ -96,6 +97,7 @@
         "signup.pageTitle": "Sign Up",
         "reset.pageTitle": "Password Reset",
         "playlist.title":"Your playlist",
+        "users.title": "Kilembe users",
         "site.copyrightText": "©2018 Kilembe School"
     }
 }

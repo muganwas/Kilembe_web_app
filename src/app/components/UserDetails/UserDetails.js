@@ -138,7 +138,7 @@ class UserDetails extends Component {
         });
     }
 
-    syncCurrentUsersFriends = (userId) => {
+    syncCurrentUsersFriends = userId => {
         base.syncState(`users/${userId}/friends`,{
             context: this,
             state: 'friends'
@@ -186,7 +186,7 @@ class UserDetails extends Component {
         getFriendsRequests(info);
         getFriends(info);
     }
-    respondOrRequest = ()=>{
+    respondOrRequest = () => {
         const { 
             direction, 
             friendRequestStatus, 
@@ -304,12 +304,18 @@ class UserDetails extends Component {
     }
 
     render(){
-        const { friendsInfo: { selectedUser: {
-            currUserAvUrl,
-            currUserDname,
-            currUserEmail,
-            currUserAbout
-        } } } = this.props;
+        const { friendsInfo: { 
+            defaultAvatar,
+            selectedUser: {
+                    currUserAvUrl,
+                    currUserDname,
+                    currUserEmail,
+                    currUserAbout
+                } 
+            } 
+        } = this.props;
+        let userImg = currUserAvUrl || defaultAvatar;
+        const aboutLength = currUserAbout ? currUserAbout.length : 0;
         return (
             <div className="container Home">
                 <Header />
@@ -318,11 +324,11 @@ class UserDetails extends Component {
                         <span className="nav-button">Back</span>
                     </div>
                     { 
-                        currUserDname?
+                        currUserDname ?
                         <div className="currUserDits">
                             <div id="left">
                                 <div className="roundPic membersAv">
-                                    <img alt={ currUserDname } className="members" src={ currUserAvUrl } />
+                                    <img alt={ currUserDname } className="members" src={ userImg } />
                                 </div>
                             </div>
                             <div id="center">
@@ -341,8 +347,8 @@ class UserDetails extends Component {
                                 </div>
                             </div>
                             <div id="right">
-                                <span className="icon-quote"></span>
-                                <div id="about-me">{ currUserAbout }</div>
+                                { aboutLength < 1 ? <span className="icon-quote"></span> :
+                                <div id="about-me">{`"${currUserAbout} "`}</div> }
                             </div>
                         </div>:
                         <KLoader 

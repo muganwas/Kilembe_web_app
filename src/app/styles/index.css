@@ -14,6 +14,9 @@
   background-color: #dd4b39;
   color: #fff;
 }
+#users-title {
+  margin-left:5px
+}
 .notification {
   height: 5px;
   width: 5px;
@@ -550,12 +553,12 @@ li{
 }
 .people{
   text-align: left;
-  box-sizing: content-box;
+  box-sizing: border-box;
+  overflow: hidden;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
   border-radius: 2px;
   position: relative;
   display: inline-block;
-  min-width: 200px;
   min-height: 40px;
   max-height: 45px;
   margin: 5px;
@@ -757,7 +760,6 @@ li{
     height: 100%; 
   }
   .pfriends{
-    min-width: 70%;
     float: right;
     font-size: 13px;
     font-weight: bold;
@@ -808,7 +810,12 @@ li{
     bottom: 0
   }
 }
-@media only screen and (max-width: 330px){
+@media only screen and (max-width: 376px){
+  .content{
+    font-size: 11px;
+    padding: 5px 0 20px;
+    margin: 1px;
+  }
   .friends{
     width: 15%;
     min-width: 50px;
