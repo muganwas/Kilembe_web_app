@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native';
+//import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+const styles = {
   chatContainer: {
     height: '100%',
     display: 'flex',
@@ -46,6 +46,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlignVertical:'top',
     display: 'inline-block',
+  },
+  closeButton: {
+    margin: 3,
+    float: 'right',
+    position: 'relative',
+    alignContent: 'center',
+    alignItems: 'center',
+    textAlignVertical:'top',
+    display: 'inline-block'
+  },
+  closeButtonText: {
+    textAlignVertical:'top',
+    color: '#16B5F3',
   },
   username: {
     display: 'block',
@@ -115,6 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginLeft: 10,
     height: 30,
+    minWidth: 50,
     backgroundColor: '#16B5F2'
   },
   disabledButton: {
@@ -124,12 +138,13 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginLeft: 10,
     height: 30,
+    minWidth: 50,
     backgroundColor: '#7F8787'
   },
   buttonText: {
     textAlign: 'center',
     color: '#fff'
   }
-});
+};
 
 export default styles;

@@ -7,7 +7,8 @@ import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import {
     fetchUsers,
     fetchFriends,
-    fetchFriendsRequests
+    fetchFriendsRequests,
+    fetchUserInfoFromDB
 } from 'reduxFiles/dispatchers/userDispatchers';
 import {
     fetchedUsersOnline,
@@ -44,7 +45,8 @@ class Header extends Component {
             logoutIconStyle: "small icon-logout",
             notificationClass: "fas fa-circle alert hidden",
             friendAction: false,
-            onlineUsers: null
+            onlineUsers: null,
+            showDropDownMenu: false
         }
         this.reconnectTimer = null;
     }
@@ -59,6 +61,8 @@ class Header extends Component {
             friendsInfo: { inComingRequests, fetchedFriends },
             dispatchSocketConnected,
             openSocket,
+            dbUserInfo,
+            fetchCurrentUserInfoFromDB
         } = this.props;
         const { socketOpen, unAuthorizedConnection } = loginInfo;
         const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
@@ -77,6 +81,8 @@ class Header extends Component {
         } 
         else {
             // console.log(friendsFetched + ' ' + fetched)
+            const dbUserInfoFetched = dbUserInfo.fetched;
+            if(!dbUserInfoFetched && uid) fetchCurrentUserInfoFromDB(uid);
             if (fetched) this.setUpFriendsInfo();
         }
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
@@ -104,8 +110,8 @@ class Header extends Component {
         });
 
         socket.on('authorized', reason => {
-            const { genInfo: { info: { uid } }, fetchChats } = this.props;
-            fetchChats(uid);
+            const { genInfo: { info: { uid, chatkitUser: { token } } }, fetchChats } = this.props;
+            fetchChats(uid, token);
             console.log(reason.message)
         })
         
@@ -117,7 +123,7 @@ class Header extends Component {
         });
         
         socket.on('disconnect', reason => {
-            let { dispatchSocketError, dispatchUsersOnline, genInfo: { info: { uid, chatkitUser: { token }  } } } = this.props;
+            let { dispatchSocketError, dispatchUsersOnline } = this.props;
             dispatchUsersOnline({});
             dispatchSocketError(reason);
         });
@@ -183,9 +189,14 @@ class Header extends Component {
     componentDidUpdate(){
         const {
             loginInfo: { loggedIn, socketOpen, unAuthorizedConnection },
-            genInfo: { fetched },
+            genInfo: { 
+                info: { uid },
+                fetched 
+            },
             friendsInfo: { fetchedFriends, inComingRequests },
-            openSocket
+            openSocket,
+            dbUserInfo,
+            fetchCurrentUserInfoFromDB
         } =this.props;
         const { notificationClass } = this.state;
         if (!loggedIn) this.goTo("/");
@@ -195,28 +206,34 @@ class Header extends Component {
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
         else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
         
-        if (loggedIn && !socketOpen && !unAuthorizedConnection) {
-            clearTimeout(this.reconnectTimer);
-            this.reconnectTimer = setTimeout(() => {
-                console.log('trying to reconnect...');
-                openSocket(this.props);
-            }, RECONNECT_TIMER);
+        if (loggedIn) { 
+            const dbUserInfoFetched = dbUserInfo.fetched;
+            if(!dbUserInfoFetched && uid) fetchCurrentUserInfoFromDB(uid);
+            if (!socketOpen && !unAuthorizedConnection) {
+                clearTimeout(this.reconnectTimer);
+                this.reconnectTimer = setTimeout(() => {
+                    console.log('trying to reconnect...');
+                    openSocket(this.props);
+                }, RECONNECT_TIMER);
+            }
         } 
         else clearTimeout(this.reconnectTimer);
     }
 
-    showMenu = () => {
-        var menu = this.state.dropDownStyle;
-        if ( menu !== "visible"){
+    toggleMenu = () => {
+        var visible = this.state.showDropDownMenu;
+        if (!visible) {
             this.setState({
                 dropDownStyle: "visible",
-                arrStyle: "visible"
+                arrStyle: "visible",
+                showDropDownMenu: true
             });
         }
         else {
             this.setState({
                 dropDownStyle: null,
-                arrStyle: null
+                arrStyle: null,
+                showDropDownMenu: false
             });
         }
     }
@@ -239,15 +256,17 @@ class Header extends Component {
             arrStyle,
             dropDownStyle,
             settingsIconStyle,
-            logoutIconStyle
+            logoutIconStyle,
+            showDropDownMenu
         } = this.state;
         const notFoundPath = loggedIn?
         "/home":
         "/";
+
         return (
             <div className="mainNav">
                 { loggedIn ? 
-                <ProfileImage dname={ dname } userId = { uid } />:
+                <ProfileImage dname={ dname } userId = { uid } /> :
                 null }    
                 { loggedIn ?
                 <div className="nav">    
@@ -256,7 +275,8 @@ class Header extends Component {
                         <span className={ notificationClass }></span>
                     </span>
                     <span className={ chatStyle } onClick={ () => this.goTo("/messaging") }></span> 
-                    <span className={ menuStyle } onClick={ this.showMenu }>
+                    <span className={ menuStyle } onClick={ this.toggleMenu }>
+                        { showDropDownMenu ? 
                         <div id="arr" className={ arrStyle }>
                             <ul id="menu" className={ dropDownStyle }>
                                 <li className={ settingsIconStyle }>
@@ -266,7 +286,8 @@ class Header extends Component {
                                     <span className="logout" onClick={ () => signOut(genInfo, this.goTo) } >Logout</span>
                                 </li>
                             </ul>
-                        </div>
+                        </div> : 
+                        null }
                     </span> 
                 </div> :
                 <div>
@@ -297,6 +318,7 @@ Header.propTypes = {
     getFriends: PropTypes.func,
     getFriendsRequests: PropTypes.func,
     uploadUsersInfoToFB: PropTypes.func,
+    fetchCurrentUserInfoFromDB: PropTypes.func
 }
 
 const mapStateToProps = state => {
@@ -305,7 +327,8 @@ const mapStateToProps = state => {
         info: state.genInfo.info,
         loginInfo: state.loginInfo,
         friendsInfo: state.friendsInfo,
-        chatInfo: state.chatInfo
+        chatInfo: state.chatInfo,
+        dbUserInfo: state.userInfo
     }
 }
 
@@ -356,8 +379,11 @@ const mapDispatchToProps = dispatch => {
         storeRecievedMessages: message => {
             dispatch(dispatchRecievedMessage(message));
         },
-        fetchChats: sender => {
-            dispatch(fetchChatMessages(sender));
+        fetchChats: (sender, token) => {
+            dispatch(fetchChatMessages(sender,token));
+        },
+        fetchCurrentUserInfoFromDB: uid => {
+            dispatch(fetchUserInfoFromDB(uid));
         }
     }
 }

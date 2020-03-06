@@ -47,7 +47,16 @@
         "signup.pageTitle": "Sign Up",
         "reset.pageTitle": "Password Reset",
         "playlist.title":"Your playlist",
-        "site.copyrightText": "©2018 Kilembe School"
+        "users.title": "Kilembe users",
+        "site.copyrightText": "©2018 Kilembe School",
+        "settings.pageTitle": "Settings",
+        "settings.profileTitle": "Profile",
+        "settings.emailLabel": "Your email address",
+        "settings.dnameLabel": "Your display name",
+        "settings.userIdLabel": "Your user ID",
+        "settings.aboutLabel": "About you",
+        "settings.shareEmailLabel": "Share email address",
+        "settings.shareEmailDescription": "Check to share you email with other users"
     },
     "fr": {
         "auth.loginLabel": "Sign in",
@@ -96,6 +105,15 @@
         "signup.pageTitle": "Sign Up",
         "reset.pageTitle": "Password Reset",
         "playlist.title":"Your playlist",
-        "site.copyrightText": "©2018 Kilembe School"
+        "users.title": "Kilembe users",
+        "site.copyrightText": "©2018 Kilembe School",
+        "settings.pageTitle": "Settings",
+        "settings.profileTitle": "Profile",
+        "settings.emailLabel": "Your email address",
+        "settings.dnameLabel": "Your display name",
+        "settings.userIdLabel": "Your user ID",
+        "settings.aboutLabel": "About you",
+        "settings.shareEmailLabel": "Share email address",
+        "settings.shareEmailDescription": "Check to share you email with other users"
     }
 }

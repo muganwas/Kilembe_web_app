@@ -12,6 +12,7 @@ import {
     fetchFriends,
     fetchFriendsRequests
 } from 'reduxFiles/dispatchers/userDispatchers';
+import { FormattedMessage } from 'react-intl';
 import { 
     loginConfirmed, 
     checkLoginStatus 
@@ -29,11 +30,11 @@ class Friends extends Component {
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
     }
 
-    userDetail = (key)=>{
+    userDetail =  key => {
         this.goTo(`/friends/${key}`);
     }
 
-    incoming = (key)=>{
+    incoming = key => {
         let { friendsInfo: { inComingRequests, responseRequired, users } } = this.props;;
         let len = inComingRequests.length;
         for(let count = 0; count < len; count++){
@@ -44,7 +45,7 @@ class Friends extends Component {
         } 
     }
 
-    getUsers = (key) => {
+    getUsers = key => {
         let { friendsInfo: { users, peopleListStyle, defaultAvatar }, genInfo: { info: { uid } } } = this.props;
         let loggedInUser = uid;
         let uCount = users.length;
@@ -66,7 +67,7 @@ class Friends extends Component {
         }
     }
 
-    goTo = (location) => {
+    goTo = location => {
         const { history } = this.props;
         history.push(location);
     } 
@@ -78,20 +79,18 @@ class Friends extends Component {
             <div className="container Home">
                 <Header />
                 <div className="content">
-                    <div id="general">
-                        <h4>Kilembe Users</h4>
-                        <div className="sub-container">
-                            { 
-                                usersLength?
-                                Object.keys(users).map(this.getUsers):
-                                <KLoader 
-                                    type="TailSpin"
-                                    color="#757575"
-                                    height={50}
-                                    width={50}
-                                />
-                            }
-                        </div>
+                    <h4 id="users-title"><FormattedMessage id="users.title" /></h4>
+                    <div className="sub-container">
+                        { 
+                            usersLength ?
+                            Object.keys(users).map(this.getUsers) :
+                            <KLoader 
+                                type="TailSpin"
+                                color="#757575"
+                                height={50}
+                                width={50}
+                            />
+                        }
                     </div>
                 </div>
                 <Footer />

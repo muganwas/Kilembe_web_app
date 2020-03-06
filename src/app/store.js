@@ -15,6 +15,7 @@ import genInfoReducer from 'reduxFiles/reducers/genInfoReducer';
 import loginReducer from 'reduxFiles/reducers/loginReducer';
 import resetReducer from 'reduxFiles/reducers/resetReducer';
 import signupReducer from 'reduxFiles/reducers/signupReducer';
+import userReducer from 'reduxFiles/reducers/userReducer';
 import chatReducer from 'reduxFiles/reducers/chatReducer';
 
 Moment.globalMoment = moment;
@@ -52,7 +53,8 @@ const allReducers = combineReducers({
     loginInfo: loginReducer,
     resetInfo: resetReducer,
     signupInfo: signupReducer,
-    chatInfo: chatReducer
+    chatInfo: chatReducer,
+    userInfo: userReducer
 });
 
 const store = createStore(

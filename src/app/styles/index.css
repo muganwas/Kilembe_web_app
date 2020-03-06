@@ -14,6 +14,9 @@
   background-color: #dd4b39;
   color: #fff;
 }
+#users-title {
+  margin-left:5px
+}
 .notification {
   height: 5px;
   width: 5px;
@@ -134,7 +137,7 @@ li{
   text-align: left;
 }
 .avContainer{
-  display: inline-block;
+  display: table;
 }
 .nav.logged-out{
   float: none;
@@ -166,7 +169,6 @@ li{
   background-color: #494141;
   padding: 5px 20px;
 }
-
 .mainNav .link, #menu {
   color: #1f1f1f;
   font-size: 13px;
@@ -299,9 +301,11 @@ li{
   min-height: 100px;
 }
 #welcome{
+  display: table-cell;
   font-size: 13px;
   font-weight: bold;
-  float: left;
+  text-transform: capitalize;
+  vertical-align: middle;
   margin: 14% 0;
 }
 .avator{
@@ -549,12 +553,12 @@ li{
 }
 .people{
   text-align: left;
-  box-sizing: content-box;
+  box-sizing: border-box;
+  overflow: hidden;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
   border-radius: 2px;
   position: relative;
   display: inline-block;
-  min-width: 200px;
   min-height: 40px;
   max-height: 45px;
   margin: 5px;
@@ -704,8 +708,13 @@ li{
     display: none;
   }
   .friends{
-    width: 35%;
-
+    width: 25%;
+    min-width: 50px;
+    padding: 5px;
+  }
+  #friends-list{
+    min-width: 180px;
+    flex: 2
   }
   .content .tutorial{
     box-sizing: border-box;
@@ -719,7 +728,10 @@ li{
     background-color: #fff;
   }
 }
-@media only screen and (max-width: 712px){
+@media only screen and (max-width: 768px){
+  .container{
+    width: 90%;
+  }
   .content .tutorial{
     box-sizing: border-box;
     min-width: 90%;
@@ -748,7 +760,6 @@ li{
     height: 100%; 
   }
   .pfriends{
-    min-width: 70%;
     float: right;
     font-size: 13px;
     font-weight: bold;
@@ -760,6 +771,26 @@ li{
   } 
 }
 @media only screen and (max-width: 550px){
+  .container{
+    width: 100%;
+  }
+  #devLink::before{
+    content: "Developed By "
+  }
+  #devLink {
+    display: block;
+    text-align: center;
+  }
+  .friends-mini {
+    box-sizing: border-box;
+    width: 15%;
+    padding: 5px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.15);
+  }
+  .friends-mini#friends-list{
+    min-width: 80px;
+    flex: 2
+  }
   .currUserDits #center{
     float: left;
     margin: 5px 0 auto 5px;
@@ -776,13 +807,22 @@ li{
     width: 100%;
     color: #000000;
     position: absolute;
-    bottom: 0;
-    left: 5%;
+    bottom: 0
   }
-  #devLink::before{
-    content: "Developed By "
+}
+@media only screen and (max-width: 376px){
+  .content{
+    font-size: 11px;
+    padding: 5px 0 20px;
+    margin: 1px;
   }
-  #welcome{
-    display: none;
+  .friends{
+    width: 15%;
+    min-width: 50px;
+    padding: 5px;
+  }
+  #friends-list{
+    min-width: 80px;
+    flex: 2
   }
 }

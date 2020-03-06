@@ -51,10 +51,13 @@ export const fetchMessagesError = error => {
     payload: error
   }
 }
-export const fetchChatMessages = uid => {
+export const fetchChatMessages = (uid, inappToken) => {
   return dispatch => {
     dispatch(fetchMessagesPending());
-    const url = chatServerUrl + '/api/v1/fetchChats?sender=' + uid;
+    const genInfo = JSON.parse(localStorage.getItem('genInfo'));
+    const { chatkitUser: { token } } = genInfo;
+    const userToken = inappToken || token
+    const url = chatServerUrl + '/api/v1/fetchChats?sender=' + uid + "&token=" + userToken;
     axios.get(url).then( results => {
       const { data } = results;
       let messages = {};
