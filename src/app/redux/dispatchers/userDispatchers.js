@@ -13,7 +13,10 @@ import {
     FETCH_OUT_GOING_REQUEST_PENDING,
     SELECT_USER_ERROR,
     SELECT_USER_FULFILLED,
-    RESPONSE_CLASS_CHANGED
+    RESPONSE_CLASS_CHANGED,
+    FETCH_USER_DB_INFO_PENDING,
+    FETCH_USER_DB_INFO_FULFILLED,
+    FETCH_USER_DB_INFO_ERROR
 } from '../types';
 import Rebase from 're-base';
 import app from '../../base';
@@ -116,17 +119,51 @@ export const responseClassChanged = payload => {
     }
 }
 
+export const fetchingUserInfoPending = () => {
+    return {
+        type:FETCH_USER_DB_INFO_PENDING
+    }
+}
+
+export const fetchingUserInfoFulfilled = payload => {
+    return {
+        type:FETCH_USER_DB_INFO_FULFILLED,
+        payload
+    }
+}
+
+export const fetchingUserInfoError = payload => {
+    return {
+        type:FETCH_USER_DB_INFO_ERROR,
+        payload
+    }
+}
 
 export const fetchUsers = () => {
     return dispatch => {
         base.fetch(`users`, {
             context: this,
             asArray: true
-        }).then(data=>{
+        }).then(data => {
             let length = data.length;
             if(length!==0 && length!==null) dispatch(usersSuccessfullyFetched(data));
-        }, error=>{
+        }, error => {
             dispatch(fetchingUsersError(error));
+        });
+    }
+}
+
+export const fetchUserInfoFromDB = uid => {
+    return dispatch => {
+        fetchingUserInfoPending();
+        base.fetch(`users/${uid}`, {
+            context: this,
+            asArray: false
+        }).then(data => {
+            let length = data.length;
+            if(length !==0 && length !== null) dispatch(fetchingUserInfoFulfilled(data));
+        }, error => {
+            dispatch(fetchingUserInfoError(error));
         });
     }
 }

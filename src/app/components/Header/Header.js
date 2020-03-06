@@ -7,7 +7,8 @@ import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import {
     fetchUsers,
     fetchFriends,
-    fetchFriendsRequests
+    fetchFriendsRequests,
+    fetchUserInfoFromDB
 } from 'reduxFiles/dispatchers/userDispatchers';
 import {
     fetchedUsersOnline,
@@ -60,6 +61,8 @@ class Header extends Component {
             friendsInfo: { inComingRequests, fetchedFriends },
             dispatchSocketConnected,
             openSocket,
+            dbUserInfo,
+            fetchCurrentUserInfoFromDB
         } = this.props;
         const { socketOpen, unAuthorizedConnection } = loginInfo;
         const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
@@ -78,6 +81,8 @@ class Header extends Component {
         } 
         else {
             // console.log(friendsFetched + ' ' + fetched)
+            const dbUserInfoFetched = dbUserInfo.fetched;
+            if(!dbUserInfoFetched && uid) fetchCurrentUserInfoFromDB(uid);
             if (fetched) this.setUpFriendsInfo();
         }
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
@@ -184,9 +189,14 @@ class Header extends Component {
     componentDidUpdate(){
         const {
             loginInfo: { loggedIn, socketOpen, unAuthorizedConnection },
-            genInfo: { fetched },
+            genInfo: { 
+                info: { uid },
+                fetched 
+            },
             friendsInfo: { fetchedFriends, inComingRequests },
-            openSocket
+            openSocket,
+            dbUserInfo,
+            fetchCurrentUserInfoFromDB
         } =this.props;
         const { notificationClass } = this.state;
         if (!loggedIn) this.goTo("/");
@@ -196,12 +206,16 @@ class Header extends Component {
         if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
         else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
         
-        if (loggedIn && !socketOpen && !unAuthorizedConnection) {
-            clearTimeout(this.reconnectTimer);
-            this.reconnectTimer = setTimeout(() => {
-                console.log('trying to reconnect...');
-                openSocket(this.props);
-            }, RECONNECT_TIMER);
+        if (loggedIn) { 
+            const dbUserInfoFetched = dbUserInfo.fetched;
+            if(!dbUserInfoFetched && uid) fetchCurrentUserInfoFromDB(uid);
+            if (!socketOpen && !unAuthorizedConnection) {
+                clearTimeout(this.reconnectTimer);
+                this.reconnectTimer = setTimeout(() => {
+                    console.log('trying to reconnect...');
+                    openSocket(this.props);
+                }, RECONNECT_TIMER);
+            }
         } 
         else clearTimeout(this.reconnectTimer);
     }
@@ -304,6 +318,7 @@ Header.propTypes = {
     getFriends: PropTypes.func,
     getFriendsRequests: PropTypes.func,
     uploadUsersInfoToFB: PropTypes.func,
+    fetchCurrentUserInfoFromDB: PropTypes.func
 }
 
 const mapStateToProps = state => {
@@ -312,7 +327,8 @@ const mapStateToProps = state => {
         info: state.genInfo.info,
         loginInfo: state.loginInfo,
         friendsInfo: state.friendsInfo,
-        chatInfo: state.chatInfo
+        chatInfo: state.chatInfo,
+        dbUserInfo: state.userInfo
     }
 }
 
@@ -365,6 +381,9 @@ const mapDispatchToProps = dispatch => {
         },
         fetchChats: (sender, token) => {
             dispatch(fetchChatMessages(sender,token));
+        },
+        fetchCurrentUserInfoFromDB: uid => {
+            dispatch(fetchUserInfoFromDB(uid));
         }
     }
 }
