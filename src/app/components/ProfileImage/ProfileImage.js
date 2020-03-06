@@ -5,6 +5,7 @@ import firebase from 'firebase';
 import Rebase from 're-base';
 import app from '../../base';
 import { getUserAvatar } from 'misc/functions';
+import { isMobile, shortName } from 'misc/helpers';
 
 let base = Rebase.createClass(app.database());
 var storage = firebase.storage();
@@ -109,19 +110,20 @@ class ProfileImage extends Component {
     
     render(){
         let { avatar, picState, imessage, levelId, dname } = this.state;
-        //console.log(dname)
+
         return (
             <div className="avContainer">
-                { imessage?<span id={ levelId }>{ imessage }</span>:null }
+                { imessage ? <span id={ levelId }>{ imessage }</span> : null }
                 <div className="avator">
                     <form method="POST" encType="multipart/form-data">
                         <input className="hidden" type="file" id="hs" name="avator" onChange={ this.uploadAv } ></input>
                         <div className={ picState }>
-                            { avatar?<img id="avator" alt="Your Avatar" title="click to change Avatar" src = { avatar } onClick={ this.clickUploadAv }/>: null }
+                            { avatar ? 
+                            <img id="avator" alt="Your Avatar" title="click to change Avatar" src = { avatar } onClick={ this.clickUploadAv }/> : null }
                         </div>
                     </form>
                 </div>
-                <span id="welcome">{ dname }</span>
+                <span id="welcome">{ isMobile() ? shortName(dname) : dname }</span>
             </div>
         )
     }

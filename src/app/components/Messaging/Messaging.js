@@ -22,6 +22,13 @@ import {
 } from 'components';
 import './localStyles/main.css';
 import ChatComponent from './ChatComponent';
+import { 
+    isMobile, 
+    isSmallMobile,
+    shortName, 
+    nameTooLong, 
+    firstLetters 
+} from 'misc/helpers';
 
 const override = css`
     display: block;
@@ -31,7 +38,8 @@ const override = css`
 
 class Messaging extends Component {
     state = {
-        messaging: false
+        isMobile: isMobile(),
+        isSmallMobile: isSmallMobile()
     }
     componentDidMount(){
         const { 
@@ -44,6 +52,15 @@ class Messaging extends Component {
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
         const { socketOpen, unAuthorizedConnection } = loginInfo;
         if (!socketOpen && !unAuthorizedConnection) openSocket(this.props);
+        
+        // reevaluate device size on resize
+        window.onresize = () => {
+            const width = window.innerWidth;
+            this.setState({
+                isMobile: isMobile(width),
+                isSmallMobile: isSmallMobile(width)
+            });
+        }
     }
 
     displayChatComponent = e => {
@@ -51,19 +68,26 @@ class Messaging extends Component {
         const { selectUserToChat } = this.props;
         const { id } = e.target;
         selectUserToChat(id);
-        this.setState({messaging:true});
     }
 
     displayFriends = key => {
-        let { friendsInfo: { users, friendsFull }, chatInfo: { onlineUsers } } = this.props;
-        let online = onlineUsers && onlineUsers[key] ? true : false;
-        let badgeClass = online ? 'fas fa-circle online' : 'fas fa-circle offline';
+        const { friendsInfo: { users, friendsFull }, chatInfo: { onlineUsers, selectedUser } } = this.props;
+        const online = onlineUsers && onlineUsers[key] ? true : false;
+        const badgeClass = online ? 'fas fa-circle online' : 'fas fa-circle offline';
+        const { isMobile, isSmallMobile } = this.state
+
         if ( users.length > 0 ) {
             return <div key={key}> {
                 users.map( obj => {
                     if (obj.uid === key && friendsFull[key].accepted) {
                         let { uid, avatar, dname, email } = obj;
-                        // console.log(dname + ' ' + email)
+                        /*console.log(dname + ' ' + email)*/
+                        const nameToDisplay = dname ? 
+                            isMobile || nameTooLong(dname) ? 
+                            shortName(dname) : 
+                            dname : 
+                            email;
+                        
                         return (
                             <div key={key} id={key} onClick={this.displayChatComponent} className="friend">
                                 <div id={key} className="left-col">
@@ -71,7 +95,7 @@ class Messaging extends Component {
                                         <img id={key} alt={ uid } className="members" src = { avatar } />
                                     </div>
                                     <i className={badgeClass}></i>
-                                    <div id={key} className="name">{ dname ? dname : email }</div>
+                                    <div id={key} className="name">{ selectedUser && isMobile || isSmallMobile ? firstLetters(nameToDisplay) : nameToDisplay }</div>
                                 </div>
                             </div>
                         )
@@ -84,14 +108,14 @@ class Messaging extends Component {
     }
 
     render(){
-        let { friendsInfo: { friends, fetchedFriends }, loginInfo: { socketOpen } } = this.props;
-        let { messaging } = this.state;
+        let { friendsInfo: { friends, fetchedFriends }, loginInfo: { socketOpen }, chatInfo: { selectedUser } } = this.props;
+        const { isMobile, isSmallMobile } = this.state;
         return (
             <div className="container Home">
                 <Header />
                 <div className="content">
                     <div className="messaging">
-                        <div id='friends-list' className="friends">
+                        <div id='friends-list' className={ selectedUser && isMobile || isSmallMobile ? "friends-mini" : "friends"}>
                             <h3><FormattedMessage  id='friends.listTitle' /></h3>
                             { fetchedFriends ? 
                             friends && friends.length > 0 ? 
@@ -110,7 +134,7 @@ class Messaging extends Component {
                             /> }
                         </div>
                         <div id='conversation-container'>
-                            { !messaging ? 
+                            { !selectedUser ? 
                             <span id='messaging-call-to-action'><FormattedMessage id={socketOpen ? 'friends.startConvo' : 'chat.noConnection'} /></span> :
                             <ChatComponent /> }
                         </div>

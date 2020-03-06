@@ -19,6 +19,8 @@ import {
   ScrollView,
   Image
 } from 'react-native';
+import { setUserToChat } from 'reduxFiles/dispatchers/chatDispatchers';
+import CloseIcon from '@material-ui/icons/Close';
 import styles from './localStyles/mainStyles';
 
 class ChatComponent extends React.Component { 
@@ -45,6 +47,12 @@ class ChatComponent extends React.Component {
     }
     else console.log('empty message')
   }
+
+  closeChat = () => {
+    const { selectUserToChat } = this.props;
+    selectUserToChat(null);
+  }
+
   render(){
     const { chatInfo: { selectedUser, messages, onlineUsers }, friendsInfo: { users }, genInfo: { info: { uid } }, intl } = this.props;
     const enabledSend = (this.state.message).length; 
@@ -101,6 +109,9 @@ class ChatComponent extends React.Component {
                       <Text style={styles.availability}><FormattedMessage id="user.offline" /></Text>  
                     }
                   </Text>
+                  <TouchableOpacity onPress={this.closeChat} style={styles.closeButton}>
+                    <CloseIcon style={styles.closeButtonText} />
+                  </TouchableOpacity>
                 </View>
               )
             })
@@ -146,7 +157,8 @@ ChatComponent.propTypes = {
   confirmLoggedIn: PropTypes.func,
   signOut: PropTypes.func,
   updateGenInfo: PropTypes.func,
-  storeSentMessages: PropTypes.func
+  storeSentMessages: PropTypes.func,
+  selectUserToChat: PropTypes.func
 }
 
 const mapStateToProps = state => {
@@ -183,7 +195,10 @@ const mapDispatchToProps = dispatch => {
       },
       storeSentMessages: message => {
           dispatch(dispatchSentMessage(message))
-      }
+      },
+      selectUserToChat: userId => {
+        dispatch(setUserToChat(userId))
+    },
   }
 }
 

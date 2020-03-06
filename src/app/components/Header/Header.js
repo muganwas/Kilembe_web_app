@@ -44,7 +44,8 @@ class Header extends Component {
             logoutIconStyle: "small icon-logout",
             notificationClass: "fas fa-circle alert hidden",
             friendAction: false,
-            onlineUsers: null
+            onlineUsers: null,
+            showDropDownMenu: false
         }
         this.reconnectTimer = null;
     }
@@ -205,18 +206,20 @@ class Header extends Component {
         else clearTimeout(this.reconnectTimer);
     }
 
-    showMenu = () => {
-        var menu = this.state.dropDownStyle;
-        if ( menu !== "visible"){
+    toggleMenu = () => {
+        var visible = this.state.showDropDownMenu;
+        if (!visible) {
             this.setState({
                 dropDownStyle: "visible",
-                arrStyle: "visible"
+                arrStyle: "visible",
+                showDropDownMenu: true
             });
         }
         else {
             this.setState({
                 dropDownStyle: null,
-                arrStyle: null
+                arrStyle: null,
+                showDropDownMenu: false
             });
         }
     }
@@ -239,15 +242,17 @@ class Header extends Component {
             arrStyle,
             dropDownStyle,
             settingsIconStyle,
-            logoutIconStyle
+            logoutIconStyle,
+            showDropDownMenu
         } = this.state;
         const notFoundPath = loggedIn?
         "/home":
         "/";
+
         return (
             <div className="mainNav">
                 { loggedIn ? 
-                <ProfileImage dname={ dname } userId = { uid } />:
+                <ProfileImage dname={ dname } userId = { uid } /> :
                 null }    
                 { loggedIn ?
                 <div className="nav">    
@@ -256,7 +261,8 @@ class Header extends Component {
                         <span className={ notificationClass }></span>
                     </span>
                     <span className={ chatStyle } onClick={ () => this.goTo("/messaging") }></span> 
-                    <span className={ menuStyle } onClick={ this.showMenu }>
+                    <span className={ menuStyle } onClick={ this.toggleMenu }>
+                        { showDropDownMenu ? 
                         <div id="arr" className={ arrStyle }>
                             <ul id="menu" className={ dropDownStyle }>
                                 <li className={ settingsIconStyle }>
@@ -266,7 +272,8 @@ class Header extends Component {
                                     <span className="logout" onClick={ () => signOut(genInfo, this.goTo) } >Logout</span>
                                 </li>
                             </ul>
-                        </div>
+                        </div> : 
+                        null }
                     </span> 
                 </div> :
                 <div>
