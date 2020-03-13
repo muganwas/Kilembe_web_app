@@ -6,9 +6,7 @@ const mainStyles = StyleSheet.create({
     color: '#ece3e2',
     backgroundColor: '#494141',
     marginTop: 2,
-    marginBottom: 2,
-    marginLeft: 5,
-    marginRight: 5,
+    marginBottom: 5,
     display: 'block',
     padding: 3,
     borderRadius: 3
@@ -18,6 +16,10 @@ const mainStyles = StyleSheet.create({
     marginBottom: 0,
     marginRight: 50,
     marginLeft: 50
+  },
+  alternatives: {
+    paddingTop: 5,
+    paddingBottom: 5
   },
   titleMedium: {
     display: 'block',

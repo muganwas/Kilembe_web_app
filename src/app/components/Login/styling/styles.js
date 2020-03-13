@@ -52,7 +52,10 @@ const styles = {
     textAlign: 'center',
   },
   textInput: {
-    marginBottom: 2,
+    marginBottom: 3,
+    borderWidth: 0,
+    boxShadow: "1px 2px 3px rgba(127,125,135, 0.3)",
+    padding: 4,
     backgroundColor: '#fff'
   }
 };

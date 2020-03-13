@@ -93,8 +93,10 @@ const LoginForm = props => {
                     />
                 </View>
             </form>
-            <Link className="link span" to = { "/signup" }>{ signupLabel }</Link> 
-            <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
+            <View style={mainStyles.alternatives}>
+                <Link className="link span" to = { "/signup" }>{ signupLabel }</Link> 
+                <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
+            </View>
             <View>
                 <AuthButton
                     id="facebook"

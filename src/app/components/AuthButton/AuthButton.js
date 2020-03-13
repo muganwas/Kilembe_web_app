@@ -54,7 +54,9 @@ AuthButton.propTypes = {
   textStyle: PropTypes.object,
   processing: PropTypes.bool,
   onpress: PropTypes.func,
-  text: PropTypes.string
+  text: PropTypes.string,
+  iconColor: PropTypes.string,
+  iconPath: PropTypes.string
 }
 
 export default AuthButton;
