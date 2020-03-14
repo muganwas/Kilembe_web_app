@@ -7,39 +7,33 @@ import {
   handlePasswordReset,
   clearErrors
 } from 'reduxFiles/dispatchers/authDispatchers';
+import { View, Image } from 'react-native';
 import { Redirect } from 'react-router-dom';
+import styles from './styling/styles';
+import mainStyles from 'styles/mainStyles';
+import logo from 'styles/images/kilembe-school.png';
 
 class Reset extends Component {
-  state = {
-    email: ""
-  }
 
   componentDidMount(){
     let { clearAllErros } = this.props;
     clearAllErros();
   }
 
-  temporaryValuesStore = event => {
-    let value = event.target.value;
-    let id = event.target.id;
-    this.setState({ [id]:value });
-  }
-
   render(){
-    const { email } = this.state;
     const { loggedIn } = this.props;
-    if(loggedIn)
-      <Redirect to={"/home"} />
+    if (loggedIn) return <Redirect to={"/home"} />
   
     return(
-      <div className="App">
-        <span className="divider"></span>
+      <View style={mainStyles.authContainer}>
+        <View style={mainStyles.logoContainer}>
+          <Image style={mainStyles.logo} source={logo} resizeMode="contain" />
+        </View>
+        <View style={styles.divider}></View>
         <ResetForm 
           { ...this.props }
-          tempValStore = { this.temporaryValuesStore }
-          email = { email } 
         />
-      </div>
+      </View>
     )
   }
 }
@@ -49,7 +43,10 @@ Reset.propTypes = {
   messageId: PropTypes.string,
   resetInfo: PropTypes.object.isRequired,
   loggedIn: PropTypes.bool.isRequired,
-  reset: PropTypes.bool.isRequired
+  reset: PropTypes.bool.isRequired,
+  dispatchEmail: PropTypes.func.isRequired,
+  clearAllErros: PropTypes.func.isRequired,
+  onReset: PropTypes.func.isRequired
 }
 const mapStateToProps = state => {
   return {

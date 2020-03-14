@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
-import { css } from '@emotion/core';
+import React, { useState, /*useEffect*/ } from 'react';
 import PropTypes from 'prop-types';
 import Firebase from 'firebase/app';
-import { ScaleLoader } from 'react-spinners';
 import { 
     FormattedMessage, 
     useIntl
 } from 'react-intl';
 import { Link } from 'react-router-dom';
-
-const override = css`
-    display: block;
-    margin: 0 auto;
-    border-color: #757575;
-`;
+import styles from './styling/styles';
+import { View, TextInput, Text } from 'react-native';
+import { AuthButton } from 'components/';
+import { SUBMIT_FORM_DELAY } from 'misc/constants';
+import { mdiGoogle, mdiFacebook } from '@mdi/js';
+import mainStyles from 'styles/mainStyles';
 
 const LoginForm = props => {
 
@@ -44,96 +42,90 @@ const LoginForm = props => {
 
     const localSubmit = e => { 
         e.preventDefault();
-        //dispatchEmail(email);
+        // just in case there was no time to dispatch password onblur
         dispatchPassword(password);
         setTimeout(() => {
-            if(!error) onSubmit(loginInfo);
-        }, 1000);
+            if (!error) onSubmit(loginInfo);
+        }, SUBMIT_FORM_DELAY);
     }
 
     return (
-        <div id="login-form" className="form">
-            <span>
-                <h3>{ loginPageTitle }</h3>
-            </span>
+        <View style={mainStyles.form}>
+            <View>
+                <Text style={mainStyles.titleMedium}>{ loginPageTitle }</Text>
+            </View>
             { 
-                error?
-                <span className={ 'feedBack' }>
+                error ?
+                <Text style={mainStyles.feedBack}>
                     <FormattedMessage id={ messageId } />
-                </span>: 
+                </Text> : 
                 null 
             }
             <form onSubmit={localSubmit}>
-                <span>
-                    <input 
+                <View>
+                    <TextInput 
                         id="email" 
+                        style={styles.textInput}
                         placeholder="Email address" 
-                        type="text" 
                         value = { email }
                         onBlur = { () => dispatchEmail(email) }
                         onChange = { e => changeEmail(e.target.value) }
                     />
-                </span>
-                <span>
-                    <input 
+                </View>
+                <View>
+                    <TextInput 
                         id="password" 
+                        style={styles.textInput}
                         placeholder="Password" 
-                        type="password"
+                        secureTextEntry={true}
                         value = { password }
                         onBlur = { () => dispatchPassword(password) }
                         onChange = { e => changePassword(e.target.value) }
                     />
-                </span>
-                <span>
-                    <button 
-                        type="submit" 
-                    >
-                        { 
-                            fetching?
-                            <ScaleLoader
-                                css={override}
-                                sizeUnit={"px"}
-                                height={10}
-                                width={3}
-                                radius={3}
-                                color={'#757575'}
-                                loading={fetching} 
-                            />:
-                            loginLabel 
-                        }
-                    </button>
-                </span>
+                </View>
+                <View>
+                    <AuthButton
+                        buttonStyle={styles.submitButton}
+                        textStyle={styles.submitButtonText}
+                        text={loginLabel}
+                        onPress={localSubmit}
+                        processing={fetching}
+                    />
+                </View>
             </form>
-            <Link className="link span" to = { "/signup" }>{ signupLabel }</Link> 
-            <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
-            <span>
-                <button 
-                id="facebook" 
-                className="icon-facebook-squared" 
-                onClick={ () => thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler ) }
-                >
-                { facebookLoginLabel }
-                </button>
-            </span>
-            <span>
-                <button 
-                id="google" 
-                className="icon-google" 
-                onClick={ () => thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler ) }
-                >
-                { googleLoginLabel }
-                </button>
-            </span>
-        </div>
+            <View style={mainStyles.alternatives}>
+                <Link className="link span" to = { "/signup" }>{ signupLabel }</Link> 
+                <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
+            </View>
+            <View>
+                <AuthButton
+                    id="facebook"
+                    buttonStyle={styles.facebookAuth}
+                    textStyle={styles.facebookAuthText}
+                    iconPath={mdiFacebook}
+                    iconColor={'white'}
+                    text={facebookLoginLabel} 
+                    onPress={ () => thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler ) }
+                />
+            </View>
+            <View>
+                <AuthButton 
+                    id="google"
+                    buttonStyle={styles.googleAuth}
+                    textStyle={styles.googleAuthText}
+                    iconPath={mdiGoogle}
+                    iconColor={'white'}
+                    text={googleLoginLabel} 
+                    onPress={ () => thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler ) }
+                />
+            </View>
+        </View>
     )
 }
 
 LoginForm.propTypes = {
-    email: PropTypes.string.isRequired,
-    password: PropTypes.string.isRequired,
     dispatchEmail: PropTypes.func.isRequired,
     dispatchPassword: PropTypes.func.isRequired,
-    tempValStore: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     error: PropTypes.bool, 
     messageId: PropTypes.string, 

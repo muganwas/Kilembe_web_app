@@ -1,25 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { css } from '@emotion/core';
-import { ScaleLoader } from 'react-spinners';
 import { Link } from 'react-router-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
-
-const override = css`
-    display: block;
-    margin: 0 auto;
-    border-color: #757575;
-`;
+import styles from './styling/styles';
+import { View, TextInput, Text } from 'react-native';
+import { AuthButton } from 'components/';
+import mainStyles from 'styles/mainStyles';
 
 const ResetForm = ({
     feedback,
-    email,
     messageId,
     resetInfo,
-    tempValStore,
     dispatchEmail,
     onReset
 }) => {
+    const [email='', changeEmail]=useState();
 
     const { fetching } = resetInfo;
 
@@ -30,57 +25,51 @@ const ResetForm = ({
     const forgotPasswordLabel = intl.formatMessage({id:"auth.forgotPasswordLabel"});
 
     return (
-        <div className="form">
-        <span>
-            <h3>{ pageTitle }</h3>
-        </span>
-        { feedback? 
-        <span className={ 'feedBack' }>
-            <FormattedMessage id = { messageId } />
-        </span>: 
-        null }
-            <span>
-                <input 
+        <View style={mainStyles.form}>
+            <View>
+                <Text style={mainStyles.titleMedium}>{ pageTitle }</Text>
+            </View>
+            { feedback ? 
+            <Text style={mainStyles.feedBack}>
+                <FormattedMessage id = { messageId } />
+            </Text> : 
+            null }
+            <View>
+                <TextInput 
                     id="email" 
                     placeholder="Email address" 
                     type="email"
+                    style={styles.textInput}
                     value={email}
-                    onChange={ tempValStore }
-                    onBlur={ ()=>dispatchEmail(email) }
+                    onChange={ e => changeEmail(e.target.value) }
+                    onBlur={ () => dispatchEmail(email) }
                 />
-            </span>
-            <span>
-                <button onClick={ ()=>{
-                    if(!feedback)
-                        onReset(email)
-                } }>
-                    { 
-                        fetching?
-                        <ScaleLoader
-                            css={override}
-                            sizeUnit={"px"}
-                            height={10}
-                            width={3}
-                            radius={3}
-                            color={'#757575'}
-                            loading={fetching} 
-                        />:
-                        forgotPasswordLabel 
+            </View>
+            <View>
+                <AuthButton
+                    buttonStyle={styles.submitButton}
+                    textStyle={styles.submitButtonText}
+                    text={forgotPasswordLabel}
+                    onPress={
+                        () => {
+                            if(!feedback) onReset(email)
+                        }
                     }
-                </button>
-            </span>
-            <Link className="link span" to = { "/login" }>{ loginLabel }</Link> 
-            <Link className="link span" to={ "/signup" }>{ signupLabel }</Link>
-        </div>
+                    processing={fetching}
+                />
+            </View>
+            <View style={mainStyles.alternatives}>
+                <Link className="link span" to = { "/login" }>{ loginLabel }</Link> 
+                <Link className="link span" to={ "/signup" }>{ signupLabel }</Link>
+            </View>
+        </View>
     )
 }
 
 ResetForm.propTypes = {
     feedback: PropTypes.bool,
-    email: PropTypes.string,
     messageId: PropTypes.string,
     resetInfo: PropTypes.object.isRequired,
-    tempValStore: PropTypes.func.isRequired,
     dispatchEmail: PropTypes.func.isRequired,
     onReset: PropTypes.func.isRequired
 }

@@ -3,9 +3,9 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { AppRegistry } from 'react-native';
 import store from './store';
 import { Provider } from 'react-intl-redux';
-import './styles/index.css';
-import './styles/styles.css';
-import './styles/animations.css';
+import 'styles/index.css';
+import 'styles/styles.css';
+import 'styles/animations.css';
 import { 
 	App,
 	Signup,

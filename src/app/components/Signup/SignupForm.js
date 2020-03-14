@@ -1,32 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
     FormattedMessage, 
     useIntl
 } from 'react-intl';
 import PropTypes from 'prop-types';
-import { css } from '@emotion/core';
-import { ScaleLoader } from 'react-spinners';
 import { Link } from 'react-router-dom';
-
-const override = css`
-    display: block;
-    margin: 0 auto;
-    border-color: #757575;
-`;
+import { AuthButton } from 'components/';
+import styles from './styling/styles';
+import mainStyles from 'styles/mainStyles';
+import { View, TextInput, Text } from 'react-native';
 
 const SignupForm = ({
-    email, 
-    password,
-    passwordConfirm,
     error, 
     messageId,
     dispatchEmail,
     dispatchPassword,
     confirmPasswordMatch,
-    tempValStore,
     onSignup,
     signupInfo
 }) => {
+    const [email = '', changeEmail] = useState();
+    const [password = '', changePassword] = useState();
+    const [passwordConfirm='', changePasswordConfirm] = useState();
 
     const localSubmit = e => {
         e.preventDefault();
@@ -40,66 +35,64 @@ const SignupForm = ({
     const loginLabel = intl.formatMessage({id:"auth.loginLabel"});
     const signupLabel = intl.formatMessage({id:"auth.signupLabel"});
     const forgotPasswordLabel = intl.formatMessage({id:"auth.forgotPasswordLabel"});
+
     return (
-        <div className="form">
-        <span>
-            <h3>{ signupPageTitle}</h3>
-        </span>
-        { error?
-            <span className={ 'feedBack' }><FormattedMessage id={ messageId } /></span>:
-        null }
+        <View style={mainStyles.form}>
+            <View>
+                <Text style={mainStyles.titleMedium}>{ signupPageTitle}</Text>
+            </View>
+            { error ?
+                <Text style={mainStyles.feedBack}><FormattedMessage id={ messageId } /></Text> :
+            null }
             <form onSubmit={localSubmit}>
-                <span>
-                    <input 
+                <View>
+                    <TextInput 
                         id="email" 
+                        style={styles.textInput}
                         placeholder="Email address" 
                         type="text"
                         value={email}
-                        onChange = { tempValStore }
+                        onChange = { e => changeEmail(e.target.value) }
                         onBlur = { () => dispatchEmail(email) }
                     />
-                </span>
-                <span>
-                    <input 
+                </View>
+                <View>
+                    <TextInput 
                         id="password" 
+                        style={styles.textInput}
                         placeholder="Password" 
-                        type="password"
+                        secureTextEntry={true}
                         value={password}
-                        onChange = { tempValStore }
+                        onChange = { e => changePassword(e.target.value) }
                         onBlur = { () => dispatchPassword(password) }
                     />
-                </span>
-                <span>
-                    <input 
+                </View>
+                <View>
+                    <TextInput 
                         id="passwordConfirm" 
+                        style={styles.textInput}
                         placeholder="Confirm Password" 
-                        type="password" 
+                        secureTextEntry={true}
                         value={passwordConfirm}
-                        onChange = { tempValStore }
+                        onChange = { e => changePasswordConfirm(e.target.value) }
                         onBlur ={ () => confirmPasswordMatch(password, passwordConfirm) }
                     />
-                </span>
-                <span>
-                    <button onClick={localSubmit}>
-                        { 
-                            fetching?
-                            <ScaleLoader
-                                css={override}
-                                sizeUnit={"px"}
-                                height={10}
-                                width={3}
-                                radius={3}
-                                color={'#757575'}
-                                loading={fetching} 
-                            /> :
-                            signupLabel 
-                        }
-                    </button>
-                </span>
+                </View>
+                <View>
+                    <AuthButton 
+                        buttonStyle={styles.submitButton}
+                        textStyle={styles.submitButtonText}
+                        processing={fetching}
+                        text={signupLabel} 
+                        onPress={localSubmit}
+                    />
+                </View>
             </form>
-            <Link className="link span" to = { "/login" }>{ loginLabel }</Link> 
-            <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
-        </div>
+            <View style={mainStyles.alternatives}>
+                <Link className="link span" to = { "/login" }>{ loginLabel }</Link> 
+                <Link className="link span" to={ "/reset" }>{ forgotPasswordLabel }</Link>
+            </View>
+        </View>
     )
 }
 
@@ -112,7 +105,6 @@ SignupForm.propTypes = {
     dispatchEmail: PropTypes.func.isRequired,
     dispatchPassword: PropTypes.func.isRequired,
     confirmPasswordMatch: PropTypes.func.isRequired,
-    tempValStore: PropTypes.func.isRequired,
     onSignup: PropTypes.func.isRequired,
     signupInfo: PropTypes.object
 }

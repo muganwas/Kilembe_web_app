@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { confirmToken } from 'reduxFiles/dispatchers/authDispatchers';
-import '../../styles/App.css';
+import 'styles/App.css';
 import { REDIRECT_TIMER } from 'misc/constants';
 import { withRouter } from 'react-router-dom';
 

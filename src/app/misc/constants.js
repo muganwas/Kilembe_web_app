@@ -4,3 +4,4 @@ export const payPalURL = process.env.PAYPAL_URL;
 export const devEmailAddress = process.env.DEV_EMAIL_ADDRESS;
 export const REDIRECT_TIMER = 300;
 export const RECONNECT_TIMER = 6000;
+export const SUBMIT_FORM_DELAY = 500;

@@ -161,6 +161,10 @@ li{
 .icon-home:hover::before{
   color: #eef7a3;
 }
+.table-cell{
+  display: table-cell;
+  vertical-align: middle;
+}
 .Home .mainNav {
   width: 100%;
   position: relative;
