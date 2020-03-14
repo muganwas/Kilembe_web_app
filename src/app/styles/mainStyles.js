@@ -1,6 +1,33 @@
 import { StyleSheet } from 'react-native';
 
 const mainStyles = StyleSheet.create({
+  authContainer: {
+    boxSizing: 'border-box',
+    display: 'inline-block',
+    backgroundColor: '#f0f0f0',
+    marginTop: '10%',
+    marginBottom: '10%',
+    marginLeft: 0,
+    marginRight: 0,
+    paddingTop: 50,
+    paddingRight: 0,
+    paddingBottom: 50,
+    paddingLeft: 0,
+    borderRadius: 5,
+    width: 350
+  },
+  logoContainer: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    marginRight: 50,
+    marginBottom: 20,
+    marginLeft: 50
+  },
+  logo: {
+    width: 120,
+    height: 50,
+    zIndex: 1000
+  },
   feedBack: {
     fontSize: 13,
     color: '#ece3e2',
@@ -9,7 +36,7 @@ const mainStyles = StyleSheet.create({
     marginBottom: 5,
     display: 'block',
     padding: 3,
-    borderRadius: 3
+    borderRadius: 1
   },
   form: {
     marginTop: 0,

@@ -10,46 +10,35 @@ import {
   authHandler,
   clearErrors
 } from 'reduxFiles/dispatchers/authDispatchers';
+import { View, Image } from 'react-native';
 import { Redirect } from 'react-router-dom';
+import styles from './styling/styles';
+import mainStyles from 'styles/mainStyles';
+import logo from 'styles/images/kilembe-school.png';
 
 class Login extends Component {
-  state = {
-    email: "",
-    password: ""
-  }
-
   componentDidMount(){
     let { clearAllErrors } = this.props;
     clearAllErrors();
-  }
-
-  temporaryValuesStore = event => {
-    let value = event.target.value;
-    let id = event.target.id;
-    this.setState({ [id]:value });
   }
 
   render(){
     const { 
       loggedIn
     } = this.props;
-    const {
-      email,
-      password
-    } = this.state;
     //go home if logged in
     if (loggedIn) return <Redirect to={"/home"} />
 
     return(
-      <div className="App">
-        <span className="divider"></span>
+      <View style={mainStyles.authContainer}>
+        <View style={mainStyles.logoContainer}>
+          <Image style={mainStyles.logo} source={logo} resizeMode="contain" />
+        </View>
+        <View style={styles.divider}></View>
         <LoginForm 
           { ...this.props }
-          tempValStore = { this.temporaryValuesStore }
-          email = { email }
-          password = { password }
         />
-      </div>
+      </View>
     )
   }
 }
@@ -58,7 +47,13 @@ Login.propTypes = {
   error: PropTypes.bool,
   messageId: PropTypes.string,
   loginInfo: PropTypes.object.isRequired,
-  loggedIn: PropTypes.bool.isRequired
+  loggedIn: PropTypes.bool.isRequired,
+  clearAllErrors: PropTypes.func.isRequired,
+  dispatchEmail: PropTypes.func.isRequired,
+  dispatchPassword: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  thirdPartyAuthentication: PropTypes.func.isRequired,
+  thirdPartyAuthHandler: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => {

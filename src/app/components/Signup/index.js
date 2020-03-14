@@ -10,43 +10,32 @@ import {
   handleSignup,
   clearErrors
 } from 'reduxFiles/dispatchers/authDispatchers';
+import { View, Image } from 'react-native';
 import { Redirect } from 'react-router-dom';
+import styles from './styling/styles';
+import mainStyles from 'styles/mainStyles';
+import logo from 'styles/images/kilembe-school.png';
 
 class Signup extends Component {
-  state = {
-    email: "",
-    password: "",
-    passwordConfirm: ""
-  }
-
   componentDidMount(){
     let { clearAllErrors } = this.props;
     clearAllErrors();
   }
 
-  temporaryValuesStore = event => {
-    let value = event.target.value;
-    let id = event.target.id;
-    this.setState({ [id]:value });
-  }
-
   render(){
-    const { email, password, passwordConfirm } = this.state;
     const { loggedIn } = this.props;
-    if(loggedIn)
-      <Redirect to={"/home"} />
+    if (loggedIn) return <Redirect to={"/home"} />
   
     return(
-      <div className="App">
-        <span className="divider"></span>
+      <View style={mainStyles.authContainer}>
+        <View style={mainStyles.logoContainer}>
+          <Image style={mainStyles.logo} source={logo} resizeMode="contain" />
+        </View>
+        <View style={styles.divider}></View>
         <SignupForm 
           { ...this.props }
-          tempValStore = { this.temporaryValuesStore }
-          email = {email}
-          password = {password}
-          passwordConfirm = {passwordConfirm}
         />
-      </div>
+      </View>
     )
   }
 }
@@ -56,7 +45,13 @@ Signup.propTypes = {
   messageId: PropTypes.string,
   signupInfo: PropTypes.object.isRequired,
   signedUp: PropTypes.bool.isRequired,
-  loggedIn: PropTypes.bool.isRequired
+  loggedIn: PropTypes.bool.isRequired,
+  clearAllErrors: PropTypes.func.isRequired,
+  dispatchEmail: PropTypes.func.isRequired,
+  dispatchPassword: PropTypes.func.isRequired,
+  onSignup: PropTypes.func.isRequired,
+  confirmPasswordMatch: PropTypes.func.isRequired,
+  thirdPartyAuthHandler: PropTypes.func.isRequired
 }
 const mapStateToProps = state => {
   return {

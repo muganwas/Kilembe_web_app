@@ -56,9 +56,9 @@ const LoginForm = props => {
             </View>
             { 
                 error ?
-                <View style={mainStyles.feedBack}>
+                <Text style={mainStyles.feedBack}>
                     <FormattedMessage id={ messageId } />
-                </View> : 
+                </Text> : 
                 null 
             }
             <form onSubmit={localSubmit}>
@@ -124,11 +124,8 @@ const LoginForm = props => {
 }
 
 LoginForm.propTypes = {
-    email: PropTypes.string.isRequired,
-    password: PropTypes.string.isRequired,
     dispatchEmail: PropTypes.func.isRequired,
     dispatchPassword: PropTypes.func.isRequired,
-    tempValStore: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     error: PropTypes.bool, 
     messageId: PropTypes.string, 

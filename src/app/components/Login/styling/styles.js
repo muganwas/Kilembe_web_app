@@ -1,6 +1,11 @@
 //import { StyleSheet } from 'react-native';
 
 const styles = {
+  divider: {
+    display: 'block',
+    height: 5,
+    backgroundColor: '#fff'
+  },
   submitButton: {
     display: 'flex',
     width: 250,
