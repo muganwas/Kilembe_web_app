@@ -4,33 +4,37 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Rebase from 're-base';
 import app from '../../base';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { View, Text, TouchableOpacity } from 'react-native';
+import styles from './styling/styles';
+import { Button } from 'components';
+import { mdiCloseCircleOutline } from '@mdi/js';
+import { isMobile } from 'misc/helpers';
 
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 
 class CoursesList extends Component {
-    constructor(){
-        super();
-        this.state = {
-            linkStyle: "urls",
-            playlistFetched: false,
-            playlist: {}
-        }
-
+    state = {
+        playlistFetched: false,
+        playlist: {},
+        mobile: isMobile()
     }
 
     componentDidMount(){
-        let { genInfo: { info: { uid } } } = this.props;
+        const { genInfo: { info: { uid } } } = this.props;
         this.getLessonPlaylist(uid);
+
+        window.addEventListener('resize', e => {
+            this.setState({mobile:isMobile(e.target.innerWidth)});
+        })
     }
     
     componentDidUpdate(){
-        let { videos, courses, userID } = this.props;
-        let { courses: stateCourses } = this.state;
+        const { videos, courses, userID } = this.props;
+        const { courses: stateCourses } = this.state;
         this.getLessonPlaylist(userID);
-        if(videos){
-            if( stateCourses === undefined ){
+        if (videos) {
+            if ( stateCourses === undefined ) {
                 this.setState({
                     videos: videos,
                     courses: courses
@@ -39,37 +43,36 @@ class CoursesList extends Component {
         }  
     }
 
-    getLessonPlaylist = (uid) => {
-        let { playlistFetched } = this.state;
-        if(uid && !playlistFetched){
+    getLessonPlaylist = uid => {
+        const { playlistFetched } = this.state;
+        if (uid && !playlistFetched) {
             base.fetch(`users/${ uid }/playlist`, {
                 context: this,
                 asArray: false
-            }).then(playlist=>{
+            }).then(playlist => {
                 this.setState({ playlist, playlistFetched: true });
             });
         }  
     }
     
-    addToPlaylist = (event)=>{
-        let { playlist } = this.state;
-        let { userID } = this.props;
-        let courseUrl = event.target.id;
-        playlist[event.target.title] = courseUrl;
+    addToPlaylist = (title, url) => {
+        const { playlist } = this.state;
+        const { userID } = this.props;
+        playlist[title] = url;
         this.setState({
-            source: courseUrl,
+            source: url,
             playlist
         });
-        let userRef = usersRef.child(userID);
+        const userRef = usersRef.child(userID);
         userRef.update({
             playlist
         });
     }
 
-    removeItem = (key)=>{
-        let { playlist } = this.state;
-        let { userID } = this.props;
-        let playlist1 = { ...playlist };
+    removeItem = key => {
+        const { playlist } = this.state;
+        const { userID } = this.props;
+        let playlist1 = Object.assign({}, playlist);
         delete playlist1[key];
         this.setState({ playlist: playlist1 });
         let userRef = usersRef.child(userID);
@@ -78,102 +81,93 @@ class CoursesList extends Component {
         });
     }
 
-    showPlayList = (key) => {
+    showPlayList = key => {
         return( 
-            <div className="item" key={key}>
-                <ReactCSSTransitionGroup 
-                    transitionName = "example"
-                    transitionAppear = {true} transitionAppearTimeout = {500}
-                    transitionEnter = { false }
-                    transitionLeave = {true} transitionLeaveTimeout = {500}  
-                >
-                    <div className="text">{key}</div><div onClick={ ()=>this.removeItem(key) } className="ex icon-x-circle"></div>
-                    <div className="clear"></div>
-                </ReactCSSTransitionGroup>  
-            </div>         
+            <View style={styles.item} key={key}>
+                <Text style={styles.text}>{key}</Text>
+                <Button
+                    style={styles.closeButtonStyle}
+                    hoveredColor='#FDD906'
+                    iconPath={mdiCloseCircleOutline}
+                    iconColor='white'
+                    onPress={()=>this.removeItem(key)}
+                    size={0.6}
+                />
+            </View>         
         )
-
     }
 
-    playlistClass = () => {
-        let { playlist } = this.state;
-        let playlistlen = Object.keys(playlist).length;
-        let there = "playlist";
-        let notThere = "hidden";
-        if(playlistlen > 0){
-            return there; 
-        }else{
-            return notThere;
-        }
-    }
-
-    showCourses = (key) => {
-        let { videos, courses, linkStyle } = this.state;
-        let vids = videos;
-        let courseName = courses[key];
-        let courseUrl = vids[key];
+    showCourses = key => {
+        const { videos, courses } = this.state;
+        const vids = videos;
+        const courseName = courses[key];
+        const courseUrl = vids[key];
         
         return(
-            <div key={key}>
-                <div onClick={ this.addToPlaylist } id={ courseUrl } title={ courseName } className={ linkStyle }>
-                    { courseName }
-                </div>
-                <div className="clear"></div>
-            </div>
+            <View key={key}>
+                <TouchableOpacity onPress={() => this.addToPlaylist(courseName, courseUrl)} style={ styles.course }>
+                    <Text style={styles.courseListText}>{ courseName }</Text>
+                </TouchableOpacity>
+            </View>
         )                
     }
 
     videoSource = () => {
-        let { playlist } = this.state;
-        let playlistLen = Object.keys(playlist).length;
-        let iniVid = "https://www.youtube.com/embed/gfkTfcpWqAY";
-        if( playlistLen === 0 && playlist !== undefined && playlist !== null){
-            return iniVid;
-        }else if( playlistLen >= 1 ){
+        const { playlist } = this.state;
+        const playlistLen = Object.keys(playlist).length;
+        const iniVid = "https://www.youtube.com/embed/gfkTfcpWqAY";
+        if ( playlistLen === 0 && playlist !== undefined && playlist !== null) return iniVid;
+        else if ( playlistLen >= 1 ) {
             let vidArr = Object.values(playlist);
             let vidArrLen = vidArr.length;
             let count = 1;
             let pLUrl = vidArr[0] + "?enablejsapi=1&playlist=";
-            for(count; count<vidArrLen; count++){
+            for (count; count<vidArrLen; count++) {
                 let currUrl = vidArr[count];
                 let currUrlArr = currUrl.split('/');
                 let vidId = currUrlArr[4];
-                if(count<(vidArrLen-1) && currUrl === vidArr[0]){
-                    pLUrl += "";
-                }
-                else if(count<(vidArrLen-1)){
-                    pLUrl += vidId + ",";
-                }else{
-                    pLUrl += vidId;
-                } 
+
+                if (count < (vidArrLen-1) && currUrl === vidArr[0]) pLUrl += "";
+                else if (count < (vidArrLen-1)) pLUrl += vidId + ",";
+                else pLUrl += vidId;
             }
             return pLUrl;
         }
     }
     
     render(){
-        let { playlist, videos } = this.state;
-        if(videos){  
+        const { playlist, videos, mobile } = this.state;
+        const showPlaylist = Object.keys(playlist).length > 0;
+        if (videos) {  
             return(
-                <div>
-                    <div className="group">
-                        { Object.keys( videos ).map(this.showCourses) }
-                    </div>
-                    <div className="tutorial">
-                        <header><FormattedMessage id={"courses.videoTitle"} /></header>
-                        <iframe className="youtube" title="tutorial video" src={ this.videoSource() }
-                        frameBorder="0" allowFullScreen></iframe>
-                    </div>
-                    <div className={ this.playlistClass() }>
-                    <header><FormattedMessage id={"playlist.title"} /></header>
-                       <span>{ Object.keys(playlist).map(this.showPlayList) }</span>
-                    </div>
-                    <div className="clear"></div>
-                </div>
+                <View style={mobile ? styles.tutorialContainerMobi : styles.tutorialContainer}>
+                    <View style={styles.courseListContainer}>
+                        <View style={styles.courseList}>
+                            { Object.keys(videos).map(this.showCourses) }
+                        </View>
+                    </View>
+                    <View style={styles.tutorial}>
+                        <Text style={styles.header}><FormattedMessage id={"courses.videoTitle"} /></Text>
+                        <iframe 
+                            className="youtube" 
+                            title="tutorial video" 
+                            src={this.videoSource()}
+                            frameBorder="0" 
+                            allowFullScreen
+                        ></iframe>
+                    </View>
+                    { showPlaylist ? 
+                        <View style={styles.playlistContainer}>
+                            <View style={styles.playlist}>
+                                <Text style={styles.header}><FormattedMessage id={"playlist.title"} /></Text>
+                                <View>{ Object.keys(playlist).map(this.showPlayList) }</View>
+                            </View>
+                        </View> : 
+                    null }
+                </View>
             )
-        }else{
-            return false;
         }
+        else return false;
     }
 }
 
