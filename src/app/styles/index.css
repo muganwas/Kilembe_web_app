@@ -26,6 +26,7 @@
 }
 /*app style*/
 body {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-family: sans-serif;
@@ -123,16 +124,16 @@ li{
   display: block!important;
 }
 .Home{
+  box-sizing: border-box;
   width: 100%;
   display: inline-block;
   text-align: center;
-  overflow-x: hidden;
 }
 .container{
+  box-sizing: border-box;
   display: inline-block;
   position: relative;
   box-sizing: content-box;
-  overflow: hidden;
   width: 70%;
   text-align: left;
 }
@@ -163,6 +164,7 @@ li{
 }
 .table-cell{
   display: table-cell;
+  padding: 3px;
   vertical-align: middle;
 }
 .Home .mainNav {
@@ -504,9 +506,11 @@ li{
     margin: 5% 10px;
 }
 .messaging{
+  position: relative;
   display: flex;
   box-sizing: border-box;
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 .friends{
   box-sizing: border-box;
@@ -519,9 +523,11 @@ li{
   flex: 2
 }
 #conversation-container{
+  position: relative;
   padding: 10px;
   display: block;
-  flex: 7
+  flex: 7;
+  z-index: 1;
 }
 #messaging-call-to-action{
   display: block;
@@ -533,7 +539,7 @@ li{
   padding: 5px;
   display: block;
   margin: 5px 0;
-  z-index: 10000;
+  z-index: 10;
 }
 .friend:hover{
   box-sizing: border-box;
@@ -568,7 +574,7 @@ li{
   margin: 5px;
   padding: 5px;
   cursor: pointer;
-  z-index: 1000;
+  z-index: 10;
 }
 .people:hover{
   box-shadow: 0 1px #FFFFFF inset, 0 1px 3px rgba(34, 25, 25, 0.4);
@@ -657,7 +663,7 @@ li{
   margin: -5px 0 0 -6px;
   color: #fdd806;
   font-size: 10px;
-  z-index: 10000;
+  z-index: 1000;
 }
 .alert-main{
   position: absolute;
@@ -665,7 +671,7 @@ li{
   right: 5px;
   color: #fdd806;
   font-size: 17px;
-  z-index: 10000;
+  z-index: 1000;
 }
 .alert-main::before{
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
@@ -678,14 +684,14 @@ li{
   margin: 0 0 0 -8px;
   color: #0ed43f;
   font-size: 8px;
-  z-index: 10000;
+  z-index: 1000;
 }
 .offline{
   position: absolute;
   margin: 0 0 0 -8px;
   color: #a5a5a5;
   font-size: 8px;
-  z-index: 10000;
+  z-index: 1000;
 }
 .respondB{
   position: absolute;

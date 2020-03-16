@@ -55,6 +55,27 @@ const mainStyles = StyleSheet.create({
     textAlign: 'left',
     fontSize: 14,
     fontWeight: 'bold'
+  },
+  mainNavigation: {
+    width: '100%',
+    position: 'relative',
+    boxSizing: 'border-box',
+    color: '#fff',
+    backgroundColor: '#494141',
+    paddingTop: 5,
+    paddindBottom: 5,
+    paddingLeft: 20,
+    paddingRight: 20
+  },
+  nav: {
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingLeft: 10,
+    paddingRight: 10,
+    position: 'absolute',
+    top:20,
+    right: 0,
+    zIndex: 10000
   }
 });
 

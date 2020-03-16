@@ -1,6 +1,6 @@
-//import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-const styles = {
+const styles = StyleSheet.create({
   divider: {
     display: 'block',
     height: 5,
@@ -29,6 +29,6 @@ const styles = {
     padding: 4,
     backgroundColor: '#fff'
   }
-};
+});
 
 export default styles;
