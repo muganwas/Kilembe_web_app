@@ -50,8 +50,8 @@ const AuthButton = ({buttonStyle, textStyle, processing, onPress, text, iconColo
 }
 
 AuthButton.propTypes = {
-  buttonStyle: PropTypes.object,
-  textStyle: PropTypes.object,
+  buttonStyle: PropTypes.number,
+  textStyle: PropTypes.number,
   processing: PropTypes.bool,
   onpress: PropTypes.func,
   text: PropTypes.string,

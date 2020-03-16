@@ -2,9 +2,11 @@
 
 const styles = {
   chatContainer: {
+    position: 'relative',
     height: '100%',
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    zIndex: 1,
   },
   input: {
     display: 'block',
@@ -16,7 +18,9 @@ const styles = {
     height: 30,
   },
   userInfoContainer: {
+    position: 'relative',
     backgroundColor: '#EDEDED',
+    zIndex: 1
   },
   members: {
     position: 'relative',
@@ -35,9 +39,11 @@ const styles = {
     borderRadius: '50%',
   },
   userInfo: {
+    position: 'relative',
     boxSizing: 'border-box',
     display: 'block',
-    margin: 5
+    margin: 5,
+    zIndex: 1,
   },
   userTextInfoContainer: {
     margin: 3,
@@ -54,7 +60,8 @@ const styles = {
     alignContent: 'center',
     alignItems: 'center',
     textAlignVertical:'top',
-    display: 'inline-block'
+    display: 'inline-block',
+    zIndex: 1,
   },
   closeButtonText: {
     textAlignVertical:'top',

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { View, ImageBackground } from 'react-native';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -14,7 +15,6 @@ import {
     fetchedUsersOnline,
     dispatchRecievedMessage,
     fetchChatMessages
-    //dispatchSentMessage
 } from 'reduxFiles/dispatchers/chatDispatchers';
 import { 
     logout, 
@@ -29,21 +29,24 @@ import {
     confirmToken
 } from 'reduxFiles/dispatchers/authDispatchers';
 import { RECONNECT_TIMER } from 'misc/constants';
+import { Button } from 'components';
+import { 
+    mdiYoutube, 
+    mdiAccountGroup, 
+    mdiForumOutline, 
+    mdiMenu, 
+    mdiAccountCogOutline,
+    mdiLogout,
+    mdiHome
+} from '@mdi/js';
+import styles from './styling/styles';
+import arrow from 'styles/images/upArrow.png';
 
 class Header extends Component {
     constructor(){
         super();
         this.state={
-            dropDownStyle: null,
-            arrStyle: null,
-            loginStyle: "menu icon icon-home",
-            homeStyle: "menu icon icon-youtube-alt",
-            friendsStyle: "menu icon icon-torsos-all",
-            chatStyle: "menu icon icon-comments",
-            menuStyle: "menu icon icon-menu",
-            settingsIconStyle: "small icon-settings",
-            logoutIconStyle: "small icon-logout",
-            notificationClass: "fas fa-circle alert hidden",
+            invitationAlert: false,
             friendAction: false,
             onlineUsers: null,
             showDropDownMenu: false
@@ -66,13 +69,12 @@ class Header extends Component {
         } = this.props;
         const { socketOpen, unAuthorizedConnection } = loginInfo;
         const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
-        const { notificationClass } = this.state;
         
         //dispatch local storage genInfo to props
         if (!loggedIn) {
             let storedInfo = localStorage.getItem('genInfo');
-            storedInfo = storedInfo?
-            JSON.parse(storedInfo):
+            storedInfo = storedInfo ?
+            JSON.parse(storedInfo) :
             null;
             if (!avURL && storedInfo) {
                 confirmLoggedIn();
@@ -85,7 +87,7 @@ class Header extends Component {
             if(!dbUserInfoFetched && uid) fetchCurrentUserInfoFromDB(uid);
             if (fetched) this.setUpFriendsInfo();
         }
-        if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
+        if (fetchedFriends && inComingRequests.length > 0 && !this.state.invitationAlert) this.setState({invitationAlert: true});
 
         socket.on('connect', () => {
             const { genInfo: { info: { uid, chatkitUser: { token } } } } = this.props;
@@ -144,12 +146,11 @@ class Header extends Component {
             if (messagesWithSenderLength > 0) {
                 const prevMessages = [...newMessages[sender]];
                 const prevMessage = prevMessages.pop();
-                if (JSON.stringify(prevMessage) === JSON.stringify(data)) console.log('repeated msg')
+                if (JSON.stringify(prevMessage) === JSON.stringify(data)) console.log('repeated msg');
                 else newMessages[sender].push(data);
             }
             else newMessages[sender] = [data];
             storeRecievedMessages(newMessages);
-            //do something when message recieved
         });
     
         socket.on("user-disconnected", data => {
@@ -198,13 +199,15 @@ class Header extends Component {
             dbUserInfo,
             fetchCurrentUserInfoFromDB
         } =this.props;
-        const { notificationClass } = this.state;
+        const { invitationAlert } = this.state;
         if (!loggedIn) this.goTo("/");
         else if (fetched) this.setUpFriendsInfo();
         
         // show nofication icon if there are incoming requests
-        if (fetchedFriends && inComingRequests.length > 0 && notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert"});
-        else if (fetchFriends && inComingRequests.length === 0 && !notificationClass.includes('hidden')) this.setState({notificationClass:"fas fa-circle alert hidden"});
+        if (fetchedFriends && inComingRequests.length > 0 && !invitationAlert) {
+            this.setState({invitationAlert: true});
+        }
+        else if (fetchFriends && inComingRequests.length === 0 && invitationAlert) this.setState({invitationAlert:false});
         
         if (loggedIn) { 
             const dbUserInfoFetched = dbUserInfo.fetched;
@@ -222,20 +225,7 @@ class Header extends Component {
 
     toggleMenu = () => {
         var visible = this.state.showDropDownMenu;
-        if (!visible) {
-            this.setState({
-                dropDownStyle: "visible",
-                arrStyle: "visible",
-                showDropDownMenu: true
-            });
-        }
-        else {
-            this.setState({
-                dropDownStyle: null,
-                arrStyle: null,
-                showDropDownMenu: false
-            });
-        }
+        this.setState({showDropDownMenu: !visible});
     }
 
     goTo = (location) => {
@@ -247,53 +237,96 @@ class Header extends Component {
         const { info: { uid, dname }, signOut, genInfo, loginInfo } = this.props;
         const { loggedIn } = loginInfo;
         const { 
-            notificationClass,
-            loginStyle, 
-            homeStyle, 
-            friendsStyle, 
-            chatStyle, 
-            menuStyle,
-            arrStyle,
-            dropDownStyle,
-            settingsIconStyle,
-            logoutIconStyle,
+            invitationAlert,
             showDropDownMenu
         } = this.state;
-        const notFoundPath = loggedIn?
+        const notFoundPath = loggedIn ?
         "/home":
         "/";
-
         return (
-            <div className="mainNav">
+            <View style={styles.mainNavigation}>
                 { loggedIn ? 
                 <ProfileImage dname={ dname } userId = { uid } /> :
                 null }    
                 { loggedIn ?
-                <div className="nav">    
-                    <span className={ homeStyle } onClick={ () => this.goTo("/home") }></span>
-                    <span className={ friendsStyle } onClick={ () => this.goTo("/friends") }>
-                        <span className={ notificationClass }></span>
-                    </span>
-                    <span className={ chatStyle } onClick={ () => this.goTo("/messaging") }></span> 
-                    <span className={ menuStyle } onClick={ this.toggleMenu }>
-                        { showDropDownMenu ? 
-                        <div id="arr" className={ arrStyle }>
-                            <ul id="menu" className={ dropDownStyle }>
-                                <li className={ settingsIconStyle }>
-                                    <span className="link" onClick={ () => this.goTo("/settings") } >Settings</span>
-                                </li>
-                                <li className={ logoutIconStyle }>
-                                    <span className="logout" onClick={ () => signOut(genInfo, this.goTo) } >Logout</span>
-                                </li>
-                            </ul>
-                        </div> : 
-                        null }
-                    </span> 
-                </div> :
-                <div>
-                    <span className={ loginStyle } onClick={ () => this.goTo(notFoundPath) }></span>
-                </div> }
-            </div>
+                <View style={styles.nav}> 
+                    <Button
+                        style={styles.navButtonStyle}
+                        hoveredColor='#FDD906'
+                        iconPath={mdiYoutube}
+                        iconColor='white'
+                        onPress={() => this.goTo('/home')}
+                        size={1}
+                    />
+                    <Button
+                        style={styles.navButtonStyle}
+                        hoveredColor='#FDD906'
+                        iconPath={mdiAccountGroup}
+                        notification={invitationAlert}
+                        notificationStyle={styles.alert}
+                        iconColor='white'
+                        onPress={() => this.goTo('/friends')}
+                        size={1}
+                    /> 
+                    <Button
+                        style={styles.navButtonStyle}
+                        hoveredColor='#FDD906'
+                        iconPath={mdiForumOutline}
+                        iconColor='white'
+                        onPress={() => this.goTo("/messaging")}
+                        size={1}
+                    />
+                    <Button
+                        style={styles.navButtonStyle}
+                        hoveredColor='#FDD906'
+                        iconPath={mdiMenu}
+                        iconColor='white'
+                        onPress={this.toggleMenu}
+                        size={1}
+                    />  
+                    { showDropDownMenu ? 
+                    <View style={styles.dropdownContainer}>
+                        <ImageBackground style={styles.dropdownMenuBackgroundImage} source={arrow} />
+                        <View style={styles.dropdown}>
+                            <View style={styles.dropdownItem}>
+                                <Button
+                                    style={styles.dropdownMenuButtons}
+                                    hoveredStyle={styles.dropdownMenuButtonsHovered}
+                                    iconPath={mdiAccountCogOutline}
+                                    textStyle={styles.dropdownMenuTextStyle}
+                                    iconColor={'black'}
+                                    text='Settings'
+                                    onPress={() => this.goTo("/settings")}
+                                    size={0.7}
+                                /> 
+                            </View>
+                            <View style={styles.dropdownMenuSplitter} />
+                            <View id='logout' style={styles.dropdownItem}>
+                                <Button
+                                    style={styles.dropdownMenuButtons}
+                                    hoveredStyle={styles.dropdownMenuButtonsHovered}
+                                    iconPath={mdiLogout}
+                                    textStyle={styles.dropdownMenuTextStyle}
+                                    iconColor={'black'}
+                                    text='Logout'
+                                    onPress={() => signOut(genInfo, this.goTo)}
+                                    size={0.7}
+                                />
+                            </View>
+                        </View>
+                    </View> : 
+                    null }
+                </View> :
+                <Button
+                    style={styles.navButtonStyle}
+                    hoveredColor='#FDD906'
+                    iconPath={mdiHome}
+                    iconColor={'white'}
+                    onPress={() => this.goTo(notFoundPath)}
+                    size={1}
+                />
+                }
+            </View>
         )
     }
 }

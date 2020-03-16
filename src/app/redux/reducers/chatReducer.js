@@ -11,7 +11,7 @@ import {
 } from "../types";
 
 const defaultState = {
-  onlineUsers: null,
+  onlineUsers: {},
   selectedUser: null,
   messages: {},
   fetchingOnlineUsers: false,

@@ -91,24 +91,19 @@ class UserDetails extends Component {
     }
 
     fetchCurrentUsersFriendsInfo = () => {
-        return new Promise((resolve, reject)=>{
+        return new Promise(resolve => {
             const { friendsInfo: { friendsFull, selectedUser: { currUserId } } } = this.props;
-            try{
-                const friendRequest = friendsFull[currUserId]
-                if(friendRequest){
-                    let preciseStatus = friendRequest.accepted;
-                    let direction = friendRequest.direction;
-                    // console.log(direction)
-                    this.setState({
-                        friendRequestStatus: preciseStatus,
-                        direction
-                    });
-                }
-                resolve('CUF fetched');
-            }catch(error){
-                console.log(error);
-                reject();
+            const friendRequest = friendsFull[currUserId]
+            if (friendRequest) {
+                let preciseStatus = friendRequest.accepted;
+                let direction = friendRequest.direction;
+                // console.log(direction)
+                this.setState({
+                    friendRequestStatus: preciseStatus,
+                    direction
+                });
             }
+            resolve('CUF fetched');   
         });
     }
 

@@ -16,3 +16,4 @@ export { default as Courses } from './Courses/CoursesList';
 export { default as KLoader } from './KLoader/KLoader';
 export { default as Redirect } from './Redirect/Redirect';
 export { default as AuthButton } from './AuthButton/AuthButton';
+export { default as Button } from './Button/Button';

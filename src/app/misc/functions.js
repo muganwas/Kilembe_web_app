@@ -5,24 +5,26 @@ const base = Rebase.createClass(app.database());
 const storage = Firebase.storage();
 const storageRef = storage.ref();
 
-export const getUserAvatar = (userId)=>{
+export const getUserAvatar = userId => {
     return new Promise(resolve => {
         base.fetch(`users/${ userId }`, {
             context: this,
             asArray: true,
             then(data){
                 let len = data.length;
-                if( len !== 0){
+                if ( len !== 0) {
                     let fl = data[1][0];
                     let avURL = data[1];
-                    if(fl === "h"){
+                    if (fl === "h") {
                         localStorage.setItem('avatar', avURL);
                         resolve(avURL);
-                    }else{
+                    }
+                    else {
                         //use generic avatar
                         resolve(setGenericAvatar());
                     }
-                }else{
+                }
+                else {
                     //use generic avatar
                     resolve(setGenericAvatar());
                 }
