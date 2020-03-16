@@ -16,7 +16,8 @@ class ProfileImage extends Component {
 
     state = {
         imessage: undefined,
-        uploading: false
+        uploading: false,
+        mobile: isMobile()
     }
     
     componentDidMount(){
@@ -29,6 +30,9 @@ class ProfileImage extends Component {
             JSON.parse(storedInfo) : 
             null;
         } 
+        window.addEventListener('resize', e => {
+            this.setState({mobile: isMobile(e.target.innerWidth)});
+        })
     }
 
     updateAvatar = url => {
@@ -53,7 +57,9 @@ class ProfileImage extends Component {
         let fname = file.name;
         let fnameArr = fname.split('.');
         let fnameExt = fnameArr.pop();
+
         this.setState({uploading: true});
+
         if (fnameExt === "jpg" || fnameExt === "png" || fnameExt === "jpeg" || fnameExt === "gif") {
             let newAvRef = storageRef.child(`${ userId }/avatar.${ fnameExt }`);
             newAvRef.put(file).then(() => {
@@ -91,7 +97,7 @@ class ProfileImage extends Component {
     }
     
     render(){
-        const { imessage } = this.state;
+        const { imessage, mobile } = this.state;
         const { avURL, genInfo: { info: { displayName } } } = this.props;
 
         return (
@@ -112,7 +118,7 @@ class ProfileImage extends Component {
                         </View>
                     </form>
                 </View> 
-                <Text style={styles.welcome}>{ isMobile() ? shortName(displayName) : displayName }</Text>
+                <Text style={styles.welcome}>{ mobile ? shortName(displayName) : displayName }</Text>
             </View>
         )
     }

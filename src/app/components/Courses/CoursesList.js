@@ -138,36 +138,37 @@ class CoursesList extends Component {
     render(){
         const { playlist, videos, mobile } = this.state;
         const showPlaylist = Object.keys(playlist).length > 0;
-        if (videos) {  
-            return(
-                <View style={mobile ? styles.tutorialContainerMobi : styles.tutorialContainer}>
-                    <View style={styles.courseListContainer}>
-                        <View style={styles.courseList}>
-                            { Object.keys(videos).map(this.showCourses) }
-                        </View>
-                    </View>
-                    <View style={styles.tutorial}>
-                        <Text style={styles.header}><FormattedMessage id={"courses.videoTitle"} /></Text>
-                        <iframe 
-                            className="youtube" 
-                            title="tutorial video" 
-                            src={this.videoSource()}
-                            frameBorder="0" 
-                            allowFullScreen
-                        ></iframe>
-                    </View>
-                    { showPlaylist ? 
-                        <View style={styles.playlistContainer}>
-                            <View style={styles.playlist}>
-                                <Text style={styles.header}><FormattedMessage id={"playlist.title"} /></Text>
-                                <View>{ Object.keys(playlist).map(this.showPlayList) }</View>
+        return(
+            <View>
+                { videos ?
+                    <View style={mobile ? styles.tutorialContainerMobi : styles.tutorialContainer}>
+                        <View style={styles.courseListContainer}>
+                            <View style={styles.courseList}>
+                                { Object.keys(videos).map(this.showCourses) }
                             </View>
-                        </View> : 
-                    null }
-                </View>
-            )
-        }
-        else return false;
+                        </View>
+                        <View style={styles.tutorial}>
+                            <Text style={styles.header}><FormattedMessage id={"courses.videoTitle"} /></Text>
+                            <iframe 
+                                className="youtube" 
+                                title="tutorial video" 
+                                src={this.videoSource()}
+                                frameBorder="0" 
+                                allowFullScreen
+                            ></iframe>
+                        </View>
+                        { showPlaylist ? 
+                            <View style={styles.playlistContainer}>
+                                <View style={styles.playlist}>
+                                    <Text style={styles.header}><FormattedMessage id={"playlist.title"} /></Text>
+                                    <View>{ Object.keys(playlist).map(this.showPlayList) }</View>
+                                </View>
+                            </View> : 
+                        null }
+                    </View> :
+                null }
+            </View>
+        )
     }
 }
 
