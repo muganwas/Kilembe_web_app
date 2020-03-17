@@ -39,6 +39,7 @@ import {
     mdiLogout,
     mdiHome
 } from '@mdi/js';
+import { isMobile } from 'misc/helpers';
 import styles from './styling/styles';
 import arrow from 'styles/images/upArrow.png';
 
@@ -46,6 +47,7 @@ class Header extends Component {
     constructor(){
         super();
         this.state={
+            mobile: isMobile(),
             invitationAlert: false,
             friendAction: false,
             onlineUsers: null,
@@ -69,6 +71,10 @@ class Header extends Component {
         } = this.props;
         const { socketOpen, unAuthorizedConnection } = loginInfo;
         const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
+
+        window.addEventListener('resize', e => {
+            this.setState({mobile: isMobile(e.target.innerWidth)});
+        });
         
         //dispatch local storage genInfo to props
         if (!loggedIn) {
@@ -238,13 +244,14 @@ class Header extends Component {
         const { loggedIn } = loginInfo;
         const { 
             invitationAlert,
-            showDropDownMenu
+            showDropDownMenu,
+            mobile
         } = this.state;
         const notFoundPath = loggedIn ?
         "/home":
         "/";
         return (
-            <View style={styles.mainNavigation}>
+            <View style={mobile ? styles.mainNavigationMobile : styles.mainNavigation}>
                 { loggedIn ? 
                 <ProfileImage dname={ dname } userId = { uid } /> :
                 null }    

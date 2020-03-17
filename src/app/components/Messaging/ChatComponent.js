@@ -38,7 +38,7 @@ class ChatComponent extends React.Component {
     const message = this.state.message;
     const messageObj = {message, recipient: selectedUser, sender: uid};
     if (message.length) {
-      let newMessages = {...messages};
+      let newMessages = Object.assign({}, messages);
       if (newMessages[selectedUser]) newMessages[selectedUser].push(messageObj);
       else newMessages[selectedUser] = [messageObj];
       storeSentMessages(newMessages)

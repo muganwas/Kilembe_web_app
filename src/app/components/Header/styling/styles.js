@@ -13,6 +13,18 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     zIndex: 1000
   },
+  mainNavigationMobile: {
+    width: '100%',
+    position: 'relative',
+    boxSizing: 'border-box',
+    color: '#fff',
+    backgroundColor: '#494141',
+    paddingTop: 5,
+    paddindBottom: 5,
+    paddingLeft: 5,
+    paddingRight: 5,
+    zIndex: 1000
+  },
   nav: {
     display: 'table-cell',
     paddingTop: 0,

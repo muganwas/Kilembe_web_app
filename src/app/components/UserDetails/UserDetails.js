@@ -228,7 +228,7 @@ class UserDetails extends Component {
         } = this.props;
         let {uid} = info;
         let newFriend = e.target.id;
-        let friendsCopy = {...friendsFull};
+        let friendsCopy = Object.assign({}, friendsFull);
         const currentUsersFrinedsRef = usersRef.child(`${uid}/friends`);
         currentUsersFrinedsRef.once('value').then(snapshot => {
             if (snapshot.val() !== null ) {
