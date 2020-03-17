@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Rebase from 're-base';
-import app from '../../base';
+import app from 'misc/base';
 import { View, Text, TouchableOpacity } from 'react-native';
 import styles from './styling/styles';
 import { Button } from 'components';
@@ -157,14 +157,15 @@ class CoursesList extends Component {
                                 allowFullScreen
                             ></iframe>
                         </View>
-                        { showPlaylist ? 
+                        
                             <View style={styles.playlistContainer}>
+                            { showPlaylist ? 
                                 <View style={styles.playlist}>
                                     <Text style={styles.header}><FormattedMessage id={"playlist.title"} /></Text>
                                     <View>{ Object.keys(playlist).map(this.showPlayList) }</View>
-                                </View>
-                            </View> : 
-                        null }
+                                </View> : 
+                            null }
+                            </View> 
                     </View> :
                 null }
             </View>

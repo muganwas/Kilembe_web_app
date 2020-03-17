@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import Rebase from 're-base';
-import app from '../../base';
+import app from 'misc/base';
 import { 
     Header,
     Footer

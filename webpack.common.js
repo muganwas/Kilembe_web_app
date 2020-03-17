@@ -26,6 +26,16 @@ module.exports = {
 				}]
 			},
 			{
+				/** for react-native-web-webview */
+				test: /postMock.html$/,
+				use: {
+					loader: 'file-loader',
+					options: {
+						name: '[name].[ext]',
+					},
+				},
+			},
+			{
 				test: /\.css/,
 				use: ['style-loader', 'css-loader']
 			}, 
@@ -75,6 +85,7 @@ module.exports = {
 			assets: path.resolve(__dirname, 'src/app/assets'),
 			styles: path.resolve(__dirname, 'src/app/styles'),
 			'react-native$': 'react-native-web',
+			'WebView': 'react-native-web-webview',
 		}
 	},
 	devServer: {

@@ -20,7 +20,7 @@ import {
     Header,
     Footer 
 } from 'components';
-import './localStyles/main.css';
+import './styling/main.css';
 import ChatComponent from './ChatComponent';
 import { 
     isMobile, 

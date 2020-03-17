@@ -40,7 +40,7 @@
         "home.coursesTitle": "Available Courses",
         "friends.listTitle": "Friends",
         "friends.startConvo": "click on a friend to start conversation",
-        "chat.noConnection": "You're not connected to server",
+        "chat.noConnection": "You're not connected to server, refresh page.",
         "chat.chatTextFieldPlaceholder": "type message...",
         "chat.send": "send",
         "login.pageTitle": "Sign In",

@@ -79,6 +79,11 @@ const styles = StyleSheet.create({
     paddingLeft: 2,
     paddingRight: 2
   },
+  uVideo: {
+    boxSizing: 'content-box',
+    width: '100%',
+    height: '100%'
+  },
   text: {
     display: 'table-cell',
     textVerticleAlign: 'middle',

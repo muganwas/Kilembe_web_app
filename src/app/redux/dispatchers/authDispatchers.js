@@ -1,5 +1,5 @@
 import axios from 'axios';
-import app from '../../base';
+import app from 'misc/base';
 import Rebase from 're-base';
 import { emailregex } from 'misc/constants';
 import { 

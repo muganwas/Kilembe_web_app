@@ -76,6 +76,30 @@ const mainStyles = StyleSheet.create({
     top:20,
     right: 0,
     zIndex: 10000
+  },
+  mainContainer: {
+    boxSizing: 'border-box',
+    display: 'inline-block',
+    overflowX: 'hidden',
+    position: 'relative',
+    width: '70%',
+    textAlign: 'left'
+  },
+  mainContainerTab: {
+    boxSizing: 'border-box',
+    display: 'inline-block',
+    overflowX: 'hidden',
+    position: 'relative',
+    width: '90%',
+    textAlign: 'left'
+  },
+  mainContainerMobi: {
+    boxSizing: 'border-box',
+    display: 'inline-block',
+    overflowX: 'hidden',
+    position: 'relative',
+    width: '100%',
+    textAlign: 'left'
   }
 });
 

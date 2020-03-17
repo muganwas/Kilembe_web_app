@@ -1,5 +1,5 @@
 import Rebase from 're-base';
-import app from '../base';
+import app from './base';
 import Firebase from 'firebase/app';
 const base = Rebase.createClass(app.database());
 const storage = Firebase.storage();

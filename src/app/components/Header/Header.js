@@ -127,7 +127,9 @@ class Header extends Component {
             const { dispatchSocketError, signOut } = this.props;
             // console.log('Unauthorized:', reason);
             dispatchSocketError(reason);
-            signOut();
+            /*
+            * signs out way too often;
+            signOut();*/
         });
         
         socket.on('disconnect', reason => {
@@ -234,7 +236,7 @@ class Header extends Component {
         this.setState({showDropDownMenu: !visible});
     }
 
-    goTo = (location) => {
+    goTo = location => {
         const { history } = this.props;
         history.push(location);
     } 
