@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { View, Text } from 'react-native';
 import { connect } from 'react-redux';
 import Rebase from 're-base';
 import { FormattedMessage } from "react-intl";
@@ -22,17 +23,19 @@ import {
     Header,
     Footer
 } from 'components';
+import { isMobile, isTab } from 'misc/helpers';
+import styles from './styling/styles';
+import mainStyles from 'styles/mainStyles';
 
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 
 
 class Home extends Component {
-    constructor(){
-        super();
-        this.state = {
-            courses: []
-        };
+    state = {
+        courses: [],
+        mobile: isMobile(),
+        tab: isTab()
     }
     
     componentDidMount(){
@@ -44,6 +47,10 @@ class Home extends Component {
         } = this.props
         this.fetchCourses();
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
+
+        window.addEventListener('resize', e => {
+            this.setState({mobile: isMobile(e.target.innerWidth), tab: isTab(e.target.innerWidth)});
+        });
     }
 
     componentDidUpdate(){
@@ -61,7 +68,11 @@ class Home extends Component {
             uid: localStorage.getItem('uid'),
             about: " ",
             shareEmailAddress: false,
-            avatar: localStorage.getItem("avatar") === undefined?avatar === undefined?{}:avatar : localStorage.getItem("avatar")
+            avatar: localStorage.getItem("avatar") === undefined ?
+            avatar === undefined ? 
+            {} : 
+            avatar : 
+            localStorage.getItem("avatar")
         });
     }
 
@@ -72,10 +83,10 @@ class Home extends Component {
         base.fetch(`courses`, {
             context: this,
             asArray: true
-        }).then((info)=>{
+        }).then( info => {
             let length = info.length; 
-            if(length!==0 && length!=null) {
-                for(var count =0; count<length; count++){
+            if (length !== 0 && length != null) {
+                for (var count = 0; count < length; count++) {
                     let course = info[count]['Course_Title'];
                     let vidUrl = info[count]['Video']
                     courses[count] = course;
@@ -90,24 +101,31 @@ class Home extends Component {
         });        
     }
 
-    goTo = (location) => {
+    goTo = location => {
         const { history } = this.props;
         history.push(location);
     } 
 
     render(){  
-        let { urls, courses } = this.state;
-        let { genInfo: { info } } = this.props;
-        let uid = info?info.uid:null;
+        const { urls, courses, mobile, tab } = this.state;
+        const { genInfo: { info } } = this.props;
+        const uid = info ? info.uid : null;
+
+        const mainContainerStyle = mobile ? 
+        mainStyles.mainContainerMobi : 
+        tab ? 
+        mainStyles.mainContainerTab : 
+        mainStyles.mainContainer;
+
         return (
-            <div className="container Home">
+            <View style={mainContainerStyle}>
                 <Header />
-                <div className="content">
-                    <h4><FormattedMessage id={"home.coursesTitle"} /></h4>
+                <View style={mobile ? styles.contentMobi : styles.content}>
+                    <Text style={styles.header}><FormattedMessage id={"home.coursesTitle"} /></Text>
                     <Courses userID={ uid } videos={ urls } courses = { courses } />
-                </div>
+                </View>
                 <Footer />                               
-            </div>
+            </View>
         )
     }
 }

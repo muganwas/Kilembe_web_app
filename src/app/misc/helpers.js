@@ -5,6 +5,10 @@ export const isMobile = (winWidth = width) => {
   if (winWidth < 500) return true;
   else return false;
 }
+export const isTab = (winWidth = width) => {
+  if (winWidth < 769 && winWidth > 500) return true;
+  else return false;
+}
 export const isSmallMobile = (winWidth = width) => {
   if (winWidth < 411) return true;
   else return false;

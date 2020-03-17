@@ -234,7 +234,7 @@ class Header extends Component {
         this.setState({showDropDownMenu: !visible});
     }
 
-    goTo = (location) => {
+    goTo = location => {
         const { history } = this.props;
         history.push(location);
     } 

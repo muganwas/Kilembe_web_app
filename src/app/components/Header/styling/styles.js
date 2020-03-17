@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     position: 'absolute',
     top: 30,
-    right: -5,
+    right: 1,
     zIndex: 1000,
     textAlign: 'center',
     alignItems: 'center'
@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
   },
   dropdownMenuBackgroundImage: {
     display: 'inline-block',
+    marginLeft: 5,
     width: 7,
     height: 7
   },
