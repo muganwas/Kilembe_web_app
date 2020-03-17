@@ -19,7 +19,7 @@ import {
     FETCH_USER_DB_INFO_ERROR
 } from '../types';
 import Rebase from 're-base';
-import app from '../../base';
+import app from 'misc/base';
 
 const base = Rebase.createClass(app.database());
 const usersRef = app.database().ref('users');

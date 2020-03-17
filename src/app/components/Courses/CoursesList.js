@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Rebase from 're-base';
-import app from '../../base';
-import { View, Text, TouchableOpacity, WebView } from 'react-native';
+import app from 'misc/base';
+import { View, Text, TouchableOpacity } from 'react-native';
 import styles from './styling/styles';
-import { Button, Video } from 'components';
+import { Button } from 'components';
 import { mdiCloseCircleOutline } from '@mdi/js';
 import { isMobile } from 'misc/helpers';
 

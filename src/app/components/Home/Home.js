@@ -5,7 +5,7 @@ import Rebase from 're-base';
 import { FormattedMessage } from "react-intl";
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import app from '../../base';
+import app from 'misc/base';
 import { 
     confirmToken, 
     loginConfirmed, 

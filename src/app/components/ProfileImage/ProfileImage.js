@@ -3,7 +3,7 @@ import { View, Text, Image } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import firebase from 'firebase';
-import app from '../../base';
+import app from 'misc/base';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { isMobile, shortName } from 'misc/helpers';
 import { REMOVE_FEEDBACK_DELAY } from 'misc/constants';

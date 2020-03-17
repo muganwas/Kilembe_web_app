@@ -1,9 +1,11 @@
 import React from 'react';
+import { View } from 'react-native';
 import { payPalURL, devEmailAddress } from 'misc/constants';
+import styles from './styling/styles';
 
 const Donate = () => {
     return (
-        <div className="paypal">
+        <View style={styles.paypal}>
             <form action = { payPalURL } method="post">
                 <input type="hidden" name="business"
                     value = { devEmailAddress }></input>
@@ -21,7 +23,7 @@ const Donate = () => {
                 src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" />
 
             </form>
-        </div>
+        </View>
     )
 }
 

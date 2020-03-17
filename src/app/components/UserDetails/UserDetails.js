@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { FormattedMessage } from "react-intl";
 import Rebase from 're-base';
-import app from '../../base';
+import app from 'misc/base';
 import {
     fetchUsers,
     fetchFriends,
