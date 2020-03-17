@@ -17,8 +17,17 @@ import {
     loginConfirmed, 
     checkLoginStatus 
 } from 'reduxFiles/dispatchers/authDispatchers';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+import NotificationIcon from '@material-ui/icons/NotificationsActive';
+import { isMobile, isTab } from 'misc/helpers';
+import mainStyles from 'styles/mainStyles';
+import styles from './styling/styles';
 
 class Friends extends Component {
+    state={
+        mobile: isMobile(),
+        tab: isTab()
+    }
     
     componentDidMount(){
         const { 
@@ -28,6 +37,10 @@ class Friends extends Component {
             logingStatusConfirmation
         } = this.props
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
+        
+        window.addEventListener('resize', e => {
+            this.setState({mobile: isMobile(e.target.innerWidth), tab: isTab(e.target.innerWidth)});
+        });
     }
 
     userDetail =  key => {
@@ -35,34 +48,32 @@ class Friends extends Component {
     }
 
     incoming = key => {
-        let { friendsInfo: { inComingRequests, responseRequired, users } } = this.props;;
+        let { friendsInfo: { inComingRequests, users } } = this.props;;
         let len = inComingRequests.length;
-        for(let count = 0; count < len; count++){
+        for (let count = 0; count < len; count++) {
             let currUser = users[key].uid;
-            if(inComingRequests[count] === currUser){
-                return <span className={ responseRequired }></span>;
-            }
+            if (inComingRequests[count] === currUser) return <NotificationIcon fontSize="small" style={styles.notificationIcon} />;
         } 
     }
 
     getUsers = key => {
-        let { friendsInfo: { users, peopleListStyle, defaultAvatar }, genInfo: { info: { uid } } } = this.props;
+        let { friendsInfo: { users, defaultAvatar }, genInfo: { info: { uid } } } = this.props;
         let loggedInUser = uid;
         let uCount = users.length;
         let userImg = users[key].avatar || defaultAvatar;
         let dname = users[key].dname;
         let usersId = users[key].uid;
-        if(uCount !== 0 && loggedInUser !== usersId && dname){
+        if (uCount !== 0 && loggedInUser !== usersId && dname) {
             return(
-                <div title={ dname } id={ usersId } key={key} className={ peopleListStyle } onClick={ ()=>{ this.userDetail(key) } }>
-                    <div className="roundPic membersAv">
-                        <img alt={ key } className="members" src={ userImg } />
-                    </div>
-                    <div className="pfriends">
-                        { users[key].dname }
-                        { this.incoming(key) }
-                    </div>
-                </div>
+                <TouchableOpacity style={styles.userInfoContainer} title={ dname } id={ usersId } key={key} onPress={ () => this.userDetail(key) }>
+                    <View style={styles.userInfo}>
+                        <Image alt={ key } style={styles.roundPic} source={ userImg } />
+                        <Text style={styles.userTextInfoContainer}>
+                            <Text style={styles.username}>{ users[key].dname }</Text>
+                            { this.incoming(key) }
+                        </Text>
+                    </View>
+                </TouchableOpacity>
             )
         }
     }
@@ -73,14 +84,22 @@ class Friends extends Component {
     } 
 
     render(){
-        let { friendsInfo: { users } } = this.props;
-        let usersLength = users.length;
+        const { mobile, tab } = this.state;
+        const { friendsInfo: { users } } = this.props;
+        const usersLength = users.length;
+
+        const mainContainerStyle = mobile ? 
+        mainStyles.mainContainerMobi : 
+        tab ? 
+        mainStyles.mainContainerTab : 
+        mainStyles.mainContainer;
+
         return (
-            <div className="container Home">
+            <View style={mainContainerStyle}>
                 <Header />
-                <div className="content">
-                    <h4 id="users-title"><FormattedMessage id="users.title" /></h4>
-                    <div className="sub-container">
+                <View style={mobile ? styles.contentMobi : styles.content}>
+                    <Text style={styles.header}><FormattedMessage id="users.title" /></Text>
+                    <View style={styles.subContainer}>
                         { 
                             usersLength ?
                             Object.keys(users).map(this.getUsers) :
@@ -91,10 +110,10 @@ class Friends extends Component {
                                 width={50}
                             />
                         }
-                    </div>
-                </div>
+                    </View>
+                </View>
                 <Footer />
-            </div>
+            </View>
         )
     }
 }
@@ -106,7 +125,8 @@ Friends.propTypes = {
     getUsers: PropTypes.func.isRequired,
     getFriends: PropTypes.func.isRequired,
     logingStatusConfirmation: PropTypes.func.isRequired,
-    confirmLoggedIn: PropTypes.func.isRequired
+    confirmLoggedIn: PropTypes.func.isRequired,
+    getFriendsRequests: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => {

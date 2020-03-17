@@ -157,14 +157,15 @@ class CoursesList extends Component {
                                 allowFullScreen
                             ></iframe>
                         </View>
-                        { showPlaylist ? 
+                        
                             <View style={styles.playlistContainer}>
+                            { showPlaylist ? 
                                 <View style={styles.playlist}>
                                     <Text style={styles.header}><FormattedMessage id={"playlist.title"} /></Text>
                                     <View>{ Object.keys(playlist).map(this.showPlayList) }</View>
-                                </View>
-                            </View> : 
-                        null }
+                                </View> : 
+                            null }
+                            </View> 
                     </View> :
                 null }
             </View>

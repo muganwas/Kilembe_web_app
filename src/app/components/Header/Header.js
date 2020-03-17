@@ -127,7 +127,9 @@ class Header extends Component {
             const { dispatchSocketError, signOut } = this.props;
             // console.log('Unauthorized:', reason);
             dispatchSocketError(reason);
-            signOut();
+            /*
+            * signs out way too often;
+            signOut();*/
         });
         
         socket.on('disconnect', reason => {

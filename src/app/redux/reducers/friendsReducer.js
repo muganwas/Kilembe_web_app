@@ -19,12 +19,9 @@ import {
 
 const defaultState = {
   users: [],
-  defaultAvatar:
-    "https://firebasestorage.googleapis.com/v0/b/kilembe-school.appspot.com/o/general%2Favatar.jpg?alt=media&token=82a7c51f-b798-4ad3-a3f6-1b84572173ca",
-  peopleListStyle: "people",
+  defaultAvatar:"https://firebasestorage.googleapis.com/v0/b/kilembe-school.appspot.com/o/general%2Favatar.jpg?alt=media&token=82a7c51f-b798-4ad3-a3f6-1b84572173ca",
   general: true,
   specific: false,
-  responseRequired: "fas fa-bell alert-main",
   outGoingRequests: [],
   inComingRequests: [],
   selectedUser: {},

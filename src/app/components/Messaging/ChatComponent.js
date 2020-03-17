@@ -21,7 +21,7 @@ import {
 } from 'react-native';
 import { setUserToChat } from 'reduxFiles/dispatchers/chatDispatchers';
 import CloseIcon from '@material-ui/icons/Close';
-import styles from './localStyles/mainStyles';
+import styles from './styling/styles';
 
 class ChatComponent extends React.Component { 
   state = {
@@ -104,10 +104,7 @@ class ChatComponent extends React.Component {
                   <Image alt={ uid } style={styles.roundPic} source={user.avatar} />
                   <Text style={styles.userTextInfoContainer}>
                     <Text style={styles.username}>{ user.dname }</Text>
-                    { onlineUsers[selectedUser] ?
-                      <Text style={styles.availability}><FormattedMessage id="user.online" /></Text> :
-                      <Text style={styles.availability}><FormattedMessage id="user.offline" /></Text>  
-                    }
+                    <Text style={styles.availability}><FormattedMessage id={onlineUsers[selectedUser] ? "user.online" : "user.offline"} /></Text>
                   </Text>
                   <TouchableOpacity onPress={this.closeChat} style={styles.closeButton}>
                     <CloseIcon style={styles.closeButtonText} />
