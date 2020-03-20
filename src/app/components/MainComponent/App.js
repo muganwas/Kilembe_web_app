@@ -11,11 +11,11 @@ import { withRouter } from 'react-router-dom';
 class App extends Component {
 
   componentDidMount(){
+    let { checkSessionValidity } = this.props;
     let storedInfo = localStorage.getItem("genInfo");
     //if stored info is present pickout session token
     let genInfo = JSON.parse(storedInfo);
     let sessionToken = storedInfo ? genInfo.chatkitUser.token : null;
-    let { checkSessionValidity } = this.props;
 
     let uid = localStorage.getItem("uid") === "null" ?
       null : localStorage.getItem("uid");
@@ -52,7 +52,10 @@ App.propTypes = {
   genInfo: PropTypes.object,
   info: PropTypes.object,
   loginInfo: PropTypes.object,
-  chatkitUser: PropTypes.object
+  chatkitUser: PropTypes.object,
+  checkSessionValidity: PropTypes.func.isRequired,
+  sendGenInfo: PropTypes.func.isRequired,
+  updateConnectivity: PropTypes.func.isRequired
 }
 const mapStateToProps = state => {
   return {

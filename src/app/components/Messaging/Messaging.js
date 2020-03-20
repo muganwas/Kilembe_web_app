@@ -25,6 +25,7 @@ import ChatComponent from './ChatComponent';
 import { 
     isMobile, 
     isSmallMobile,
+    isTab,
     shortName, 
     nameTooLong, 
     firstLetters 
@@ -39,7 +40,8 @@ const override = css`
 class Messaging extends Component {
     state = {
         isMobile: isMobile(),
-        isSmallMobile: isSmallMobile()
+        isSmallMobile: isSmallMobile(),
+        tab: isTab()
     }
     componentDidMount(){
         const { 
@@ -58,7 +60,8 @@ class Messaging extends Component {
             const width = window.innerWidth;
             this.setState({
                 isMobile: isMobile(width),
-                isSmallMobile: isSmallMobile(width)
+                isSmallMobile: isSmallMobile(width),
+                tab: isTab(width)
             });
         }
     }
@@ -77,7 +80,8 @@ class Messaging extends Component {
         const { isMobile, isSmallMobile } = this.state
 
         if ( users.length > 0 ) {
-            return <div key={key}> {
+            return (
+            <div key={key}> {
                 users.map( obj => {
                     if (obj.uid === key && friendsFull[key].accepted) {
                         let { uid, avatar, dname, email } = obj;
@@ -101,8 +105,8 @@ class Messaging extends Component {
                         )
                     }
                     return;
-            }) }
-            </div>
+                }) }
+            </div>)
         }
         return;
     }

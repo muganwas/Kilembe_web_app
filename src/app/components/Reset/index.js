@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ResetForm from './ResetForm';
+import { OfflineBanner } from 'components';
 import { 
   handleEmail, 
   handlePasswordReset,
@@ -26,6 +27,7 @@ class Reset extends Component {
   
     return(
       <View style={mainStyles.authContainer}>
+        <OfflineBanner containerStyle={mainStyles.authOfflineBannerContainer} />
         <View style={mainStyles.logoContainer}>
           <Image style={mainStyles.logo} source={logo} resizeMode="contain" />
         </View>
@@ -46,7 +48,8 @@ Reset.propTypes = {
   reset: PropTypes.bool.isRequired,
   dispatchEmail: PropTypes.func.isRequired,
   clearAllErros: PropTypes.func.isRequired,
-  onReset: PropTypes.func.isRequired
+  onReset: PropTypes.func.isRequired,
+  online: PropTypes.bool.isRequired
 }
 const mapStateToProps = state => {
   return {
@@ -54,7 +57,8 @@ const mapStateToProps = state => {
     feedback: state.resetInfo.feedback,
     resetInfo: state.resetInfo,
     reset: state.resetInfo.reset,
-    loggedIn: state.loginInfo.loggedIn
+    loggedIn: state.loginInfo.loggedIn,
+    online: state.genInfo.online
   }
 }
 const mapDispatchToProps = dispatch => {

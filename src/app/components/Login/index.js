@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import LoginForm from './LoginForm';
+import { OfflineBanner } from 'components';
 import { 
   handleEmail, 
   handlePassword, 
   handleLogin, 
   authenticate, 
   authHandler,
-  clearErrors
+  clearErrors,
 } from 'reduxFiles/dispatchers/authDispatchers';
 import { View, Image } from 'react-native';
 import { Redirect } from 'react-router-dom';
@@ -24,13 +25,14 @@ class Login extends Component {
 
   render(){
     const { 
-      loggedIn
+      loggedIn,
     } = this.props;
     //go home if logged in
     if (loggedIn) return <Redirect to={"/home"} />
 
     return(
       <View style={mainStyles.authContainer}>
+        <OfflineBanner containerStyle={mainStyles.authOfflineBannerContainer} />
         <View style={mainStyles.logoContainer}>
           <Image style={mainStyles.logo} source={logo} resizeMode="contain" />
         </View>
@@ -53,7 +55,8 @@ Login.propTypes = {
   dispatchPassword: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   thirdPartyAuthentication: PropTypes.func.isRequired,
-  thirdPartyAuthHandler: PropTypes.func.isRequired
+  thirdPartyAuthHandler: PropTypes.func.isRequired,
+  online: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => {
@@ -61,7 +64,8 @@ const mapStateToProps = state => {
     messageId: state.loginInfo.messageId,
     error: state.loginInfo.error,
     loginInfo: state.loginInfo,
-    loggedIn: state.loginInfo.loggedIn
+    loggedIn: state.loginInfo.loggedIn,
+    online: state.genInfo.online
   }
 }
 

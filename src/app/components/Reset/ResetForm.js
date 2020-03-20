@@ -12,7 +12,8 @@ const ResetForm = ({
     messageId,
     resetInfo,
     dispatchEmail,
-    onReset
+    onReset,
+    online
 }) => {
     const [email='', changeEmail]=useState();
 
@@ -47,7 +48,7 @@ const ResetForm = ({
             </View>
             <View>
                 <AuthButton
-                    buttonStyle={styles.submitButton}
+                    buttonStyle={online ? mainStyles.authSubmitButton : mainStyles.authSubmitButtonOffline}
                     textStyle={styles.submitButtonText}
                     text={forgotPasswordLabel}
                     onPress={
@@ -56,6 +57,7 @@ const ResetForm = ({
                         }
                     }
                     processing={fetching}
+                    disabled={!online}
                 />
             </View>
             <View style={mainStyles.alternatives}>
@@ -71,7 +73,8 @@ ResetForm.propTypes = {
     messageId: PropTypes.string,
     resetInfo: PropTypes.object.isRequired,
     dispatchEmail: PropTypes.func.isRequired,
-    onReset: PropTypes.func.isRequired
+    onReset: PropTypes.func.isRequired,
+    online: PropTypes.bool.isRequired
 }
 
 export default ResetForm;

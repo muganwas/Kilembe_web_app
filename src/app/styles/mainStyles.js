@@ -100,7 +100,41 @@ const mainStyles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     textAlign: 'left'
-  }
+  },
+  authSubmitButton: {
+    display: 'flex',
+    width: 250,
+    padding: 3,
+    marginTop: 2,
+    boxSizing: 'border-box',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#fff',
+    borderRadius: 3,
+    boxShadow: "1px 2px 3px rgba(127,125,135, 0.8)"
+  },
+  authSubmitButtonOffline: {
+    display: 'flex',
+    width: 250,
+    padding: 3,
+    marginTop: 2,
+    boxSizing: 'border-box',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#fff',
+    borderRadius: 3,
+    boxShadow: "1px 1px 1px rgba(127,125,135, 0.4)"
+  },
+  authOfflineBannerContainer: {
+    position: 'absolute',
+    backgroundColor: "#000",
+    display: 'table',
+    width: '100%',
+    height: 40,
+    top: 0,
+    borderTopRightRadius: 5,
+    borderTopLeftRadius: 5
+  },
 });
 
 export default mainStyles;

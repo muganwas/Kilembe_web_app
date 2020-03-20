@@ -17,7 +17,8 @@ const SignupForm = ({
     dispatchPassword,
     confirmPasswordMatch,
     onSignup,
-    signupInfo
+    signupInfo,
+    online
 }) => {
     const [email = '', changeEmail] = useState();
     const [password = '', changePassword] = useState();
@@ -80,11 +81,12 @@ const SignupForm = ({
                 </View>
                 <View>
                     <AuthButton 
-                        buttonStyle={styles.submitButton}
+                        buttonStyle={online ? mainStyles.authSubmitButton : mainStyles.authSubmitButtonOffline}
                         textStyle={styles.submitButtonText}
                         processing={fetching}
                         text={signupLabel} 
                         onPress={localSubmit}
+                        disabled={!online}
                     />
                 </View>
             </form>
@@ -106,7 +108,8 @@ SignupForm.propTypes = {
     dispatchPassword: PropTypes.func.isRequired,
     confirmPasswordMatch: PropTypes.func.isRequired,
     onSignup: PropTypes.func.isRequired,
-    signupInfo: PropTypes.object
+    signupInfo: PropTypes.object,
+    online: PropTypes.bool
 }
 
 export default SignupForm;

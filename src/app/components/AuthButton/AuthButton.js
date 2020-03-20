@@ -15,9 +15,9 @@ const override = css`
     border-color: #757575;
 `;
 
-const AuthButton = ({buttonStyle, textStyle, processing, onPress, text, iconColor, iconPath}) => {
+const AuthButton = ({buttonStyle, textStyle, processing, onPress, text, iconColor, iconPath, disabled=false}) => {
   return (
-    <TouchableOpacity onPress={onPress} style={buttonStyle} >
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={buttonStyle} >
       { processing ?
           <ScaleLoader
               css={override}
@@ -56,7 +56,8 @@ AuthButton.propTypes = {
   onpress: PropTypes.func,
   text: PropTypes.string,
   iconColor: PropTypes.string,
-  iconPath: PropTypes.string
+  iconPath: PropTypes.string,
+  disabled: PropTypes.bool
 }
 
 export default AuthButton;

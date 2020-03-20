@@ -1,4 +1,4 @@
-import { FETCH_GEN_FULFILLED, FETCH_GEN_REJECTED, FETCH_ID_TOKEN } from '../types';
+import { FETCH_GEN_FULFILLED, FETCH_GEN_REJECTED, FETCH_ID_TOKEN, UPDATE_ONLINE_STATUS } from '../types';
 
 export const dispatchedGenInfo = info => {
     if(info !== undefined && info !== null){   
@@ -37,4 +37,11 @@ export const fetchGenInfoFromlocalStorage = (confirmLoggedIn, loginInfo) => {
             resolve("not dispatched");
         }
     });
+}
+
+export const updateOnlineStatus = status => {
+    return {
+        type: UPDATE_ONLINE_STATUS,
+        payload: status
+    }
 }
