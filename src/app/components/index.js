@@ -19,3 +19,4 @@ export { default as AuthButton } from './AuthButton/AuthButton';
 export { default as Button } from './Button/Button';
 export { default as Video } from './Video/Video';
 export { default as OfflineBanner } from './OfflineBanner/OfflineBanner';
+export { default as Scaleloader } from './Scaleloader/Scaleloader';

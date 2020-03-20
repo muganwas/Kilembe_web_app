@@ -4,13 +4,12 @@ import { css } from '@emotion/core';
 import { View } from 'react-native';
 import { ScaleLoader } from 'react-spinners';
 
-const override = css`
+const Scaleloader = ({borderColor, containerStyle, height, width, radius, color, loading}) => {
+  const override = css`
     display: block;
     margin: 0 auto;
-    border-color: #757575;
+    border-color: ${borderColor || '#757575'};
 `;
-
-const Scaleloader = ({containerStyle, height, width, radius, color, loading}) => {
   return (
     <View style={containerStyle}>
       <ScaleLoader
@@ -32,7 +31,8 @@ Scaleloader.propTypes = {
   width: PropTypes.number.isRequired,
   radius: PropTypes.number.isRequired,
   color: PropTypes.string.isRequired,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  borderColor: PropTypes.string
 }
 
 export default Scaleloader;

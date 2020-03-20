@@ -1,5 +1,6 @@
 const width = window.innerWidth;
 // const height = window.innerHeight;
+const env = process.env.NODE_ENV;
 
 export const isMobile = (winWidth = width) => {
   if (winWidth < 500) return true;
@@ -34,4 +35,9 @@ export const firstLetters = name => {
     resultingName = name;
   }
   return resultingName;
+}
+export const disableConsoleLog = () => {
+  if (env.toLowerCase() === 'production') {
+    console.log = () => {};
+  }
 }

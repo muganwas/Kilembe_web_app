@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { ScaleLoader } from 'react-spinners';
 import { css } from '@emotion/core';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { 
@@ -18,7 +17,8 @@ import {
 import { setUserToChat } from 'reduxFiles/dispatchers/chatDispatchers';
 import { 
     Header,
-    Footer 
+    Footer,
+    Scaleloader 
 } from 'components';
 import './styling/main.css';
 import ChatComponent from './ChatComponent';
@@ -30,12 +30,6 @@ import {
     nameTooLong, 
     firstLetters 
 } from 'misc/helpers';
-
-const override = css`
-    display: block;
-    margin: 0 auto;
-    border-color: #757575;
-`;
 
 class Messaging extends Component {
     state = {
@@ -127,13 +121,12 @@ class Messaging extends Component {
                             <div className='messages'>
                                 <FormattedMessage id='message.noFriendsYet' />
                             </div> :
-                            <ScaleLoader
-                                css={override}
-                                sizeUnit={"px"}
+                            <Scaleloader
                                 height={10}
                                 width={3}
                                 radius={3}
                                 color={'#757575'}
+                                borderColor={'#757575'}
                                 loading={!fetchedFriends} 
                             /> }
                         </div>
