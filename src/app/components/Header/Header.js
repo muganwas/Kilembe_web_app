@@ -3,8 +3,8 @@ import { View, ImageBackground } from 'react-native';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { ProfileImage } from 'components';
-import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
+import { ProfileImage, OfflineBanner } from 'components';
+import { dispatchedGenInfo, updateOnlineStatus } from 'reduxFiles/dispatchers/genDispatchers';
 import {
     fetchUsers,
     fetchFriends,
@@ -67,8 +67,16 @@ class Header extends Component {
             dispatchSocketConnected,
             openSocket,
             dbUserInfo,
-            fetchCurrentUserInfoFromDB
+            fetchCurrentUserInfoFromDB,
+            updateConnectivity
         } = this.props;
+        /**check whether online*/
+        window.addEventListener('online', () => {
+            updateConnectivity(true);
+        });
+        window.addEventListener('offline', () => {
+            updateConnectivity(false);
+        });
         const { socketOpen, unAuthorizedConnection } = loginInfo;
         const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
 
@@ -254,6 +262,7 @@ class Header extends Component {
         "/";
         return (
             <View style={mobile ? styles.mainNavigationMobile : styles.mainNavigation}>
+                <OfflineBanner textStyle={styles.offlineBannerText} containerStyle={styles.offlineBannerContainer} />
                 { loggedIn ? 
                 <ProfileImage dname={ dname } userId = { uid } /> :
                 null }    
@@ -360,7 +369,9 @@ Header.propTypes = {
     getFriends: PropTypes.func,
     getFriendsRequests: PropTypes.func,
     uploadUsersInfoToFB: PropTypes.func,
-    fetchCurrentUserInfoFromDB: PropTypes.func
+    fetchCurrentUserInfoFromDB: PropTypes.func,
+    updateConnectivity: PropTypes.func.isRequired,
+    online: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = state => {
@@ -370,7 +381,8 @@ const mapStateToProps = state => {
         loginInfo: state.loginInfo,
         friendsInfo: state.friendsInfo,
         chatInfo: state.chatInfo,
-        dbUserInfo: state.userInfo
+        dbUserInfo: state.userInfo,
+        online: state.genInfo.online
     }
 }
 
@@ -426,6 +438,9 @@ const mapDispatchToProps = dispatch => {
         },
         fetchCurrentUserInfoFromDB: uid => {
             dispatch(fetchUserInfoFromDB(uid));
+        },
+        updateConnectivity: status => {
+            dispatch(updateOnlineStatus(status));
         }
     }
 }

@@ -124,6 +124,27 @@ const styles = StyleSheet.create({
     width: 8,
     borderRadius: '45%',
     zIndex: 1000,
+  },
+  offlineBannerContainer: {
+    position: 'absolute',
+    boxSizing: 'border-box',
+    backgroundColor: "#000",
+    display: 'block',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    width: '100%',
+    height: 20,
+    top: 50,
+    left: 0,
+    right: 0
+  },
+  offlineBannerText: {
+    textAlign: 'center',
+    display: 'inline-block',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12
   }
 });
 

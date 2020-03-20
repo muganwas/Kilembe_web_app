@@ -4,12 +4,14 @@ import {
   FETCH_GEN_FULFILLED, 
   FETCH_ID_TOKEN,
   LOGOUT_CONFIRMED,
-  USER_SAVED_IN_DATABASE 
+  USER_SAVED_IN_DATABASE,
+  UPDATE_ONLINE_STATUS
 } from '../types';
 const defaultState = {
     info: {
       chatkitUser: {}
     },
+    online: window.navigator.onLine,
     userInDatabase: false,
     menu: "Main-Menu",
     fetching: false,
@@ -58,6 +60,12 @@ const defaultState = {
               fetching: false,
               error: false,
               info: action.payload
+            }
+          }
+          case UPDATE_ONLINE_STATUS:{
+            return {
+              ...state,
+              online: action.payload
             }
           }
           default:

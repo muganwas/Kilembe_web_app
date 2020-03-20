@@ -8,6 +8,7 @@ import {
     fetchGenInfoFromlocalStorage 
 } from 'reduxFiles/dispatchers/genDispatchers';
 import { getUserAvatar } from 'misc/functions';
+import { disableConsoleLog } from 'misc/helpers';
 import { 
     LOGIN_FULFILLED,
     LOGIN_PENDING, 
@@ -44,28 +45,31 @@ const confirmTokenURL = process.env.CONFIRM_FIREBASE_TOKEN;
 let base = Rebase.createClass(app.database());
 let usersRef = app.database().ref('users');
 
-export const storeEmail = email =>{
+//disable console.log in production 
+disableConsoleLog();
+
+export const storeEmail = email => {
     return {
         type: STORE_EMAIL,
         payload: email
     }
 }
 
-export const storePassword = password =>{
+export const storePassword = password => {
     return {
         type: STORE_PASSWORD,
         payload: password
     }
 }
 
-export const confirmPasswordMatch = password =>{
+export const confirmPasswordMatch = password => {
     return {
         type: PASSWORDS_MATCH,
         payload: password
     }
 }
 
-export const passwordMatchError = messageId =>{
+export const passwordMatchError = messageId => {
     return {
         type: PASSWORDS_MATCH_ERROR,
         payload: messageId
@@ -349,7 +353,7 @@ export const eAuthenticate = (email, password) => {
                 errorMessage = "error.loginFailure";
 
             dispatch(loginFailed(errorMessage));
-            console.log(error)
+            //console.log(error)
         });
     }
 }
@@ -367,7 +371,7 @@ export const eSignup = (email, password)=>{
                     console.log("Confirmation email sent...")
                 }): null;
             }
-            console.log(emailVerified);
+            //console.log(emailVerified);
             //after signup
         }).catch(error => {
             //console.log(error);
@@ -383,10 +387,11 @@ export const eSignup = (email, password)=>{
 
 export const handlePasswordReset = email => {
     return dispatch => {
-        if(email){
+        if (email) {
             dispatch(resetPending());
             dispatch(eReset(email));  
-        }else{
+        }
+        else {
             dispatch(resetMessageAlert('error.noEmail'));
         } 
     }    
@@ -445,10 +450,11 @@ export const setupUserInFirebase = (avatar, uid) => {
 
 export const handleSignup = (email, password) => {
     return dispatch => {
-        if(email && password){
+        if (email && password) {
             dispatch(signupPending());
             dispatch(eSignup(email, password));  
-        }else{
+        }
+        else {
             dispatch(signupMessageAlert('error.noCredentials'));
         } 
     }    
@@ -533,7 +539,7 @@ export const connectToChatServer = props => {
         const storedInfo = JSON.parse(localStorage.getItem('genInfo'));
         const storedToken = storedInfo.chatkitUser.token;
         const remoteConnected = socket.connected;
-        console.log('remote socket open: ', remoteConnected);
+        console.log('remote socket open: ' + remoteConnected);
         if ((token || storedToken) && !socketOpen) {
             console.log('opening socket...')
             socket.open();

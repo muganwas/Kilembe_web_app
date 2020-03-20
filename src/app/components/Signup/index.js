@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import SignupForm from './SignupForm';
+import { OfflineBanner } from 'components'; 
 import { 
   handleEmail, 
   handlePassword, 
@@ -28,6 +29,7 @@ class Signup extends Component {
   
     return(
       <View style={mainStyles.authContainer}>
+        <OfflineBanner containerStyle={mainStyles.authOfflineBannerContainer} />
         <View style={mainStyles.logoContainer}>
           <Image style={mainStyles.logo} source={logo} resizeMode="contain" />
         </View>
@@ -51,7 +53,8 @@ Signup.propTypes = {
   dispatchPassword: PropTypes.func.isRequired,
   onSignup: PropTypes.func.isRequired,
   confirmPasswordMatch: PropTypes.func.isRequired,
-  thirdPartyAuthHandler: PropTypes.func.isRequired
+  thirdPartyAuthHandler: PropTypes.func.isRequired,
+  online: PropTypes.bool.isRequired
 }
 const mapStateToProps = state => {
   return {
@@ -59,7 +62,8 @@ const mapStateToProps = state => {
     error: state.signupInfo.error,
     signupInfo: state.signupInfo,
     signedUp: state.signupInfo.signedUp,
-    loggedIn: state.loginInfo.loggedIn
+    loggedIn: state.loginInfo.loggedIn,
+    online: state.genInfo.online
   }
 }
 const mapDispatchToProps = dispatch => {

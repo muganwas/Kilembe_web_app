@@ -26,7 +26,8 @@ const LoginForm = props => {
         loginInfo,
         messageId, 
         thirdPartyAuthentication, 
-        thirdPartyAuthHandler
+        thirdPartyAuthHandler,
+        online
     } = props;
     const { fetching } = loginInfo;
     const intl = useIntl();
@@ -85,11 +86,12 @@ const LoginForm = props => {
                 </View>
                 <View>
                     <AuthButton
-                        buttonStyle={styles.submitButton}
+                        buttonStyle={online ? mainStyles.authSubmitButton : mainStyles.authSubmitButtonOffline}
                         textStyle={styles.submitButtonText}
                         text={loginLabel}
                         onPress={localSubmit}
                         processing={fetching}
+                        disabled={!online}
                     />
                 </View>
             </form>
@@ -100,23 +102,25 @@ const LoginForm = props => {
             <View>
                 <AuthButton
                     id="facebook"
-                    buttonStyle={styles.facebookAuth}
+                    buttonStyle={online ? styles.facebookAuth : styles.facebookAuthOffline}
                     textStyle={styles.facebookAuthText}
                     iconPath={mdiFacebook}
                     iconColor={'white'}
                     text={facebookLoginLabel} 
                     onPress={ () => thirdPartyAuthentication( fbAuth, thirdPartyAuthHandler ) }
+                    disabled={!online}
                 />
             </View>
             <View>
                 <AuthButton 
                     id="google"
-                    buttonStyle={styles.googleAuth}
+                    buttonStyle={online ? styles.googleAuth : styles.googleAuthOffline}
                     textStyle={styles.googleAuthText}
                     iconPath={mdiGoogle}
                     iconColor={'white'}
                     text={googleLoginLabel} 
                     onPress={ () => thirdPartyAuthentication( googleAuth, thirdPartyAuthHandler ) }
+                    disabled={!online}
                 />
             </View>
         </View>
@@ -128,9 +132,11 @@ LoginForm.propTypes = {
     dispatchPassword: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     error: PropTypes.bool, 
+    online: PropTypes.bool.isRequired,
     messageId: PropTypes.string, 
     thirdPartyAuthentication: PropTypes.func.isRequired, 
-    thirdPartyAuthHandler: PropTypes.func.isRequired
+    thirdPartyAuthHandler: PropTypes.func.isRequired,
+    online: PropTypes.bool.isRequired
 }
 
 export default LoginForm;
