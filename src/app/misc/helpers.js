@@ -38,6 +38,6 @@ export const firstLetters = name => {
 }
 export const disableConsoleLog = () => {
   if (env.toLowerCase() === 'production') {
-    console.log = () => {};
+    // console.log = () => {};
   }
 }
