@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { css } from '@emotion/core';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { 
     loginConfirmed, 
@@ -18,9 +18,9 @@ import { setUserToChat } from 'reduxFiles/dispatchers/chatDispatchers';
 import { 
     Header,
     Footer,
-    Scaleloader 
+    Scaleloader,
+    KLoader
 } from 'components';
-import './styling/main.css';
 import ChatComponent from './ChatComponent';
 import { 
     isMobile, 
@@ -30,6 +30,8 @@ import {
     nameTooLong, 
     firstLetters 
 } from 'misc/helpers';
+import mainStyles from 'styles/mainStyles';
+import styles from './styling/styles';
 
 class Messaging extends Component {
     state = {
@@ -60,67 +62,81 @@ class Messaging extends Component {
         }
     }
 
-    displayChatComponent = e => {
-        e.stopPropagation();
+    displayChatComponent = id => {
         const { selectUserToChat } = this.props;
-        const { id } = e.target;
         selectUserToChat(id);
     }
 
     displayFriends = key => {
         const { friendsInfo: { users, friendsFull }, chatInfo: { onlineUsers, selectedUser } } = this.props;
         const online = onlineUsers && onlineUsers[key] ? true : false;
-        const badgeClass = online ? 'fas fa-circle online' : 'fas fa-circle offline';
-        const { isMobile, isSmallMobile } = this.state
-
+        const badgeStyle = online ? styles.userOnline : styles.userOffline;
+        const { isMobile, isSmallMobile } = this.state;
+        const activeUser = String(key) === String(selectedUser);
         if ( users.length > 0 ) {
             return (
-            <div key={key}> {
-                users.map( obj => {
-                    if (obj.uid === key && friendsFull[key].accepted) {
-                        let { uid, avatar, dname, email } = obj;
-                        /*console.log(dname + ' ' + email)*/
-                        const nameToDisplay = dname ? 
-                            isMobile || nameTooLong(dname) ? 
-                            shortName(dname) : 
-                            dname : 
-                            email;
-                        
-                        return (
-                            <div key={key} id={key} onClick={this.displayChatComponent} className="friend">
-                                <div id={key} className="left-col">
-                                    <div id={key} className="roundPic-users membersAv-small">
-                                        <img id={key} alt={ uid } className="members" src = { avatar } />
-                                    </div>
-                                    <i className={badgeClass}></i>
-                                    <div id={key} className="name">{ selectedUser && isMobile || isSmallMobile ? firstLetters(nameToDisplay) : nameToDisplay }</div>
-                                </div>
-                            </div>
-                        )
+                <View key={key}> 
+                    {
+                        users.map(obj => {
+                            if (obj.uid === key && friendsFull[key].accepted) {
+                                let { uid, avatar, dname, email } = obj;
+                                /*console.log(dname + ' ' + email)*/
+                                const nameToDisplay = dname ? 
+                                    isMobile || nameTooLong(dname) ? 
+                                    shortName(dname) : 
+                                    dname : 
+                                    email;
+                                
+                                return (
+                                    <TouchableOpacity key={key} onPress={() => this.displayChatComponent(key)} style={activeUser ? styles.friendActive : styles.friend}>
+                                        <View id={key} style={styles.leftCol}>
+                                            <View id={key} style={styles.avatarContainer}>
+                                                <Image id={key} alt={ uid } style={styles.avatar} source = { avatar } />  
+                                            </View>
+                                            <View style={badgeStyle}></View>
+                                            <Text id={key} style={styles.name}>{ selectedUser && isMobile || isSmallMobile ? firstLetters(nameToDisplay) : nameToDisplay }</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            }
+                        }) 
                     }
-                    return;
-                }) }
-            </div>)
+                </View>
+            )
         }
         return;
     }
 
     render(){
         let { friendsInfo: { friends, fetchedFriends }, loginInfo: { socketOpen }, chatInfo: { selectedUser } } = this.props;
-        const { isMobile, isSmallMobile } = this.state;
+        const { isMobile, isSmallMobile, tab } = this.state;
+        const mainContainerStyle = isMobile ? 
+        mainStyles.mainContainerMobi : 
+        tab ? 
+        mainStyles.mainContainerTab : 
+        mainStyles.mainContainer;
         return (
-            <div className="container Home">
+            <View style={mainContainerStyle}>
                 <Header />
-                <div className="content">
-                    <div className="messaging">
-                        <div id='friends-list' className={ selectedUser && isMobile || isSmallMobile ? "friends-mini" : "friends"}>
-                            <h3><FormattedMessage  id='friends.listTitle' /></h3>
+                <View style={isMobile ? mainStyles.contentMobi : mainStyles.content}>
+                    <Text style={mainStyles.title}><FormattedMessage id="friends.pageTitle"/></Text>
+                    { fetchedFriends ?
+                    <View style={mainStyles.messaging}>
+                        <View  
+                            style={ 
+                                selectedUser && isMobile || selectedUser && tab || isSmallMobile ? 
+                                mainStyles.friendsListMobi : 
+                                tab || isMobile ? 
+                                mainStyles.friendsListTab :
+                                mainStyles.friendsList
+                            }
+                        >
                             { fetchedFriends ? 
                             friends && friends.length > 0 ? 
                             friends.map(this.displayFriends) : 
-                            <div className='messages'>
+                            <Text style={styles.messages}>
                                 <FormattedMessage id='message.noFriendsYet' />
-                            </div> :
+                            </Text> :
                             <Scaleloader
                                 height={10}
                                 width={3}
@@ -129,16 +145,26 @@ class Messaging extends Component {
                                 borderColor={'#757575'}
                                 loading={!fetchedFriends} 
                             /> }
-                        </div>
-                        <div id='conversation-container'>
-                            { !selectedUser ? 
-                            <span id='messaging-call-to-action'><FormattedMessage id={socketOpen ? 'friends.startConvo' : 'chat.noConnection'} /></span> :
-                            <ChatComponent /> }
-                        </div>
-                    </div>
-                </div>
+                        </View>
+                        <View style={styles.conversationContainer}>
+                            { 
+                                !selectedUser ? 
+                                <View style={styles.messagingCallToAction}>
+                                    <FormattedMessage id={socketOpen ? 'friends.startConvo' : 'chat.noConnection'} />
+                                </View> :
+                                <ChatComponent /> 
+                            }
+                        </View>
+                    </View> :
+                    <KLoader 
+                        type="TailSpin"
+                        color="#757575"
+                        height={50}
+                        width={50}
+                    /> }
+                </View>
                 <Footer />
-            </div>
+            </View>
         )
     }
 

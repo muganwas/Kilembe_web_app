@@ -16,11 +16,12 @@ export const isSmallMobile = (winWidth = width) => {
 }
 export const shortName = name => {
   const shortname = name ? name.split(' ')[0] : '';
-  return shortname;
+  if (nameTooLong(shortname)) return firstLetters(shortname)
+  else return shortname;
 }
 export const nameTooLong = name => {
   const nameLength = name.length;
-  if (nameLength > 28) return true;
+  if (nameLength > 15) return true;
   else return false;
 }
 export const firstLetters = name => {
@@ -38,6 +39,6 @@ export const firstLetters = name => {
 }
 export const disableConsoleLog = () => {
   if (env.toLowerCase() === 'production') {
-    console.log = () => {};
+    // console.log = () => {};
   }
 }

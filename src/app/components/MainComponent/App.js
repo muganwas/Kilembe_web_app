@@ -54,8 +54,7 @@ App.propTypes = {
   loginInfo: PropTypes.object,
   chatkitUser: PropTypes.object,
   checkSessionValidity: PropTypes.func.isRequired,
-  sendGenInfo: PropTypes.func.isRequired,
-  updateConnectivity: PropTypes.func.isRequired
+  sendGenInfo: PropTypes.func.isRequired
 }
 const mapStateToProps = state => {
   return {

@@ -21,10 +21,10 @@ import {
 import { 
     Courses,
     Header,
-    Footer
+    Footer,
+    KLoader
 } from 'components';
 import { isMobile, isTab } from 'misc/helpers';
-import styles from './styling/styles';
 import mainStyles from 'styles/mainStyles';
 
 let base = Rebase.createClass(app.database());
@@ -110,6 +110,7 @@ class Home extends Component {
         const { urls, courses, mobile, tab } = this.state;
         const { genInfo: { info } } = this.props;
         const uid = info ? info.uid : null;
+        const coursesLoaded = courses.length > 0;
 
         const mainContainerStyle = mobile ? 
         mainStyles.mainContainerMobi : 
@@ -120,9 +121,17 @@ class Home extends Component {
         return (
             <View style={mainContainerStyle}>
                 <Header />
-                <View style={mobile ? styles.contentMobi : styles.content}>
-                    <Text style={styles.header}><FormattedMessage id={"home.coursesTitle"} /></Text>
-                    <Courses userID={ uid } videos={ urls } courses = { courses } />
+                <View style={mobile ? mainStyles.contentMobi : mainStyles.content}>
+                    <Text style={mainStyles.title}><FormattedMessage id={"home.coursesTitle"} /></Text>
+                    { coursesLoaded ? 
+                        <Courses userID={ uid } videos={ urls } courses = { courses } /> :
+                        <KLoader 
+                            type="TailSpin"
+                            color="#757575"
+                            height={50}
+                            width={50}
+                        />
+                    }  
                 </View>
                 <Footer />                               
             </View>

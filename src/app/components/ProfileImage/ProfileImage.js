@@ -98,8 +98,7 @@ class ProfileImage extends Component {
     
     render(){
         const { imessage, mobile } = this.state;
-        const { avURL, genInfo: { info: { displayName } } } = this.props;
-
+        const { avURL, dname } = this.props;
         return (
             <View style={styles.profile}>
                 { imessage ? <Text style={styles.uploadFeedback}>{ imessage }</Text> : null }
@@ -108,17 +107,17 @@ class ProfileImage extends Component {
                         <input className="hidden" type="file" id="hs" name="avator" onChange={ this.uploadAv } ></input>
                         <View style={ styles.avatarContainer } onClick={this.clickUploadAv}>
                             { avURL ? 
-                            <Image
-                                style={styles.avatar} 
-                                alt="Your Avatar" 
-                                title="click to change Avatar" 
-                                source = { avURL } 
-                            /> : 
+                                <Image
+                                    style={styles.avatar} 
+                                    alt="Your Avatar" 
+                                    title="click to change Avatar" 
+                                    source = { avURL } 
+                                /> : 
                             null }
                         </View>
                     </form>
                 </View> 
-                <Text style={styles.welcome}>{ mobile ? shortName(displayName) : displayName }</Text>
+                { dname ? <Text style={styles.welcome}>{ mobile ? shortName(dname) : dname }</Text> : null }
             </View>
         )
     }

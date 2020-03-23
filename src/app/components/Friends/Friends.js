@@ -97,8 +97,8 @@ class Friends extends Component {
         return (
             <View style={mainContainerStyle}>
                 <Header />
-                <View style={mobile ? styles.contentMobi : styles.content}>
-                    <Text style={styles.header}><FormattedMessage id="users.title" /></Text>
+                <View style={mobile ? mainStyles.contentMobi : mainStyles.content}>
+                    <Text style={mainStyles.title}><FormattedMessage id="users.title" /></Text>
                     <View style={styles.subContainer}>
                         { 
                             usersLength ?

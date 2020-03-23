@@ -151,6 +151,97 @@ const styles = {
   buttonText: {
     textAlign: 'center',
     color: '#fff'
+  },
+  friendActive: {
+    boxSizing: 'border-box',
+    backgroundColor: '#EDEDED',
+    padding: 5,
+    display: 'block',
+    marginTop: 5,
+    marginBottom: 5,
+    marginLeft: 0,
+    marginRight: 0,
+    zIndex: 0
+  },
+  friend: {
+    boxSizing: 'border-box',
+    padding: 5,
+    display: 'block',
+    marginTop: 5,
+    marginBottom: 5,
+    marginLeft: 0,
+    marginRight: 0,
+    zIndex: 0
+  },
+  leftCol: {
+    position: 'relative',
+    display: 'table'
+  },
+  avatarContainer: {
+    display: 'table-cell',
+    verticalAlign: 'middle',
+    width: 30,
+    height: 30,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#c9c9c9',
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: '50%'
+  },
+  avatar: {
+    position: 'relative',
+    width: 30,
+    height: 30
+  },
+  userOnline: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    borderRadius: '50%',
+    backgroundColor: '#0ed43f',
+    width: 8,
+    height: 8,
+    zIndex: 1000
+  },
+  userOffline: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    borderRadius: '50%',
+    backgroundColor: '#a5a5a5',
+    width: 8,
+    height: 8,
+    zIndex: 1000
+  },
+  name: {
+    textTransform: 'capitalize',
+    display: 'table-cell',
+    alignItems: 'center',
+    textAlignVertical: 'middle',
+    alignContent: 'center',
+    padding: 5,
+    fontSize: 10,
+    fontWeight: 'bold'
+  },
+  messages: {
+    backgroundColor: '#b9b9b9',
+    padding: 3,
+    textTransform: 'lowercase',
+    fontStyle: 'italic',
+    color: '#f0f0f0'
+  },
+  conversationContainer: {
+    position: 'relative',
+    padding: 10,
+    display: 'block',
+    flex: 7,
+    zIndex: 1
+  },
+  messagingCallToAction: {
+    display: 'block',
+    color: '#bbbbbb',
+    textAlign: 'center'
   }
 };
 

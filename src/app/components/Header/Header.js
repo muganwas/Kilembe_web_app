@@ -114,13 +114,15 @@ class Header extends Component {
             }
             else {
                 const storedGen = JSON.parse(localStorage.getItem('genInfo'));
-                const { uid, chatkitUser: { token } } = storedGen;
-                if ( token && uid ) {
-                    socket.emit('authentication', {
-                        token,
-                        uid
-                    });
-                    dispatchSocketConnected();
+                if (storedGen) {
+                    const { uid, chatkitUser: { token } } = storedGen;
+                    if ( token && uid ) {
+                        socket.emit('authentication', {
+                            token,
+                            uid
+                        });
+                        dispatchSocketConnected();
+                    }
                 }
             }
         });
@@ -250,8 +252,9 @@ class Header extends Component {
     } 
 
     render(){
-        const { info: { uid, dname }, signOut, genInfo, loginInfo } = this.props;
+        const { info: { uid }, signOut, dbUserInfo, genInfo, loginInfo } = this.props;
         const { loggedIn } = loginInfo;
+        const dname = dbUserInfo.userInfo ? dbUserInfo.userInfo.dname : '';
         const { 
             invitationAlert,
             showDropDownMenu,
@@ -313,7 +316,7 @@ class Header extends Component {
                                     iconPath={mdiAccountCogOutline}
                                     textStyle={styles.dropdownMenuTextStyle}
                                     iconColor={'black'}
-                                    text='Settings'
+                                    text='Profile'
                                     onPress={() => this.goTo("/settings")}
                                     size={0.7}
                                 /> 

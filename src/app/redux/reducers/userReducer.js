@@ -1,7 +1,8 @@
 import { 
   FETCH_USER_DB_INFO_PENDING,
   FETCH_USER_DB_INFO_FULFILLED,
-  FETCH_USER_DB_INFO_ERROR
+  FETCH_USER_DB_INFO_ERROR,
+  LOGOUT_CONFIRMED
 } from "../types";
 
 const defaultState = {
@@ -33,6 +34,11 @@ const defaultState = {
           error: action.payload,
           fetched: false,
           fetching: false
+        }
+      }
+      case LOGOUT_CONFIRMED: {
+        return {
+          ...defaultState
         }
       }
       default:

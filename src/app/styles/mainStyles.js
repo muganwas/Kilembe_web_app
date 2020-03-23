@@ -1,4 +1,7 @@
 import { StyleSheet } from 'react-native';
+import { isMobile } from '../misc/helpers';
+
+const width = window.innerWidth;
 
 const mainStyles = StyleSheet.create({
   authContainer: {
@@ -14,7 +17,7 @@ const mainStyles = StyleSheet.create({
     paddingBottom: 50,
     paddingLeft: 0,
     borderRadius: 5,
-    width: 350
+    width: isMobile(width) ? '98%' : 350
   },
   logoContainer: {
     display: 'flex',
@@ -103,7 +106,6 @@ const mainStyles = StyleSheet.create({
   },
   authSubmitButton: {
     display: 'flex',
-    width: 250,
     padding: 3,
     marginTop: 2,
     boxSizing: 'border-box',
@@ -115,7 +117,6 @@ const mainStyles = StyleSheet.create({
   },
   authSubmitButtonOffline: {
     display: 'flex',
-    width: 250,
     padding: 3,
     marginTop: 2,
     boxSizing: 'border-box',
@@ -135,6 +136,62 @@ const mainStyles = StyleSheet.create({
     borderTopRightRadius: 5,
     borderTopLeftRadius: 5
   },
+  content: {
+    fontSize: '13',
+    backgroundColor: '#ffffff',
+    boxShadow: "0 1px 5px rgba(0, 0, 0, 0.15)",
+    paddingTop: 5,
+    paddingLeft: 30,
+    paddingRight: 30,
+    paddingBottom: 20,
+    margin: 2
+  },
+  contentMobi: {
+    fontSize: '13',
+    backgroundColor: '#ffffff',
+    boxShadow: "0 1px 5px rgba(0, 0, 0, 0.15)",
+    padding: 5,
+    margin: 2
+  },
+  messaging: {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'row',
+    boxSizing: 'border-box',
+    boxShadow: "2px 2px 2px rgba(0, 0, 0, 0.1)",
+    zIndex: 1
+  },
+  title: {
+    display: 'block',
+    marginTop: 10,
+    marginBottom: 10,
+    color: '#43423c',
+    fontWeight: 'bold'
+  },
+  friendsList: {
+    minWidth: 200,
+    flex: 2,
+    boxSizing: 'border-box',
+    width: '25%',
+    padding: 10,
+    boxShadow: '2px 0 5px rgba(0, 0, 0, 0.15)'
+  },
+  friendsListTab: {
+    minWidth: 160,
+    flex: 2,
+    boxSizing: 'border-box',
+    width: '35%',
+    padding: 5,
+    boxShadow: '2px 0 5px rgba(0, 0, 0, 0.15)'
+  },
+  friendsListMobi: {
+    minWidth: 80,
+    flex: 2,
+    boxSizing: 'border-box',
+    width: '25%',
+    padding: 5,
+    boxShadow: '2px 0 5px rgba(0, 0, 0, 0.15)'
+  }
 });
 
 export default mainStyles;
