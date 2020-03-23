@@ -120,8 +120,8 @@ class Home extends Component {
         return (
             <View style={mainContainerStyle}>
                 <Header />
-                <View style={mobile ? styles.contentMobi : styles.content}>
-                    <Text style={styles.header}><FormattedMessage id={"home.coursesTitle"} /></Text>
+                <View style={mobile ? mainStyles.contentMobi : mainStyles.content}>
+                    <Text style={mainStyles.title}><FormattedMessage id={"home.coursesTitle"} /></Text>
                     <Courses userID={ uid } videos={ urls } courses = { courses } />
                 </View>
                 <Footer />                               
