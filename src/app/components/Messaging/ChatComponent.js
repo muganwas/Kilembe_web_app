@@ -28,8 +28,7 @@ class ChatComponent extends React.Component {
     message: ''
   }
 
-  tempStoreMessage = e => {
-    const message = e.target.value;
+  tempStoreMessage = message => {
     this.setState({message});
   }
 
@@ -129,7 +128,7 @@ class ChatComponent extends React.Component {
             onKeyPress={ event => {
               if ((event.key).toLowerCase() === 'enter') this.sendMessage()
             }}
-            onChange={this.tempStoreMessage}
+            onChangeText={this.tempStoreMessage}
             style={styles.input} 
             placeholder={intl.formatMessage({id:'chat.chatTextFieldPlaceholder'})}
           />

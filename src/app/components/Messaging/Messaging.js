@@ -18,9 +18,9 @@ import { setUserToChat } from 'reduxFiles/dispatchers/chatDispatchers';
 import { 
     Header,
     Footer,
-    Scaleloader 
+    Scaleloader,
+    KLoader
 } from 'components';
-import './styling/main.css';
 import ChatComponent from './ChatComponent';
 import { 
     isMobile, 
@@ -119,6 +119,8 @@ class Messaging extends Component {
             <View style={mainContainerStyle}>
                 <Header />
                 <View style={isMobile ? mainStyles.contentMobi : mainStyles.content}>
+                    <Text style={mainStyles.title}><FormattedMessage id="friends.pageTitle"/></Text>
+                    { fetchedFriends ?
                     <View style={mainStyles.messaging}>
                         <View  
                             style={ 
@@ -129,7 +131,6 @@ class Messaging extends Component {
                                 mainStyles.friendsList
                             }
                         >
-                            <Text style={mainStyles.title}><FormattedMessage  id='friends.listTitle' /></Text>
                             { fetchedFriends ? 
                             friends && friends.length > 0 ? 
                             friends.map(this.displayFriends) : 
@@ -154,7 +155,13 @@ class Messaging extends Component {
                                 <ChatComponent /> 
                             }
                         </View>
-                    </View>
+                    </View> :
+                    <KLoader 
+                        type="TailSpin"
+                        color="#757575"
+                        height={50}
+                        width={50}
+                    /> }
                 </View>
                 <Footer />
             </View>
