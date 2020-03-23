@@ -1,4 +1,7 @@
 import { StyleSheet } from 'react-native';
+import { isMobile } from '../misc/helpers';
+
+const width = window.innerWidth;
 
 const mainStyles = StyleSheet.create({
   authContainer: {
@@ -14,7 +17,7 @@ const mainStyles = StyleSheet.create({
     paddingBottom: 50,
     paddingLeft: 0,
     borderRadius: 5,
-    width: 350
+    width: isMobile(width) ? '98%' : 350
   },
   logoContainer: {
     display: 'flex',
@@ -103,7 +106,6 @@ const mainStyles = StyleSheet.create({
   },
   authSubmitButton: {
     display: 'flex',
-    width: 250,
     padding: 3,
     marginTop: 2,
     boxSizing: 'border-box',
@@ -115,7 +117,6 @@ const mainStyles = StyleSheet.create({
   },
   authSubmitButtonOffline: {
     display: 'flex',
-    width: 250,
     padding: 3,
     marginTop: 2,
     boxSizing: 'border-box',

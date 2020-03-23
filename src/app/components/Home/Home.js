@@ -25,7 +25,6 @@ import {
     KLoader
 } from 'components';
 import { isMobile, isTab } from 'misc/helpers';
-import styles from './styling/styles';
 import mainStyles from 'styles/mainStyles';
 
 let base = Rebase.createClass(app.database());

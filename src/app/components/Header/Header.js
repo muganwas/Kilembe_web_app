@@ -252,8 +252,9 @@ class Header extends Component {
     } 
 
     render(){
-        const { info: { uid, dname }, signOut, genInfo, loginInfo } = this.props;
+        const { info: { uid }, signOut, dbUserInfo, genInfo, loginInfo } = this.props;
         const { loggedIn } = loginInfo;
+        const dname = dbUserInfo.userInfo ? dbUserInfo.userInfo.dname : '';
         const { 
             invitationAlert,
             showDropDownMenu,
