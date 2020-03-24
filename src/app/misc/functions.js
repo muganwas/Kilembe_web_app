@@ -33,6 +33,45 @@ export const getUserAvatar = userId => {
     }); 
 }
 
+export const checkUserLoggedIn = userId => {
+    return new Promise(resolve => {
+        const usersRef = app.database().ref('users');
+        base.fetch(`users/${ userId }`, {
+            context: this,
+            asArray: false,
+            then(data){
+                let len = Object.keys(data).length;
+                if (len !== 0) {
+                    const { online } = data;
+                    if (online) resolve(true);
+                    else {
+                        usersRef.child(`${userId}`).update({
+                            online: true,
+                        });
+                        resolve(false);
+                    }
+                }
+            }
+        }); 
+    });
+}
+
+export const dbLogout = userId => {
+    return new Promise(resolve => {
+        const usersRef = app.database().ref('users');
+        if (userId) {
+            usersRef.child(`${userId}`).update({
+                online: false,
+            }).catch(e => {
+                console.log(e.message);
+                resolve(false);
+            })
+            resolve(true);
+        }
+        else resolve(false);
+    });
+}
+
 export const setGenericAvatar = () => {
     storageRef.child('general/avatar.jpg').getDownloadURL().then((url)=>{
         console.log("generic avatar set");

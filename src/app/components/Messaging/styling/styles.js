@@ -163,6 +163,17 @@ const styles = {
     marginRight: 0,
     zIndex: 0
   },
+  friendHovered: {
+    boxSizing: 'border-box',
+    backgroundColor: '#FDD906',
+    padding: 5,
+    display: 'block',
+    marginTop: 5,
+    marginBottom: 5,
+    marginLeft: 0,
+    marginRight: 0,
+    zIndex: 0
+  },
   friend: {
     boxSizing: 'border-box',
     padding: 5,

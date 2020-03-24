@@ -7,7 +7,11 @@ import {
     dispatchChatkitTokenId, 
     fetchGenInfoFromlocalStorage 
 } from 'reduxFiles/dispatchers/genDispatchers';
-import { getUserAvatar } from 'misc/functions';
+import { 
+    getUserAvatar, 
+    checkUserLoggedIn, 
+    dbLogout 
+} from 'misc/functions';
 import { disableConsoleLog } from 'misc/helpers';
 import { 
     LOGIN_FULFILLED,
@@ -271,25 +275,40 @@ export const handleLogin = loginInfo => {
 
 export const authHandler = authData => {
     return dispatch => {
-        let currentUser = app.auth().currentUser;
-        const uid= authData.user.uid;
+        const currentUser = app.auth().currentUser;
+        const uid = authData.user.uid;
+        const { additionalUserInfo: { profile: { verified_email } } } = authData;
+        const i = false;
         //console.log(currentUser)
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        getUserAvatar(uid).then(url => {
-            const displayName= authData.user.displayName;
-            const email= authData.user.email;
-            const avURL = url || authData.user.photoURL;
-            const userLoginInfo = { uid, email, displayName, avURL, chatkitUser: {} };
-            const states = [ uid, email, displayName ];
-            const statesS = ['uid','email','displayName'];
-            const len = states.length;
-            dispatch(dispatchedGenInfo(userLoginInfo));
-            dispatch(fetchToken(currentUser, userLoginInfo));
-            for(var count = 0; count < len; count++){
-                localStorage.setItem(statesS[count], states[count]);
-            }
-            dispatch(loginFulfilled(userLoginInfo));
-        });
+        if (verified_email) {
+            checkUserLoggedIn(uid).then( loggedIn => {
+                if (!loggedIn){
+                    getUserAvatar(uid).then(url => {
+                        const displayName= authData.user.displayName;
+                        const email= authData.user.email;
+                        const avURL = url || authData.user.photoURL;
+                        const userLoginInfo = { uid, email, displayName, avURL, chatkitUser: {} };
+                        const states = [ uid, email, displayName ];
+                        const statesS = ['uid','email','displayName'];
+                        const len = states.length;
+                        dispatch(dispatchedGenInfo(userLoginInfo));
+                        dispatch(fetchToken(currentUser, userLoginInfo));
+                        for(var count = 0; count < len; count++){
+                            localStorage.setItem(statesS[count], states[count]);
+                        }
+                        dispatch(loginFulfilled(userLoginInfo));
+                    });
+                }
+                else dispatch(logout(true));
+            });
+        }
+        else {
+            dispatch(loginFailed("error.userEmailNotVerified"));
+            currentUser.sendEmailVerification().then(() => {
+                console.log("verfication email sent");
+            });
+        }
     }
 }
 
@@ -320,22 +339,27 @@ export const eAuthenticate = (email, password) => {
             if (emailVerified) {
                 let uid = currUser.uid;
                 localStorage.setItem('currentUser', JSON.stringify(currUser));
-                getUserAvatar(uid).then(url => {
-                    console.log(url);
-                    let email = currUser.email;
-                    let splitEmailAdd = email.split('@');
-                    let avURL = url;
-                    let displayName = splitEmailAdd[0];
-                    let userInfo = { uid,email,displayName,avURL,chatkitUser: {} };
-                    let states = [uid,email,displayName];
-                    let statesS = ['uid','email','displayName'];
-                    let len = states.length;
-                    dispatch(dispatchedGenInfo(userInfo));
-                    dispatch(fetchToken(currUser, userInfo));
-                    for (var count = 0; count < len; count++) {
-                        localStorage.setItem(statesS[count], states[count]);
+                checkUserLoggedIn(uid).then( loggedIn => {
+                    if (!loggedIn) {
+                        getUserAvatar(uid).then(url => {
+                            console.log(url);
+                            let email = currUser.email;
+                            let splitEmailAdd = email.split('@');
+                            let avURL = url;
+                            let displayName = splitEmailAdd[0];
+                            let userInfo = { uid,email,displayName,avURL,chatkitUser: {} };
+                            let states = [uid,email,displayName];
+                            let statesS = ['uid','email','displayName'];
+                            let len = states.length;
+                            dispatch(dispatchedGenInfo(userInfo));
+                            dispatch(fetchToken(currUser, userInfo));
+                            for (var count = 0; count < len; count++) {
+                                localStorage.setItem(statesS[count], states[count]);
+                            }
+                            dispatch(loginFulfilled(userInfo));
+                        });
                     }
-                    dispatch(loginFulfilled(userInfo));
+                    else dispatch(logout(true));
                 });
             }
             else {
@@ -469,7 +493,7 @@ export const confirmToken = tokenId => {
                 if (error) {
                     if (error.code === "auth/argument-error") {
                         dispatch(loginErrorAlert("error.sessionExpired"));
-                        dispatch(logout());
+                        dispatch(logout(true));
                     }
                 }
                 else dispatch(loginConfirmed());
@@ -477,7 +501,7 @@ export const confirmToken = tokenId => {
             }).catch(error => {
                 console.log(error.message)
                 dispatch(loginErrorAlert("error.loginFailure"));
-                dispatch(logout());
+                dispatch(logout(true));
             });
     }
 }
@@ -505,7 +529,7 @@ export const checkLoginStatus = (confirmLoggedIn, loginInfo, info)=>{
                 alert('no info')
                 fetchGenInfoFromlocalStorage(confirmLoggedIn, loginInfo).then(res=>{
                     if (res === "not dispatched") {
-                        dispatch(logout());
+                        dispatch(logout(true));
                     }
                     else {
                         const { chatkitUser: { token } } = genInfo;
@@ -521,14 +545,32 @@ export const checkLoginStatus = (confirmLoggedIn, loginInfo, info)=>{
     }
 }
 
-export const logout = () =>{
+export const logout = (resetSession = false) =>{
     return dispatch => {
         app.auth().signOut().then(() => {
-            localStorage.removeItem('genInfo');
-            localStorage.clear();
-            dispatch(logoutConfirmed());
-            socket.disconnect();
-            console.log("user signed out!");
+            const storedInfo = localStorage.getItem('genInfo');
+            const { uid } = storedInfo ? JSON.parse(storedInfo) : {};
+            if (resetSession) {
+                dbLogout(uid).then(loggedOut => {
+                    console.log(`logged out: ${loggedOut}`);
+                    if (loggedOut) {
+                        localStorage.removeItem('genInfo');
+                        localStorage.clear();
+                        dispatch(logoutConfirmed());
+                        socket.disconnect();
+                        console.log("user signed out!");
+                        dispatch(loginErrorAlert("error.resetSession"));
+                    }
+                    else dispatch(loginErrorAlert("error.existingSession"));
+                })
+            }
+            else {
+                localStorage.removeItem('genInfo');
+                localStorage.clear();
+                dispatch(logoutConfirmed());
+                socket.disconnect();
+                console.log("user signed out!");
+            }
         });
     }
 }
@@ -562,7 +604,7 @@ export const alertSocketError = error => {
         //socket.disconnect();
         if (error.message && error.message === 'UNAUTHORIZED') dispatch(unAuthorizedAuthentication());
         if (error.code === 'auth/id-token-expired') {
-            dispatch(logout());
+            dispatch(logout(true));
         }
         dispatch(socketError(error));
     }
