@@ -300,7 +300,7 @@ export const authHandler = authData => {
                         dispatch(loginFulfilled(userLoginInfo));
                     });
                 }
-                else dispatch(logout(true));
+                else dispatch(logout());
             });
         }
         else {
@@ -359,7 +359,7 @@ export const eAuthenticate = (email, password) => {
                             dispatch(loginFulfilled(userInfo));
                         });
                     }
-                    else dispatch(logout(true));
+                    else dispatch(logout());
                 });
             }
             else {
@@ -493,7 +493,7 @@ export const confirmToken = tokenId => {
                 if (error) {
                     if (error.code === "auth/argument-error") {
                         dispatch(loginErrorAlert("error.sessionExpired"));
-                        dispatch(logout(true));
+                        dispatch(logout());
                     }
                 }
                 else dispatch(loginConfirmed());
@@ -501,7 +501,7 @@ export const confirmToken = tokenId => {
             }).catch(error => {
                 console.log(error.message)
                 dispatch(loginErrorAlert("error.loginFailure"));
-                dispatch(logout(true));
+                dispatch(logout());
             });
     }
 }
@@ -529,7 +529,7 @@ export const checkLoginStatus = (confirmLoggedIn, loginInfo, info)=>{
                 alert('no info')
                 fetchGenInfoFromlocalStorage(confirmLoggedIn, loginInfo).then(res=>{
                     if (res === "not dispatched") {
-                        dispatch(logout(true));
+                        dispatch(logout());
                     }
                     else {
                         const { chatkitUser: { token } } = genInfo;
@@ -545,32 +545,22 @@ export const checkLoginStatus = (confirmLoggedIn, loginInfo, info)=>{
     }
 }
 
-export const logout = (resetSession = false) =>{
+export const logout = () =>{
     return dispatch => {
-        app.auth().signOut().then(() => {
-            const storedInfo = localStorage.getItem('genInfo');
-            const { uid } = storedInfo ? JSON.parse(storedInfo) : {};
-            if (resetSession) {
-                dbLogout(uid).then(loggedOut => {
-                    console.log(`logged out: ${loggedOut}`);
-                    if (loggedOut) {
-                        localStorage.removeItem('genInfo');
-                        localStorage.clear();
-                        dispatch(logoutConfirmed());
-                        socket.disconnect();
-                        console.log("user signed out!");
-                        dispatch(loginErrorAlert("error.resetSession"));
-                    }
-                    else dispatch(loginErrorAlert("error.existingSession"));
-                })
+        const storedInfo = localStorage.getItem('genInfo');
+        const { uid } = storedInfo ? JSON.parse(storedInfo) : {};
+        dbLogout(uid).then(loggedOut => {
+            console.log(`logged out: ${loggedOut}`);
+            if (loggedOut) {
+                app.auth().signOut().then(() => {
+                    localStorage.removeItem('genInfo');
+                    localStorage.clear();
+                    dispatch(logoutConfirmed());
+                    socket.disconnect();
+                    console.log("user signed out!");     
+                });
             }
-            else {
-                localStorage.removeItem('genInfo');
-                localStorage.clear();
-                dispatch(logoutConfirmed());
-                socket.disconnect();
-                console.log("user signed out!");
-            }
+            else dispatch(loginErrorAlert("error.existingSession"));
         });
     }
 }
@@ -604,7 +594,7 @@ export const alertSocketError = error => {
         //socket.disconnect();
         if (error.message && error.message === 'UNAUTHORIZED') dispatch(unAuthorizedAuthentication());
         if (error.code === 'auth/id-token-expired') {
-            dispatch(logout(true));
+            dispatch(logout());
         }
         dispatch(socketError(error));
     }
