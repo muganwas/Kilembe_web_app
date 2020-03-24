@@ -37,7 +37,8 @@ class Messaging extends Component {
     state = {
         isMobile: isMobile(),
         isSmallMobile: isSmallMobile(),
-        tab: isTab()
+        tab: isTab(),
+        hovered: null
     }
     componentDidMount(){
         const { 
@@ -71,15 +72,16 @@ class Messaging extends Component {
         const { friendsInfo: { users, friendsFull }, chatInfo: { onlineUsers, selectedUser } } = this.props;
         const online = onlineUsers && onlineUsers[key] ? true : false;
         const badgeStyle = online ? styles.userOnline : styles.userOffline;
-        const { isMobile, isSmallMobile } = this.state;
+        const { isMobile, isSmallMobile, hovered } = this.state;
         const activeUser = String(key) === String(selectedUser);
+        const isHovered = String(hovered) === String(key);
         if ( users.length > 0 ) {
             return (
                 <View key={key}> 
                     {
                         users.map(obj => {
                             if (obj.uid === key && friendsFull[key].accepted) {
-                                let { uid, avatar, dname, email } = obj;
+                                const { uid, avatar, dname, email } = obj;
                                 /*console.log(dname + ' ' + email)*/
                                 const nameToDisplay = dname ? 
                                     isMobile || nameTooLong(dname) ? 
@@ -88,7 +90,13 @@ class Messaging extends Component {
                                     email;
                                 
                                 return (
-                                    <TouchableOpacity key={key} onPress={() => this.displayChatComponent(key)} style={activeUser ? styles.friendActive : styles.friend}>
+                                    <TouchableOpacity 
+                                        key={key} 
+                                        onPress={() => this.displayChatComponent(key)} 
+                                        onMouseEnter={() => this.setState({hovered:key})}
+                                        onMouseLeave={() => this.setState({hovered:null})}
+                                        style={activeUser && !isHovered ? styles.friendActive : isHovered ? styles.friendHovered : styles.friend}
+                                    >
                                         <View id={key} style={styles.leftCol}>
                                             <View id={key} style={styles.avatarContainer}>
                                                 <Image id={key} alt={ uid } style={styles.avatar} source = { avatar } />  
@@ -104,7 +112,7 @@ class Messaging extends Component {
                 </View>
             )
         }
-        return;
+        return null;
     }
 
     render(){
