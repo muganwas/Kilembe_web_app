@@ -96,6 +96,20 @@ const styles = StyleSheet.create({
     boxShadow: "1px 2px 3px rgba(127,125,135, 0.3)",
     padding: 4,
     backgroundColor: '#fff'
+  },
+  resetSessionButtonContainer: {
+    display: 'inline-block',
+    cursor: 'pointer',
+    padding: 3,
+    backgroundColor: '#fff',
+    borderRadius: 1,
+    boxShadow: "1px 1px 3px rgba(255,255,255, 0.3)",
+    marginTop: 3,
+    marginLeft: 0,
+    marginRight: 0
+  },
+  resetSessionText: {
+    color: '#000'
   }
 });
 

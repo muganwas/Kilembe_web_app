@@ -1,7 +1,7 @@
 { 
     "en": {
         "auth.loginLabel": "Sign in",
-        "auth.signupLabel": "Signup",
+        "auth.signupLabel": "Sign up",
         "auth.facebookLoginLabel": " Login with Facebook",
         "auth.googleLoginLabel": " Login with Google",
         "auth.forgotPasswordLabel": "Forgot Password",
@@ -65,7 +65,7 @@
     },
     "fr": {
         "auth.loginLabel": "Sign in",
-        "auth.signupLabel": "Signup",
+        "auth.signupLabel": "Sign up",
         "auth.facebookLoginLabel": " Login with Facebook",
         "auth.googleLoginLabel": " Login with Google",
         "auth.forgotPasswordLabel": "Forgot Password",

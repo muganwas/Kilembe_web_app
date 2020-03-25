@@ -10,6 +10,7 @@ import {
   authenticate, 
   authHandler,
   clearErrors,
+  logout
 } from 'reduxFiles/dispatchers/authDispatchers';
 import { View, Image } from 'react-native';
 import { Redirect } from 'react-router-dom';
@@ -38,7 +39,7 @@ class Login extends Component {
         </View>
         <View style={styles.divider}></View>
         <LoginForm 
-          { ...this.props }
+          {...this.props}
         />
       </View>
     )
@@ -56,7 +57,9 @@ Login.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   thirdPartyAuthentication: PropTypes.func.isRequired,
   thirdPartyAuthHandler: PropTypes.func.isRequired,
-  online: PropTypes.bool.isRequired
+  online: PropTypes.bool.isRequired,
+  loggedInElsewhere: PropTypes.bool.isRequired,
+  signOut: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => {
@@ -65,6 +68,7 @@ const mapStateToProps = state => {
     error: state.loginInfo.error,
     loginInfo: state.loginInfo,
     loggedIn: state.loginInfo.loggedIn,
+    loggedInElsewhere: state.loginInfo.loggedInElsewhere,
     online: state.genInfo.online
   }
 }
@@ -88,7 +92,10 @@ const mapDispatchToProps = dispatch => {
     },
     thirdPartyAuthHandler: authData => {
       dispatch(authHandler(authData));
-    }
+    },
+    signOut: (elsewhere, uid) => {
+      dispatch(logout(elsewhere, uid));
+    },
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
