@@ -11,7 +11,8 @@ import {
   SOCKET_CONNECTED,
   SOCKET_DISCONNECTED,
   SOCKET_ERROR,
-  UNAUTHORIZED_AUTHENTICATION
+  UNAUTHORIZED_AUTHENTICATION,
+  UPDATE_LOGGEDIN_ELSEWHERE
 } from "../types";
 
 const defaultState = {
@@ -20,6 +21,8 @@ const defaultState = {
   info: null,
   messageId: null,
   loggedIn: false,
+  loggedInElsewhere: false,
+  tempUID: null,
   fetching: false,
   fetched: false,
   error: false,
@@ -124,13 +127,22 @@ const defaultState = {
             }
           }
           
-          case LOGIN_FULFILLED:{
-            return {...state,
+          case LOGIN_FULFILLED: {
+            return {
+              ...state,
               fetched: true,
               fetching: false,
               error: false,
               loggedIn: true,
               info: action.payload
+            }
+          }
+
+          case UPDATE_LOGGEDIN_ELSEWHERE: {
+            return {
+              ...state,
+              loggedInElsewhere: action.payload.loggedInElsewhere,
+              tempUID: action.payload.tempUID
             }
           }
           default:

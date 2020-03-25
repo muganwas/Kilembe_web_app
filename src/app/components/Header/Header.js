@@ -40,6 +40,7 @@ import {
     mdiHome
 } from '@mdi/js';
 import { isMobile } from 'misc/helpers';
+import app from 'misc/base';
 import styles from './styling/styles';
 import arrow from 'styles/images/upArrow.png';
 
@@ -68,8 +69,19 @@ class Header extends Component {
             openSocket,
             dbUserInfo,
             fetchCurrentUserInfoFromDB,
-            updateConnectivity
+            updateConnectivity,
+            signOut
         } = this.props;
+        const { socketOpen, unAuthorizedConnection } = loginInfo;
+        const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
+
+        const storedInfo = JSON.parse(localStorage.getItem('genInfo'));
+        const storedUID =  storedInfo ? storedInfo.uid : null;
+        const finalUID = uid || storedUID;
+
+        const userRef = app.database().ref(`users/${finalUID}`);
+        const onlineRef = userRef.child('online');
+
         /**check whether online*/
         window.addEventListener('online', () => {
             updateConnectivity(true);
@@ -77,11 +89,20 @@ class Header extends Component {
         window.addEventListener('offline', () => {
             updateConnectivity(false);
         });
-        const { socketOpen, unAuthorizedConnection } = loginInfo;
-        const { info: { avURL, uid, chatkitUser: { token }  }, fetched } = genInfo;
-
+        /**listen for resizing */
         window.addEventListener('resize', e => {
             this.setState({mobile: isMobile(e.target.innerWidth)});
+        });
+
+        /**check if user should be logged in*/
+        onlineRef.once('value').then(snapshot => {
+            if (!snapshot.val()) signOut();
+        });
+        /**listen for firebase db changes */
+        userRef.on('child_changed', snapshot => {
+            const key = snapshot.key;
+            const value = snapshot.val();
+            if (key === 'online' && !value) signOut(); 
         });
         
         //dispatch local storage genInfo to props
@@ -181,7 +202,7 @@ class Header extends Component {
             const { dispatchUsersOnline } = this.props;
             dispatchUsersOnline(data);
         });
-        if (!socketOpen && !unAuthorizedConnection && token && uid) openSocket(this.props);
+        if (!socketOpen && !unAuthorizedConnection && token && finalUID) openSocket(this.props);
     }
 
     setUpFriendsInfo = () =>  {
@@ -427,8 +448,8 @@ const mapDispatchToProps = dispatch => {
         confirmLoggedIn: () => {
             dispatch(loginConfirmed());
         },
-        signOut: genInfo => {
-            dispatch(logout(genInfo));
+        signOut: () => {
+            dispatch(logout());
         },
         dispatchUsersOnline: users => {
             dispatch(fetchedUsersOnline(users));

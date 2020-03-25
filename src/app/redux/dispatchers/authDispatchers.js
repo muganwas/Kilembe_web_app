@@ -38,7 +38,8 @@ import {
     SOCKET_CONNECTED,
     SOCKET_DISCONNECTED,
     SOCKET_ERROR,
-    UNAUTHORIZED_AUTHENTICATION
+    UNAUTHORIZED_AUTHENTICATION,
+    UPDATE_LOGGEDIN_ELSEWHERE
 } from '../types';
 import io from 'socket.io-client';
 // import { setChatId } from '../../misc/functions';
@@ -216,6 +217,13 @@ export const unAuthorizedAuthentication = () => {
     }
 }
 
+export const updateLoggedInElsewhere = (loggedInElsewhere, tempUID) => {
+    return {
+        type: UPDATE_LOGGEDIN_ELSEWHERE,
+        payload: {loggedInElsewhere, tempUID}
+    }
+}
+
 export const handleEmail = email => {
     return dispatch => {
         if (email && email.match(emailregex)) {
@@ -300,7 +308,10 @@ export const authHandler = authData => {
                         dispatch(loginFulfilled(userLoginInfo));
                     });
                 }
-                else dispatch(logout());
+                else {
+                    dispatch(updateLoggedInElsewhere(true, uid));
+                    dispatch(logout());
+                }
             });
         }
         else {
@@ -339,7 +350,7 @@ export const eAuthenticate = (email, password) => {
             if (emailVerified) {
                 let uid = currUser.uid;
                 localStorage.setItem('currentUser', JSON.stringify(currUser));
-                checkUserLoggedIn(uid).then( loggedIn => {
+                checkUserLoggedIn(uid).then(loggedIn => {
                     if (!loggedIn) {
                         getUserAvatar(uid).then(url => {
                             console.log(url);
@@ -359,7 +370,10 @@ export const eAuthenticate = (email, password) => {
                             dispatch(loginFulfilled(userInfo));
                         });
                     }
-                    else dispatch(logout());
+                    else {
+                        dispatch(updateLoggedInElsewhere(true, uid));
+                        dispatch(logout());
+                    }
                 });
             }
             else {
@@ -545,11 +559,12 @@ export const checkLoginStatus = (confirmLoggedIn, loginInfo, info)=>{
     }
 }
 
-export const logout = () =>{
+export const logout = (elsewhere=false, altUID) => {
     return dispatch => {
         const storedInfo = localStorage.getItem('genInfo');
         const { uid } = storedInfo ? JSON.parse(storedInfo) : {};
-        dbLogout(uid).then(loggedOut => {
+        const finalUID = elsewhere && altUID ? altUID : uid;
+        dbLogout(finalUID).then(loggedOut => {
             console.log(`logged out: ${loggedOut}`);
             if (loggedOut) {
                 app.auth().signOut().then(() => {

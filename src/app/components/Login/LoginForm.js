@@ -8,7 +8,7 @@ import {
 import { Link } from 'react-router-dom';
 import styles from './styling/styles';
 import { View, TextInput, Text } from 'react-native';
-import { AuthButton } from 'components/';
+import { AuthButton, Button } from 'components/';
 import { SUBMIT_FORM_DELAY } from 'misc/constants';
 import { mdiGoogle, mdiFacebook } from '@mdi/js';
 import mainStyles from 'styles/mainStyles';
@@ -27,9 +27,11 @@ const LoginForm = props => {
         messageId, 
         thirdPartyAuthentication, 
         thirdPartyAuthHandler,
-        online
+        online,
+        loggedInElsewhere,
+        signOut
     } = props;
-    const { fetching } = loginInfo;
+    const { fetching, tempUID } = loginInfo;
     const intl = useIntl();
 
     const loginPageTitle = intl.formatMessage({id:"login.pageTitle"});
@@ -59,6 +61,18 @@ const LoginForm = props => {
                 error ?
                 <Text style={mainStyles.feedBack}>
                     <FormattedMessage id={ messageId } />
+                    { 
+                        loggedInElsewhere ?
+                        <Button
+                            style={styles.resetSessionButtonContainer}
+                            textStyle={styles.resetSessionText}
+                            hoveredColor='#FDD906'
+                            text='Logout Everywhere'
+                            onPress={() => signOut(true, tempUID)}
+                            size={1}
+                        />  :
+                        null
+                    }
                 </Text> : 
                 null 
             }
@@ -136,7 +150,9 @@ LoginForm.propTypes = {
     messageId: PropTypes.string, 
     thirdPartyAuthentication: PropTypes.func.isRequired, 
     thirdPartyAuthHandler: PropTypes.func.isRequired,
-    online: PropTypes.bool.isRequired
+    online: PropTypes.bool.isRequired,
+    loggedInElsewhere: PropTypes.bool.isRequired,
+    signOut: PropTypes.func.isRequired
 }
 
 export default LoginForm;
