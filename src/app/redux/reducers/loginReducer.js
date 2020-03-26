@@ -142,7 +142,9 @@ const defaultState = {
             return {
               ...state,
               loggedInElsewhere: action.payload.loggedInElsewhere,
-              tempUID: action.payload.tempUID
+              tempUID: action.payload.tempUID,
+              error: action.payload.error,
+              messageId: action.payload.messageId
             }
           }
           default:

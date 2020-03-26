@@ -24,10 +24,14 @@ class CoursesList extends Component {
         const { genInfo: { info: { uid } } } = this.props;
         this.getLessonPlaylist(uid);
 
-        window.addEventListener('resize', e => {
-            this.setState({mobile:isMobile(e.target.innerWidth)});
-        })
+        window.addEventListener('resize', this.resize, true);
     }
+
+    /**Event listeners start */
+    resize = e => {
+        this.setState({mobile:isMobile(e.target.innerWidth)});
+    }
+    /**Event listeners end */
     
     componentDidUpdate(){
         const { videos, courses, userID } = this.props;
@@ -133,6 +137,10 @@ class CoursesList extends Component {
             }
             return pLUrl;
         }
+    }
+
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.resize, true);
     }
     
     render(){

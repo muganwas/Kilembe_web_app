@@ -48,9 +48,11 @@ class Home extends Component {
         this.fetchCourses();
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
 
-        window.addEventListener('resize', e => {
-            this.setState({mobile: isMobile(e.target.innerWidth), tab: isTab(e.target.innerWidth)});
-        });
+        window.addEventListener('resize', this.resize, true);
+    }
+
+    resize = e => {
+        this.setState({mobile: isMobile(e.target.innerWidth), tab: isTab(e.target.innerWidth)});
     }
 
     componentDidUpdate(){
@@ -106,6 +108,10 @@ class Home extends Component {
         history.push(location);
     } 
 
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.resize, true);
+    }
+
     render(){  
         const { urls, courses, mobile, tab } = this.state;
         const { genInfo: { info } } = this.props;
@@ -146,7 +152,6 @@ Home.propTypes = {
     confirmUserToken: PropTypes.func.isRequired,
     updateGenInfo: PropTypes.func.isRequired,
     getUsers: PropTypes.func.isRequired,
-    signOut: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => {
@@ -170,9 +175,6 @@ const mapDispatchToProps = dispatch => {
         },
         confirmLoggedIn: () => {
             dispatch(loginConfirmed());
-        },
-        signOut: genInfo => {
-            dispatch(logout(genInfo));
         },
         updateGenInfo: genInfo => {
             dispatch(dispatchedGenInfo(genInfo));

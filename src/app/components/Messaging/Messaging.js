@@ -53,14 +53,11 @@ class Messaging extends Component {
         if (!socketOpen && !unAuthorizedConnection) openSocket(this.props);
         
         // reevaluate device size on resize
-        window.onresize = () => {
-            const width = window.innerWidth;
-            this.setState({
-                isMobile: isMobile(width),
-                isSmallMobile: isSmallMobile(width),
-                tab: isTab(width)
-            });
-        }
+        window.addEventListener('resize', this.resize, true);
+    }
+
+    resize = e => {
+        this.setState({mobile: isMobile(e.target.innerWidth), isSmallMobile: isSmallMobile(e.target.innerWidth), tab: isTab(e.target.innerWidth)});
     }
 
     displayChatComponent = id => {
@@ -113,6 +110,10 @@ class Messaging extends Component {
             )
         }
         return null;
+    }
+
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.resize, true);
     }
 
     render(){
@@ -184,7 +185,6 @@ Messaging.propTypes = {
     friendsInfo: PropTypes.object.isRequired,
     updateGenInfo: PropTypes.func.isRequired,
     getUsers: PropTypes.func.isRequired,
-    signOut: PropTypes.func.isRequired,
     getFriends: PropTypes.func.isRequired,
     chatInfo: PropTypes.object.isRequired
 }
@@ -217,9 +217,6 @@ const mapDispatchToProps = dispatch => {
         },
         selectUserToChat: userId => {
             dispatch(setUserToChat(userId))
-        },
-        signOut: genInfo => {
-            dispatch(logout(genInfo));
         },
         updateGenInfo: genInfo => {
             dispatch(dispatchedGenInfo(genInfo));

@@ -8,7 +8,7 @@ const Button = ({iconPath, iconColor, size, text, textStyle, onPress, style, not
   return (
     <View onMouseEnter={() => changeHovered(true)} onMouseLeave={() => changeHovered(false)}  style={hovered && hoveredStyle ? hoveredStyle : style}>
       { notification ? <View style={notificationStyle}></View> : null }
-      <TouchableOpacity onPress={onPress} style={{display:'table'}}>
+      <TouchableOpacity onPress={onPress} style={{display: iconPath ? 'table' : 'block'}}>
       { 
         iconPath ? 
         <Icon 

@@ -66,7 +66,7 @@ const LoginForm = props => {
                         <Button
                             style={styles.resetSessionButtonContainer}
                             textStyle={styles.resetSessionText}
-                            hoveredColor='#FDD906'
+                            hoveredStyle={styles.resetSessionButtonContainerOnHover}
                             text='Logout Everywhere'
                             onPress={() => signOut(true, tempUID)}
                             size={1}
