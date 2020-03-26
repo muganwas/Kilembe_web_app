@@ -99,17 +99,36 @@ const styles = StyleSheet.create({
   },
   resetSessionButtonContainer: {
     display: 'inline-block',
+    width: '100%',
     cursor: 'pointer',
     padding: 3,
     backgroundColor: '#fff',
     borderRadius: 1,
     boxShadow: "1px 1px 3px rgba(255,255,255, 0.3)",
+    textAlignVertical: 'middle',
+    textAlign: 'center',
+    marginTop: 3,
+    marginLeft: 0,
+    marginRight: 0
+  },
+  resetSessionButtonContainerOnHover: {
+    display: 'inline-block',
+    width: '100%',
+    cursor: 'pointer',
+    padding: 3,
+    backgroundColor: '#EDEDED',
+    borderRadius: 1,
+    boxShadow: "1px 1px 3px rgba(255,255,255, 0.3)",
+    textAlignVertical: 'middle',
+    textAlign: 'center',
     marginTop: 3,
     marginLeft: 0,
     marginRight: 0
   },
   resetSessionText: {
-    color: '#000'
+    textAlignVertical: 'middle',
+    verticalAlign: 'middle',
+    color: '#7F8787',
   }
 });
 

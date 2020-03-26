@@ -57,14 +57,11 @@ class Settings extends Component {
                 this.setState({infoFetched: true});
             }
         }
-        window.onresize = () => {
-            const width = window.innerWidth;
-            this.setState({
-                isMobile: isMobile(width),
-                isSmallMobile: isSmallMobile(width),
-                tab: isTab(width)
-            });
-        }
+        window.addEventListener('resize', this.resize, true);
+    }
+
+    resize = e => {
+        this.setState({mobile: isMobile(e.target.innerWidth), isSmallMobile: isSmallMobile(e.target.innerWidth), tab: isTab(e.target.innerWidth)});
     }
 
     componentDidUpdate(){
@@ -123,6 +120,10 @@ class Settings extends Component {
                 });
             }
         });  
+    }
+
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.resize, true);
     }
 
     render(){

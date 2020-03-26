@@ -30,9 +30,11 @@ class ProfileImage extends Component {
             JSON.parse(storedInfo) : 
             null;
         } 
-        window.addEventListener('resize', e => {
-            this.setState({mobile: isMobile(e.target.innerWidth)});
-        })
+        window.addEventListener('resize', this.resize, true)
+    }
+
+    resize = e => {
+        this.setState({mobile: isMobile(e.target.innerWidth)});
     }
 
     updateAvatar = url => {
@@ -94,6 +96,10 @@ class ProfileImage extends Component {
     clickUploadAv = () => {
         let uploadB = document.getElementById('hs');
         uploadB.click();
+    }
+
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.resize, true);
     }
     
     render(){

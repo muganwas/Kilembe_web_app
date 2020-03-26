@@ -10,17 +10,26 @@ const OfflineBanner = ({ online, updateConnectivity, containerStyle, textStyle=s
 
   useEffect(() => {
     /**check whether online*/
-    window.addEventListener('online', () => {
-      updateConnectivity(true);
-    });
-    window.addEventListener('offline', () => {
-      updateConnectivity(false);
-    });
+    window.addEventListener('online', onlineCheck, true);
+    window.addEventListener('offline', offlineCheck, true);
   }, []);
 
   useEffect(() => {
     console.log(`Online: ${online}`);
+    
+    return () => {
+      window.removeEventListener('online', onlineCheck, true);
+      window.removeEventListener('offline', offlineCheck, true)
+    }
   });
+
+  const onlineCheck = () => {
+    updateConnectivity(true);
+  }
+
+  const offlineCheck = () => {
+    updateConnectivity(false);
+  }
 
   return (
     <View style={ online ? styles.containerOnline : containerStyle || styles.container}>

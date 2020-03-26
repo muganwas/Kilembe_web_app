@@ -1,50 +1,81 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
+import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { dispatchedGenInfo } from 'reduxFiles/dispatchers/genDispatchers';
 import { confirmToken } from 'reduxFiles/dispatchers/authDispatchers';
-import 'styles/App.css';
-import { REDIRECT_TIMER } from 'misc/constants';
+import { Footer, Header, KLoader } from 'components';
+import mainStyles from 'styles/mainStyles';
 import { withRouter } from 'react-router-dom';
+import { isMobile, isTab } from 'misc/helpers';
+import 'styles/App.css';
 
 
 class App extends Component {
 
+  state = {
+    courses: [],
+    mobile: isMobile(),
+    tab: isTab()
+  }
+
   componentDidMount(){
-    let { checkSessionValidity } = this.props;
+    const { checkSessionValidity, sendGenInfo } = this.props;
     let storedInfo = localStorage.getItem("genInfo");
     //if stored info is present pickout session token
-    let genInfo = JSON.parse(storedInfo);
-    let sessionToken = storedInfo ? genInfo.chatkitUser.token : null;
-
-    let uid = localStorage.getItem("uid") === "null" ?
-      null : localStorage.getItem("uid");
-
-    let exists = localStorage.getItem("exists") === "null" ?
-      null : localStorage.getItem("exists") === "false" ?
-        false : localStorage.getItem("exists");
+    storedInfo = JSON.parse(storedInfo);
+    const sessionToken = storedInfo ? storedInfo.chatkitUser.token : null;
+    const storedUID = localStorage.getItem("uid");
     
     /**Determine page to redirect to */
-    if (uid) {
-      console.log(genInfo)
-      if (genInfo) this.props.sendGenInfo(genInfo);
+    if (storedUID) {
+      if (storedInfo) sendGenInfo(storedInfo);
       //check if user session is still valid
       if (sessionToken) checkSessionValidity(sessionToken);
-      //go home if not logged out
-      setTimeout(() => {
-        this.goTo("/home");
-      }, REDIRECT_TIMER);
-    }else if (uid === null && exists === null) this.goTo("/login")
-    else if (uid === null && exists === false ) this.goTo("/signup")
+    }
+    else this.goTo("/login")
+    window.addEventListener('resize', this.resize, true);
+  }
+
+  resize = e => {
+    this.setState({mobile: isMobile(e.target.innerWidth), tab: isTab(e.target.innerWidth)});
+  }
+
+  componentDidUpdate(){
+    const { loginInfo: { loggedIn } } = this.props;
+    if (loggedIn) this.goTo("/home");
   }
 
   goTo = location => {
     const { history } = this.props;
     history.push(location);
   } 
+
+  componentWillUnmount(){
+    window.removeEventListener('resize', this.resize, true);
+  }
  
   render() {
-    return null;
+    const { mobile, tab } = this.state;
+
+    const mainContainerStyle = mobile ? 
+        mainStyles.mainContainerMobi : 
+        tab ? 
+        mainStyles.mainContainerTab : 
+        mainStyles.mainContainer;
+
+    return (
+      <View style={mainContainerStyle}>
+        <Header />
+        <KLoader 
+          type="TailSpin"
+          color="#757575"
+          height={50}
+          width={50}
+        />
+        <Footer />
+      </View>
+    )
   }
 }
 

@@ -38,9 +38,11 @@ class Friends extends Component {
         } = this.props
         logingStatusConfirmation(confirmLoggedIn, loginInfo, genInfo);
         
-        window.addEventListener('resize', e => {
-            this.setState({mobile: isMobile(e.target.innerWidth), tab: isTab(e.target.innerWidth)});
-        });
+        window.addEventListener('resize', this.resize, true);
+    }
+
+    resize = e => {
+        this.setState({mobile: isMobile(e.target.innerWidth), tab: isTab(e.target.innerWidth)});
     }
 
     userDetail =  key => {
@@ -82,6 +84,10 @@ class Friends extends Component {
         const { history } = this.props;
         history.push(location);
     } 
+
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.resize, true);
+    }
 
     render(){
         const { mobile, tab } = this.state;

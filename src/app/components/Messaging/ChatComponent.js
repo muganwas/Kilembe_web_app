@@ -151,7 +151,6 @@ ChatComponent.propTypes = {
   logingStatusConfirmation: PropTypes.func,
   openSocket: PropTypes.func,
   confirmLoggedIn: PropTypes.func,
-  signOut: PropTypes.func,
   updateGenInfo: PropTypes.func,
   storeSentMessages: PropTypes.func,
   selectUserToChat: PropTypes.func
@@ -182,9 +181,6 @@ const mapDispatchToProps = dispatch => {
       },
       confirmLoggedIn: () => {
           dispatch(loginConfirmed());
-      },
-      signOut: genInfo => {
-          dispatch(logout(genInfo));
       },
       updateGenInfo: genInfo => {
           dispatch(dispatchedGenInfo(genInfo));

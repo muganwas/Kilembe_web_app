@@ -69,7 +69,6 @@ class Header extends Component {
             openSocket,
             dbUserInfo,
             fetchCurrentUserInfoFromDB,
-            updateConnectivity,
             signOut
         } = this.props;
         const { socketOpen, unAuthorizedConnection } = loginInfo;
@@ -82,17 +81,8 @@ class Header extends Component {
         const userRef = app.database().ref(`users/${finalUID}`);
         const onlineRef = userRef.child('online');
 
-        /**check whether online*/
-        window.addEventListener('online', () => {
-            updateConnectivity(true);
-        });
-        window.addEventListener('offline', () => {
-            updateConnectivity(false);
-        });
         /**listen for resizing */
-        window.addEventListener('resize', e => {
-            this.setState({mobile: isMobile(e.target.innerWidth)});
-        });
+        window.addEventListener('resize', this.resize, true);
 
         /**check if user should be logged in*/
         onlineRef.once('value').then(snapshot => {
@@ -205,6 +195,12 @@ class Header extends Component {
         if (!socketOpen && !unAuthorizedConnection && token && finalUID) openSocket(this.props);
     }
 
+    /**Event listeners start */
+    resize = e => {
+        this.setState({mobile: isMobile(e.target.innerWidth)});
+    }
+    /**Event listeners end */
+
     setUpFriendsInfo = () =>  {
         const { 
             genInfo: { 
@@ -271,6 +267,10 @@ class Header extends Component {
         const { history } = this.props;
         history.push(location);
     } 
+
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.resize, true);
+    }
 
     render(){
         const { info: { uid }, signOut, dbUserInfo, genInfo, loginInfo } = this.props;

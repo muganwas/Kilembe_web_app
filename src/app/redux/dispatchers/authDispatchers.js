@@ -217,10 +217,10 @@ export const unAuthorizedAuthentication = () => {
     }
 }
 
-export const updateLoggedInElsewhere = (loggedInElsewhere, tempUID) => {
+export const updateLoggedInElsewhere = (loggedInElsewhere, tempUID, error=false, messageId) => {
     return {
         type: UPDATE_LOGGEDIN_ELSEWHERE,
-        payload: {loggedInElsewhere, tempUID}
+        payload: {loggedInElsewhere, tempUID, messageId, error}
     }
 }
 
@@ -292,6 +292,7 @@ export const authHandler = authData => {
         if (verified_email) {
             checkUserLoggedIn(uid).then( loggedIn => {
                 if (!loggedIn){
+                    updateLoggedInElsewhere(false, uid);
                     getUserAvatar(uid).then(url => {
                         const displayName= authData.user.displayName;
                         const email= authData.user.email;
@@ -308,10 +309,7 @@ export const authHandler = authData => {
                         dispatch(loginFulfilled(userLoginInfo));
                     });
                 }
-                else {
-                    dispatch(updateLoggedInElsewhere(true, uid));
-                    dispatch(logout());
-                }
+                else dispatch(updateLoggedInElsewhere(true, uid, true, 'error.existingSession'));
             });
         }
         else {
@@ -352,6 +350,7 @@ export const eAuthenticate = (email, password) => {
                 localStorage.setItem('currentUser', JSON.stringify(currUser));
                 checkUserLoggedIn(uid).then(loggedIn => {
                     if (!loggedIn) {
+                        updateLoggedInElsewhere(false, uid)
                         getUserAvatar(uid).then(url => {
                             console.log(url);
                             let email = currUser.email;
@@ -370,10 +369,7 @@ export const eAuthenticate = (email, password) => {
                             dispatch(loginFulfilled(userInfo));
                         });
                     }
-                    else {
-                        dispatch(updateLoggedInElsewhere(true, uid));
-                        dispatch(logout());
-                    }
+                    else dispatch(updateLoggedInElsewhere(true, uid, true, 'error.existingSession'));
                 });
             }
             else {
@@ -501,7 +497,8 @@ export const handleSignup = (email, password) => {
 export const confirmToken = tokenId => {
     return dispatch => {
         const url = confirmTokenURL + tokenId;
-        if (tokenId) axios.post(url).then(result => {
+        if (tokenId) {
+            axios.post(url).then(result => {
                 let { data } = result;
                 let { error } = data;
                 if (error) {
@@ -510,13 +507,13 @@ export const confirmToken = tokenId => {
                         dispatch(logout());
                     }
                 }
-                else dispatch(loginConfirmed());
-                
+                else dispatch(loginConfirmed());  
             }).catch(error => {
                 console.log(error.message)
                 dispatch(loginErrorAlert("error.loginFailure"));
                 dispatch(logout());
             });
+        }
     }
 }
 
@@ -575,7 +572,7 @@ export const logout = (elsewhere=false, altUID) => {
                     console.log("user signed out!");     
                 });
             }
-            else dispatch(loginErrorAlert("error.existingSession"));
+            else if (!loggedOut && altUID) dispatch(loginErrorAlert("error.existingSession"));
         });
     }
 }
