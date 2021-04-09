@@ -3,13 +3,13 @@ import thunk from 'redux-thunk';
 import { apiMiddleware } from 'redux-api-middleware';
 import logger from 'redux-logger';
 import { intlReducer } from 'react-intl-redux';
+import promise from 'redux-promise-middleware';
 import moment from 'moment';
 import Moment from 'react-moment';
 import localeData from './locales/lang.json'
 import '@formatjs/intl-relativetimeformat/polyfill';
 import '@formatjs/intl-relativetimeformat/dist/locale-data/en';
 import '@formatjs/intl-relativetimeformat/dist/locale-data/fr'
-import promise from 'redux-promise-middleware';
 import friendsReducer from 'reduxFiles/reducers/friendsReducer';
 import genInfoReducer from 'reduxFiles/reducers/genInfoReducer';
 import loginReducer from 'reduxFiles/reducers/loginReducer';
